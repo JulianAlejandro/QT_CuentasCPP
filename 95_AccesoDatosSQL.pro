@@ -9,9 +9,11 @@ CONFIG += c++17 cmdline
 SOURCES += \
         gestor_sql.cpp \
         main.cpp \
+        personadialog.cpp \
         transaccionbase.cpp \
         transaccionbruta.cpp \
-        transaccionneta.cpp
+        transaccionneta.cpp \
+        widget.cpp
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
@@ -20,9 +22,15 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 HEADERS += \
     gestor_sql.h \
+    personadialog.h \
     transaccionbase.h \
     transaccionbruta.h \
-    transaccionneta.h
+    transaccionneta.h \
+    widget.h
 
 
 QMAKE_CXXFLAGS += -std=gnu++11
+
+FORMS += \
+    personadialog.ui \
+    widget.ui

@@ -1,3 +1,4 @@
+/*
 #include <QCoreApplication>
 #include "gestor_sql.h"
 #include "Transaccionneta.h"
@@ -108,46 +109,18 @@ int main(int argc, char *argv[])
 }
 
 
-/*
-#include <QCoreApplication>
-#include "gestor_sql.h"
-#include "Transaccionneta.h"
-#include "transaccionbruta.h"
-
-#include <qDebug>
+*/
 
 
+#include "widget.h"
+
+#include <QApplication>
 
 int main(int argc, char *argv[])
 {
-    QCoreApplication a(argc, argv);
-
-    TransaccionBruta tb1(-3.2, "uno", "uno", "uno", false);
-    TransaccionBruta tb2(-2, "dos", "dos", "dos", true);
-    TransaccionBruta aux;
-    //TransaccionNeta tn(-3, "algo", "ff", 1, "algo");
-
-    tb1.show_info();
-    tb2.show_info();
-    aux.show_info();
-
-    Gestor_SQL g;
-    //Transaccion t(1, "o", "a", "a", -24, "s");
-
-    g.almacena_transaccion_bruta(tb1);
-    g.almacena_transaccion_bruta(tb2);
-    //g.almacena_transaccion_neta(tn);
-
-
-   // qDebug() << "TN" << tn.getId();
-
-    qDebug() << "despues";
-
-    aux = g.devuelve_transaccion_bruta(1);
-
-    aux.show_info();
-
-
+    QApplication a(argc, argv);
+    a.setStyle("fusion");
+    Widget w;
+    w.show();
     return a.exec();
 }
-*/
