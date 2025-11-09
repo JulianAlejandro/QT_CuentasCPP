@@ -31,7 +31,7 @@ std::string TransaccionNeta::getCategory() const {
 void TransaccionNeta::SetId_TB (const int id_TB){
     m_id_TB = id_TB;
 }
-void TransaccionNeta::SetCategery(const std::string& category){
+void TransaccionNeta::SetCategory(const std::string& category){
     m_category = category;
 }
 

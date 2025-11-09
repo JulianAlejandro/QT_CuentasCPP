@@ -20,13 +20,13 @@ public:
 
 protected:
     void SetId_TB (const int id_TB);
-    void SetCategery(const std::string& category);
+    void SetCategory(const std::string& category);
 
 private:
     int m_id_TB; // id de la transaccion bruta
     std::string m_category;
 
-    //friend class Gestor_SQL;
+    friend class Gestor_SQL;
 };
 
 

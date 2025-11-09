@@ -229,3 +229,50 @@ QList<TransaccionBruta> Gestor_SQL::devuelve_todas_transacciones_brutas()
     bd.close();
     return listaTransacciones;
 }
+
+
+QList<TransaccionNeta> Gestor_SQL::devuelve_transacciones_netas(int id_TB)
+{
+    QList<TransaccionNeta> listaTransacciones;
+
+    if(!bd.isOpen()){
+        if(!bd.open()){
+            qDebug() << "Error abriendo BD:" << bd.lastError().text();
+            return listaTransacciones; // Retorna lista vacía en caso de error
+        }
+    }
+
+    QSqlQuery q;
+    QString queryStr = "SELECT id, amount, comment, date, id_TB, category "
+                       "FROM transaccion_neta WHERE id_TB = :id_TB ORDER BY id";
+
+    q.prepare(queryStr);
+    q.bindValue(":id_TB", id_TB);
+
+    if(!q.exec()){
+        qDebug() << "Error ejecutando consulta:" << q.lastError().text();
+        bd.close();
+        return listaTransacciones;
+    }
+
+    int contador = 0;
+    while(q.next()){
+        TransaccionNeta tn;
+
+        // Asignar los valores desde la base de datos al objeto TransaccionNeta
+        tn.setId(q.value("id").toInt());
+        tn.setAmount(q.value("amount").toDouble());
+        tn.setComment(q.value("comment").toString().toStdString());
+        tn.setDate(q.value("date").toString().toStdString());
+        tn.SetId_TB(q.value("id_TB").toInt());
+        tn.SetCategory(q.value("category").toString().toStdString());
+
+        // Añadir a la lista
+        listaTransacciones.append(tn);
+        contador++;
+    }
+
+    qDebug() << "Transacciones netas recuperadas para id_TB" << id_TB << ":" << contador;
+    bd.close();
+    return listaTransacciones;
+}

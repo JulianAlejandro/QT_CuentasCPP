@@ -17,6 +17,9 @@ public:
     TransaccionBruta devuelve_transaccion_bruta(const int id);
     QList<TransaccionBruta> devuelve_todas_transacciones_brutas();
 
+    QList<TransaccionNeta> devuelve_transacciones_netas(int id_TB);
+
+
     //TransaccionBruta devuelve_transaccion_bruta(const int id);
     //TransaccionNeta devuelve_transaccion_neta(const int id);
 
