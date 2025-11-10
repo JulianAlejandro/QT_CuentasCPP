@@ -1,0 +1,29 @@
+# Archivos de construcción y compilación
+build/
+gestor_sql
+personadialog
+transaccionbase
+transaccionbruta
+transaccionmeta
+widget
+
+# Archivos de configuración de Qt Creator
+*.pro.user
+
+# Archivos objeto y binarios
+*.o
+*.obj
+*.exe
+
+# Archivos de depuración
+*.debug
+*.pdb
+
+# Archivos de respaldo
+*~
+*.bak
+*.backup
+
+# Archivos del sistema
+.DS_Store
+Thumbs.db
