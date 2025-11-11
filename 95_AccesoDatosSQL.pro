@@ -7,13 +7,17 @@ CONFIG += c++17 cmdline
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-        gestor_sql.cpp \
+        backend/gestor_sql.cpp \
+        backend/gestortransacciones.cpp \
         main.cpp \
-        personadialog.cpp \
-        transaccionbase.cpp \
-        transaccionbruta.cpp \
-        transaccionneta.cpp \
-        widget.cpp
+        main_2.cpp \
+        frontend/mainwindow.cpp \
+        frontend/personadialog.cpp \
+        backend/transaccionbase.cpp \
+        frontend/transaccionbasicadialog.cpp \
+        backend/transaccionbruta.cpp \
+        backend/transaccionneta.cpp \
+        frontend/widget.cpp
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
@@ -21,16 +25,21 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 HEADERS += \
-    gestor_sql.h \
-    personadialog.h \
-    transaccionbase.h \
-    transaccionbruta.h \
-    transaccionneta.h \
-    widget.h
+    backend/gestor_sql.h \
+    backend/gestortransacciones.h \
+    frontend/mainwindow.h \
+    frontend/personadialog.h \
+    backend/transaccionbase.h \
+    frontend/transaccionbasicadialog.h \
+    backend/transaccionbruta.h \
+    backend/transaccionneta.h \
+    frontend/widget.h
 
 
 QMAKE_CXXFLAGS += -std=gnu++11
 
 FORMS += \
-    personadialog.ui \
-    widget.ui
+    frontend/mainwindow.ui \
+    frontend/personadialog.ui \
+    frontend/transaccionbasicadialog.ui \
+    frontend/widget.ui
