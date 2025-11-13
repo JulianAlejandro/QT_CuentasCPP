@@ -1,8 +1,8 @@
 /*
 #include <QCoreApplication>
-#include "gestor_sql.h"
-#include "Transaccionneta.h"
-#include "transaccionbruta.h"
+#include "backend/gestor_sql.h"
+#include "backend/Transaccionneta.h"
+#include "backend/transaccionbruta.h"
 #include <qDebug>
 
 int main(int argc, char *argv[])
@@ -108,11 +108,11 @@ int main(int argc, char *argv[])
     return a.exec();
 }
 
+/*
 
-*/
 
 /*
-#include "widget.h"
+#include "frontend/widget.h"
 
 #include <QApplication>
 
@@ -126,14 +126,25 @@ int main(int argc, char *argv[])
 }
 */
 
+
 #include "frontend/mainwindow.h"
 
 #include <QApplication>
+#include "backend/gestortransacciones.h"
+//#include "QDebug"
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
+   // gestorTransacciones g;
+   // QList<TransaccionBruta> b = g.getTransaccionesBrutas();
+
+   // for (const TransaccionBruta& transaccion : b) {
+   //     transaccion.show_info();
+   // }
     MainWindow w;
     w.show();
     return a.exec();
 }
+
+

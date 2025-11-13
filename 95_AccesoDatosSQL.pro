@@ -27,6 +27,7 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 HEADERS += \
     backend/gestor_sql.h \
     backend/gestortransacciones.h \
+    backend/itransactionmanager.h \
     frontend/mainwindow.h \
     frontend/personadialog.h \
     backend/transaccionbase.h \

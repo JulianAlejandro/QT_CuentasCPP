@@ -3,65 +3,79 @@
 
 #include "transaccionbasicadialog.h"
 #include <QMessageBox>
-
-
-namespace {
-
-    void inicializarListaSimulacion(QTableWidget* tableWidget) {
-        //prueba para añadir una transaccion bruta simple
-        QStringList titulos;
-        tableWidget->setColumnCount(4);
-        titulos << "Amount"  << "Comment"  << "Date" << "category";
-        tableWidget->setHorizontalHeaderLabels(titulos);
-
-        // Configurar selección por filas completas
-        tableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
-        tableWidget->setSelectionMode(QAbstractItemView::SingleSelection); // o ExtendedSelection para múltiples
-
-        int newRow = tableWidget->rowCount();
-        tableWidget->insertRow(newRow);
-
-        // Agregar los datos a las celdas
-        tableWidget->setItem(newRow, 0, new QTableWidgetItem("QString::number(-3)"));
-        tableWidget->setItem(newRow, 1, new QTableWidgetItem("pd.comment()"));
-        tableWidget->setItem(newRow, 2, new QTableWidgetItem("pd.date()"));
-        tableWidget->setItem(newRow, 3, new QTableWidgetItem("pd.currency()"));
-    }
-}
-
+#include <QTableWidget>
+#include <QHeaderView>
+#include "backend/gestortransacciones.h"  // Solo para crear la instancia
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
+    , transaccionManager(std::make_unique<gestorTransacciones>())  // Crear instancia a través de interfaz
 {
     ui->setupUi(this);
+    setWindowTitle("App");
 
-    setWindowTitle("Trasnsacciones brutas");
+    // Configurar la tabla
+    crearTablaTransaccionesBrutas();
 
+    // Conectar las señales
+    connect(ui->tableWidget, &QTableWidget::customContextMenuRequested,
+            this, &MainWindow::onCustomContextMenuRequested);
+    connect(ui->tableWidget, &QTableWidget::itemSelectionChanged,
+            this, &MainWindow::onRowSelected);
+
+    // Cargar datos iniciales usando la interfaz
+    cargarTransaccionesEnTabla();
+}
+
+MainWindow::~MainWindow()
+{
+    delete ui;
+}
+
+void MainWindow::crearTablaTransaccionesBrutas()
+{
     QStringList titulos;
-    ui->tableWidget->setColumnCount(4);
-    titulos << "Amount"  << "Comment"  << "Date" << "Currency";
+    ui->tableWidget->setColumnCount(5);
+    titulos << "Amount" << "Comment" << "Date" << "Currency" << "Processed";
     ui->tableWidget->setHorizontalHeaderLabels(titulos);
 
     // Configurar selección por filas completas
     ui->tableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
     ui->tableWidget->setSelectionMode(QAbstractItemView::SingleSelection);
 
+    // Ajustar el ancho de las columnas
+    ui->tableWidget->horizontalHeader()->setStretchLastSection(true);
+
     // Habilitar el menú contextual
     ui->tableWidget->setContextMenuPolicy(Qt::CustomContextMenu);
-
-    // Conectar la señal del menú contextual
-    connect(ui->tableWidget, &QTableWidget::customContextMenuRequested,
-            this, &MainWindow::onCustomContextMenuRequested);
-
-    // Conectar la señal de selección de fila
-    connect(ui->tableWidget, &QTableWidget::itemSelectionChanged,
-            this, &MainWindow::onRowSelected);
 }
 
-MainWindow::~MainWindow()
+void MainWindow::cargarTransaccionesEnTabla()
 {
-    delete ui;
+    // Limpiar tabla existente
+    ui->tableWidget->setRowCount(0);
+
+    // Obtener datos a través de la interfaz - ¡Aquí está la magia!
+    auto transacciones = transaccionManager->getTransaccionesBrutas();
+
+    // Llenar la tabla con los datos
+    for (const auto& transaccion : transacciones) {
+        int newRow = ui->tableWidget->rowCount();
+        ui->tableWidget->insertRow(newRow);
+
+        // Agregar los datos a las celdas
+        ui->tableWidget->setItem(newRow, AMOUNT,
+                                 new QTableWidgetItem(QString::number(transaccion.amount)));
+        ui->tableWidget->setItem(newRow, COMMENT,
+                                 new QTableWidgetItem(QString::fromStdString(transaccion.comment)));
+        ui->tableWidget->setItem(newRow, DATE,
+                                 new QTableWidgetItem(QString::fromStdString(transaccion.date)));
+        ui->tableWidget->setItem(newRow, CURRENCY,
+                                 new QTableWidgetItem(QString::fromStdString(transaccion.currency)));
+        ui->tableWidget->setItem(newRow, PROCESSED,
+                                 new QTableWidgetItem(transaccion.processed ? "Yes" : "No"));
+    }
 }
 
 void MainWindow::on_actionA_adir_transaccion_Basica_triggered()
@@ -74,30 +88,36 @@ void MainWindow::on_actionA_adir_transaccion_Basica_triggered()
         return;
     }
 
+    // Aquí podrías agregar la transacción a través de la interfaz también
+    // Por ahora mantenemos la lógica existente de UI
+
     int newRow = ui->tableWidget->rowCount();
     ui->tableWidget->insertRow(newRow);
 
     // Agregar los datos a las celdas
-    ui->tableWidget->setItem(newRow, AMOUNT, new QTableWidgetItem(QString::number(pd.amount())));
-    ui->tableWidget->setItem(newRow, COMMENT, new QTableWidgetItem(pd.comment()));
-    ui->tableWidget->setItem(newRow, DATE, new QTableWidgetItem(pd.date()));
-    ui->tableWidget->setItem(newRow, CURRENCY, new QTableWidgetItem(pd.currency()));
-
-    //applyRowColor(newRow, pd.processed());
+    ui->tableWidget->setItem(newRow, AMOUNT,
+                             new QTableWidgetItem(QString::number(pd.amount())));
+    ui->tableWidget->setItem(newRow, COMMENT,
+                             new QTableWidgetItem(pd.comment()));
+    ui->tableWidget->setItem(newRow, DATE,
+                             new QTableWidgetItem(pd.date()));
+    ui->tableWidget->setItem(newRow, CURRENCY,
+                             new QTableWidgetItem(pd.currency()));
+    ui->tableWidget->setItem(newRow, PROCESSED,
+                             new QTableWidgetItem("No"));  // Por defecto no procesada
 }
 
+// Los demás métodos permanecen igual...
 void MainWindow::onCustomContextMenuRequested(const QPoint &pos)
 {
     QTableWidgetItem *item = ui->tableWidget->itemAt(pos);
-    if (!item) return; // No mostrar menú si no hay item en la posición
+    if (!item) return;
 
     QMenu *contextMenu = new QMenu(this);
-
     QAction *editAction = contextMenu->addAction("Editar");
     QAction *deleteAction = contextMenu->addAction("Eliminar");
     QAction *markProcessedAction = contextMenu->addAction("Marcar como procesado");
 
-    // Conectar las acciones a sus slots
     connect(editAction, &QAction::triggered, this, &MainWindow::onEditRow);
     connect(deleteAction, &QAction::triggered, this, &MainWindow::onDeleteRow);
     connect(markProcessedAction, &QAction::triggered, this, &MainWindow::onMarkProcessed);
@@ -108,15 +128,17 @@ void MainWindow::onCustomContextMenuRequested(const QPoint &pos)
 
 void MainWindow::onEditRow()
 {
+    /*
     int currentRow = ui->tableWidget->currentRow();
     if (currentRow < 0) return;
 
-    // Aquí implementas la edición de la fila seleccionada
     QMessageBox::information(this, "Editar", "Editando fila: " + QString::number(currentRow));
+*/
 }
 
 void MainWindow::onDeleteRow()
 {
+    /*
     int currentRow = ui->tableWidget->currentRow();
     if (currentRow < 0) return;
 
@@ -127,33 +149,40 @@ void MainWindow::onDeleteRow()
 
     if (reply == QMessageBox::Yes) {
         ui->tableWidget->removeRow(currentRow);
+
+        // Aquí también podrías llamar a la interfaz para eliminar del backend
+        // transaccionManager->deleteTransaccion(currentRow);
     }
+*/
 }
 
 void MainWindow::onMarkProcessed()
 {
-    /*int currentRow = ui->tableWidget->currentRow();
+    /*
+    int currentRow = ui->tableWidget->currentRow();
     if (currentRow < 0) return;
 
     QTableWidgetItem *processedItem = ui->tableWidget->item(currentRow, PROCESSED);
     if (processedItem) {
         processedItem->setText("Yes");
-    }*/
+
+        // Aquí podrías llamar a la interfaz para marcar como procesado en el backend
+        // transaccionManager->markAsProcessed(currentRow);
+    }
+    */
+
+
+
 }
 
 void MainWindow::onRowSelected()
 {
-    //aquí se ejecuta la accion
-
+    // en este punto quiero comunicarme con el gestor para que
     /*
-    // Opcional: obtener la fila seleccionada
-    int currentRow = ui->tableWidget->currentRow();
-    if (currentRow >= 0) {
-        // Puedes acceder a los datos de la fila si lo necesitas
-        // QTableWidgetItem *item = ui->tableWidget->item(currentRow, 0);
-    }
-*/
-    //inicializarListaSimulacion(ui->tableWidget_2);
+     tengo un problema, quiero seleccionar la fila , esa fila debe tener un id asignado
+    ese id asignado se le asigna cada vez que se crea una nueva fila.
+
+    si selecciono una fila, quiero tener acceso a ese id y hacer una operacion con el*/
+
+
 }
-
-

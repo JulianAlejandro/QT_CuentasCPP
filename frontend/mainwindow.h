@@ -2,6 +2,8 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <memory>
+#include "backend/itransactionmanager.h"  // Incluir la interfaz
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -18,25 +20,25 @@ public:
     ~MainWindow();
 
 private slots:
-    //pulsar en anadir transaccion basica
     void on_actionA_adir_transaccion_Basica_triggered();
-
-    //acciones de context menu request
     void onCustomContextMenuRequested(const QPoint &pos);
     void onEditRow();
     void onDeleteRow();
     void onMarkProcessed();
-    void onRowSelected(); // ← Agrega esta línea
-
-    //aplicar color en filas....a modificar
-    //void applyRowColor(int row, bool processed);
+    void onRowSelected();
 
 private:
     Ui::MainWindow *ui;
+    std::unique_ptr<ITransaccionManager> transaccionManager;  // Usar interfaz
+
+    // Métodos auxiliares
+    void crearTablaTransaccionesBrutas();
+    void cargarTransaccionesEnTabla();
+
+
 
     enum columna{
-        AMOUNT, COMMENT, DATE, CURRENCY
+        AMOUNT, COMMENT, DATE, CURRENCY, PROCESSED
     };
 };
 #endif // MAINWINDOW_H
-
