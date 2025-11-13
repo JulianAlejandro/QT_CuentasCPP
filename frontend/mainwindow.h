@@ -3,7 +3,7 @@
 
 #include <QMainWindow>
 #include <memory>
-#include "backend/itransactionmanager.h"  // Incluir la interfaz
+#include "backend/itransactionmanager.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -27,18 +27,34 @@ private slots:
     void onMarkProcessed();
     void onRowSelected();
 
+    void on_actionQuitar_2_triggered();
+
 private:
     Ui::MainWindow *ui;
-    std::unique_ptr<ITransaccionManager> transaccionManager;  // Usar interfaz
+    std::unique_ptr<ITransaccionManager> transaccionManager;
+
+    // Roles personalizados para almacenar datos
+    enum UserRoles {
+        IdRole = Qt::UserRole + 1,  // Para almacenar el ID
+        ProcessedRole = Qt::UserRole + 2  // Para almacenar estado processed
+    };
+
+    enum Columna {
+        AMOUNT, COMMENT, DATE, CURRENCY, PROCESSED
+    };
 
     // Métodos auxiliares
     void crearTablaTransaccionesBrutas();
+    void crearTablaTransaccionesNetas();
+
     void cargarTransaccionesEnTabla();
 
+    // Métodos para gestionar IDs
+    int obtenerIdDeFila(int fila) const;
+    void establecerIdEnFila(int fila, int id);
+    int generarNuevoId();  // Generador de IDs únicos
 
-
-    enum columna{
-        AMOUNT, COMMENT, DATE, CURRENCY, PROCESSED
-    };
+    // Contador para IDs (podrías usar una base de datos después)
+    int contadorId;
 };
 #endif // MAINWINDOW_H

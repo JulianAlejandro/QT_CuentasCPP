@@ -5,18 +5,20 @@
 #include <QMessageBox>
 #include <QTableWidget>
 #include <QHeaderView>
-#include "backend/gestortransacciones.h"  // Solo para crear la instancia
+#include "backend/gestortransacciones.h"
 
-MainWindow::MainWindow(QWidget *parent)
+    MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
-    , transaccionManager(std::make_unique<gestorTransacciones>())  // Crear instancia a través de interfaz
+    , transaccionManager(std::make_unique<gestorTransacciones>())
+    , contadorId(0)  // Inicializar contador de IDs
 {
     ui->setupUi(this);
     setWindowTitle("App");
 
     // Configurar la tabla
     crearTablaTransaccionesBrutas();
+    crearTablaTransaccionesNetas();
 
     // Conectar las señales
     connect(ui->tableWidget, &QTableWidget::customContextMenuRequested,
@@ -51,12 +53,33 @@ void MainWindow::crearTablaTransaccionesBrutas()
     ui->tableWidget->setContextMenuPolicy(Qt::CustomContextMenu);
 }
 
+
+void MainWindow::crearTablaTransaccionesNetas(){
+
+    QStringList titulos;
+
+    ui->tableWidget_2->setColumnCount(5);
+    titulos << "Amount" << "Comment" << "Date" << "id_TB" << "Category";
+    ui->tableWidget_2->setHorizontalHeaderLabels(titulos);
+
+    // Configurar selección por filas completas
+    ui->tableWidget_2->setSelectionBehavior(QAbstractItemView::SelectRows);
+    ui->tableWidget_2->setSelectionMode(QAbstractItemView::SingleSelection);
+
+    // Ajustar el ancho de las columnas
+    ui->tableWidget_2->horizontalHeader()->setStretchLastSection(true);
+
+    // Habilitar el menú contextual
+    //ui->tableWidget->setContextMenuPolicy(Qt::CustomContextMenu);
+
+}
+
 void MainWindow::cargarTransaccionesEnTabla()
 {
     // Limpiar tabla existente
     ui->tableWidget->setRowCount(0);
 
-    // Obtener datos a través de la interfaz - ¡Aquí está la magia!
+    // Obtener datos a través de la interfaz
     auto transacciones = transaccionManager->getTransaccionesBrutas();
 
     // Llenar la tabla con los datos
@@ -64,18 +87,68 @@ void MainWindow::cargarTransaccionesEnTabla()
         int newRow = ui->tableWidget->rowCount();
         ui->tableWidget->insertRow(newRow);
 
-        // Agregar los datos a las celdas
-        ui->tableWidget->setItem(newRow, AMOUNT,
-                                 new QTableWidgetItem(QString::number(transaccion.amount)));
-        ui->tableWidget->setItem(newRow, COMMENT,
-                                 new QTableWidgetItem(QString::fromStdString(transaccion.comment)));
-        ui->tableWidget->setItem(newRow, DATE,
-                                 new QTableWidgetItem(QString::fromStdString(transaccion.date)));
-        ui->tableWidget->setItem(newRow, CURRENCY,
-                                 new QTableWidgetItem(QString::fromStdString(transaccion.currency)));
-        ui->tableWidget->setItem(newRow, PROCESSED,
-                                 new QTableWidgetItem(transaccion.processed ? "Yes" : "No"));
+        // Generar un ID único para esta fila
+        int nuevoId = transaccion.id;
+
+        // Crear items y asignarles el ID
+        QTableWidgetItem* amountItem = new QTableWidgetItem(QString::number(transaccion.amount));
+        QTableWidgetItem* commentItem = new QTableWidgetItem(QString::fromStdString(transaccion.comment));
+        QTableWidgetItem* dateItem = new QTableWidgetItem(QString::fromStdString(transaccion.date));
+        QTableWidgetItem* currencyItem = new QTableWidgetItem(QString::fromStdString(transaccion.currency));
+        QTableWidgetItem* processedItem = new QTableWidgetItem(transaccion.processed ? "Yes" : "No");
+
+        // Asignar el ID a TODOS los items de la fila
+        amountItem->setData(IdRole, nuevoId);
+        commentItem->setData(IdRole, nuevoId);
+        dateItem->setData(IdRole, nuevoId);
+        currencyItem->setData(IdRole, nuevoId);
+        processedItem->setData(IdRole, nuevoId);
+        processedItem->setData(ProcessedRole, transaccion.processed);
+
+        // Agregar a la tabla
+        ui->tableWidget->setItem(newRow, AMOUNT, amountItem);
+        ui->tableWidget->setItem(newRow, COMMENT, commentItem);
+        ui->tableWidget->setItem(newRow, DATE, dateItem);
+        ui->tableWidget->setItem(newRow, CURRENCY, currencyItem);
+        ui->tableWidget->setItem(newRow, PROCESSED, processedItem);
+
+        qDebug() << "Fila" << newRow << "asignada ID:" << nuevoId;
     }
+}
+
+int MainWindow::obtenerIdDeFila(int fila) const
+{
+    if (fila < 0 || fila >= ui->tableWidget->rowCount()) {
+        return -1;
+    }
+
+    // Obtener el ID desde cualquier item de la fila (usamos la columna 0)
+    QTableWidgetItem* item = ui->tableWidget->item(fila, 0);
+    if (item) {
+        return item->data(IdRole).toInt();
+    }
+    return -1;
+}
+
+void MainWindow::establecerIdEnFila(int fila, int id)
+{
+    if (fila < 0 || fila >= ui->tableWidget->rowCount()) {
+        return;
+    }
+
+    // Establecer el ID en todos los items de la fila
+    for (int col = 0; col < ui->tableWidget->columnCount(); ++col) {
+        QTableWidgetItem* item = ui->tableWidget->item(fila, col);
+        if (item) {
+            item->setData(IdRole, id);
+        }
+    }
+}
+
+int MainWindow::generarNuevoId()
+{
+    // Incrementar el contador y devolver el nuevo ID
+    return ++contadorId;
 }
 
 void MainWindow::on_actionA_adir_transaccion_Basica_triggered()
@@ -88,26 +161,37 @@ void MainWindow::on_actionA_adir_transaccion_Basica_triggered()
         return;
     }
 
-    // Aquí podrías agregar la transacción a través de la interfaz también
-    // Por ahora mantenemos la lógica existente de UI
-
     int newRow = ui->tableWidget->rowCount();
     ui->tableWidget->insertRow(newRow);
 
-    // Agregar los datos a las celdas
-    ui->tableWidget->setItem(newRow, AMOUNT,
-                             new QTableWidgetItem(QString::number(pd.amount())));
-    ui->tableWidget->setItem(newRow, COMMENT,
-                             new QTableWidgetItem(pd.comment()));
-    ui->tableWidget->setItem(newRow, DATE,
-                             new QTableWidgetItem(pd.date()));
-    ui->tableWidget->setItem(newRow, CURRENCY,
-                             new QTableWidgetItem(pd.currency()));
-    ui->tableWidget->setItem(newRow, PROCESSED,
-                             new QTableWidgetItem("No"));  // Por defecto no procesada
+    // Generar nuevo ID para esta transacción
+    int nuevoId = generarNuevoId();
+
+    // Crear items y asignarles el ID
+    QTableWidgetItem* amountItem = new QTableWidgetItem(QString::number(pd.amount()));
+    QTableWidgetItem* commentItem = new QTableWidgetItem(pd.comment());
+    QTableWidgetItem* dateItem = new QTableWidgetItem(pd.date());
+    QTableWidgetItem* currencyItem = new QTableWidgetItem(pd.currency());
+    QTableWidgetItem* processedItem = new QTableWidgetItem("No");
+
+    // Asignar el ID a todos los items
+    amountItem->setData(IdRole, nuevoId);
+    commentItem->setData(IdRole, nuevoId);
+    dateItem->setData(IdRole, nuevoId);
+    currencyItem->setData(IdRole, nuevoId);
+    processedItem->setData(IdRole, nuevoId);
+    processedItem->setData(ProcessedRole, false);
+
+    // Agregar a la tabla
+    ui->tableWidget->setItem(newRow, AMOUNT, amountItem);
+    ui->tableWidget->setItem(newRow, COMMENT, commentItem);
+    ui->tableWidget->setItem(newRow, DATE, dateItem);
+    ui->tableWidget->setItem(newRow, CURRENCY, currencyItem);
+    ui->tableWidget->setItem(newRow, PROCESSED, processedItem);
+
+    qDebug() << "Nueva transacción agregada con ID:" << nuevoId;
 }
 
-// Los demás métodos permanecen igual...
 void MainWindow::onCustomContextMenuRequested(const QPoint &pos)
 {
     QTableWidgetItem *item = ui->tableWidget->itemAt(pos);
@@ -132,7 +216,13 @@ void MainWindow::onEditRow()
     int currentRow = ui->tableWidget->currentRow();
     if (currentRow < 0) return;
 
-    QMessageBox::information(this, "Editar", "Editando fila: " + QString::number(currentRow));
+    int id = obtenerIdDeFila(currentRow);
+    QMessageBox::information(this, "Editar",
+                             QString("Editando transacción - Fila: %1, ID: %2")
+                                 .arg(currentRow).arg(id));
+
+    // Aquí puedes implementar la lógica de edición usando el ID
+    // Por ejemplo: transaccionManager->editarTransaccion(id, nuevosDatos);
 */
 }
 
@@ -142,16 +232,20 @@ void MainWindow::onDeleteRow()
     int currentRow = ui->tableWidget->currentRow();
     if (currentRow < 0) return;
 
+    int id = obtenerIdDeFila(currentRow);
+
     QMessageBox::StandardButton reply;
     reply = QMessageBox::question(this, "Eliminar",
-                                  "¿Estás seguro de eliminar esta transacción?",
+                                  QString("¿Estás seguro de eliminar la transacción ID %1?")
+                                      .arg(id),
                                   QMessageBox::Yes | QMessageBox::No);
 
     if (reply == QMessageBox::Yes) {
-        ui->tableWidget->removeRow(currentRow);
+        // Aquí llamarías al backend para eliminar por ID
+        // transaccionManager->eliminarTransaccion(id);
 
-        // Aquí también podrías llamar a la interfaz para eliminar del backend
-        // transaccionManager->deleteTransaccion(currentRow);
+        ui->tableWidget->removeRow(currentRow);
+        qDebug() << "Transacción ID" << id << "eliminada";
     }
 */
 }
@@ -162,27 +256,70 @@ void MainWindow::onMarkProcessed()
     int currentRow = ui->tableWidget->currentRow();
     if (currentRow < 0) return;
 
+    int id = obtenerIdDeFila(currentRow);
+
     QTableWidgetItem *processedItem = ui->tableWidget->item(currentRow, PROCESSED);
     if (processedItem) {
         processedItem->setText("Yes");
+        processedItem->setData(ProcessedRole, true);
 
-        // Aquí podrías llamar a la interfaz para marcar como procesado en el backend
-        // transaccionManager->markAsProcessed(currentRow);
+        // Aquí llamarías al backend para marcar como procesado
+        // transaccionManager->marcarComoProcesado(id);
+
+        qDebug() << "Transacción ID" << id << "marcada como procesada";
     }
-    */
-
-
-
+*/
 }
 
 void MainWindow::onRowSelected()
 {
-    // en este punto quiero comunicarme con el gestor para que
+    int currentRow = ui->tableWidget->currentRow();
+    if (currentRow < 0) return;
+
+    int id = obtenerIdDeFila(currentRow);
+
+
+    // ¡Ahora tienes acceso al ID! Puedes hacer cualquier operación con él
+    //qDebug() <<  "ID:" << id;
+
+    // Ejemplo: Obtener más información usando el ID
+    // auto infoTransaccion = transaccionManager->obtenerTransaccionPorId(id);
+
+    // Ejemplo: Actualizar otra parte de la UI basada en este ID
+    // actualizarDetallesTransaccion(id);
+
+    // Ejemplo: Filtrar otras tablas basado en este ID
+    // filtrarTransaccionesRelacionadas(id);
+
     /*
-     tengo un problema, quiero seleccionar la fila , esa fila debe tener un id asignado
-    ese id asignado se le asigna cada vez que se crea una nueva fila.
+    QMessageBox::information(this, "Fila Seleccionada",
+                             QString("Has seleccionado la transacción con ID: %1")
+                                 .arg(id));
+    */
 
-    si selecciono una fila, quiero tener acceso a ese id y hacer una operacion con el*/
+    // Limpiar tabla existente
+    ui->tableWidget_2->setRowCount(0);
 
+    // Obtener datos a través de la interfaz
+    auto transacciones = transaccionManager->getTransaccionesNetasPorIdTB(id);
+
+    // Llenar la tabla con los datos
+    for (const auto& transaccion : transacciones) {
+        int newRow = ui->tableWidget_2->rowCount();
+        ui->tableWidget_2->insertRow(newRow);
+
+        ui->tableWidget_2->setItem(newRow, 0, new QTableWidgetItem(QString::number(transaccion.amount)));
+        ui->tableWidget_2->setItem(newRow, 1, new QTableWidgetItem(QString::fromStdString(transaccion.comment)));
+        ui->tableWidget_2->setItem(newRow, 2, new QTableWidgetItem(QString::fromStdString(transaccion.date)));
+        ui->tableWidget_2->setItem(newRow, 3, new QTableWidgetItem(QString::number(transaccion.id_TB)));
+        ui->tableWidget_2->setItem(newRow, 4, new QTableWidgetItem(QString::fromStdString(transaccion.category)));
+
+    }
 
 }
+
+void MainWindow::on_actionQuitar_2_triggered()
+{
+    close();
+}
+
