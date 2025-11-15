@@ -12,12 +12,10 @@ SOURCES += \
         backend/sqlmanager.cpp \
         backend/transactionmodel/transaction.cpp \
         backend/transactionsmanager.cpp \
+        frontend/transaccionbasicadialog.cpp \
         main.cpp \
         main_2.cpp \
-        frontend/mainwindow.cpp \
-        frontend/personadialog.cpp \
-        frontend/transaccionbasicadialog.cpp \
-        frontend/widget.cpp
+        frontend/mainwindow.cpp
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
@@ -32,15 +30,11 @@ HEADERS += \
     backend/transactionmodel/transaction.h \
     backend/transactionsmanager.h \
     frontend/mainwindow.h \
-    frontend/personadialog.h \
-    frontend/transaccionbasicadialog.h \
-    frontend/widget.h
+    frontend/transaccionbasicadialog.h
 
 
 QMAKE_CXXFLAGS += -std=gnu++11
 
 FORMS += \
     frontend/mainwindow.ui \
-    frontend/personadialog.ui \
-    frontend/transaccionbasicadialog.ui \
-    frontend/widget.ui
+    frontend/transaccionbasicadialog.ui

@@ -31,12 +31,11 @@ private slots:
 
 private:
     Ui::MainWindow *ui;
-    std::unique_ptr<ITransaccionsManager> transaccionManager;
+    std::unique_ptr<ITransactionsManager> transaccionManager;
 
     // Roles personalizados para almacenar datos
     enum UserRoles {
-        IdRole = Qt::UserRole + 1,  // Para almacenar el ID
-        ProcessedRole = Qt::UserRole + 2  // Para almacenar estado processed
+        IdRole = Qt::UserRole + 1,  // TODO
     };
 
     enum Columna {
@@ -44,13 +43,11 @@ private:
     };
 
     // Métodos auxiliares
-    void crearTablaTransaccionesBrutas();
-    void crearTablaTransaccionesNetas();
-
+    //void setupTableWidget(QTableWidget* tableWidget, const QStringList& columnTitles);
     void cargarTransaccionesEnTabla();
 
     // Métodos para gestionar IDs
-    int obtenerIdDeFila(int fila) const;
+    //int obtenerIdDeFila(int fila) const;
     void establecerIdEnFila(int fila, int id);
     int generarNuevoId();  // Generador de IDs únicos
 

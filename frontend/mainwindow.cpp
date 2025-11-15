@@ -7,6 +7,11 @@
 #include <QHeaderView>
 #include "backend/transactionsmanager.h"
 
+//suport functions
+void setupTableWidget(QTableWidget* tableWidget, const QStringList& columnTitles);
+QStringList vectorString_to_QStringList( std::vector<std::string> v);
+
+
     MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -17,10 +22,14 @@
     setWindowTitle("App");
 
     // Configurar la tabla
-    crearTablaTransaccionesBrutas();
-    crearTablaTransaccionesNetas();
 
-    // Conectar las señales
+    //vectorString_to_QStringList (transaccionManager->getFieldsTableTransactions());
+
+    setupTableWidget(ui->tableWidget, vectorString_to_QStringList (transaccionManager->getFieldsTableTransactions()));
+
+    setupTableWidget(ui->tableWidget_2, vectorString_to_QStringList(transaccionManager->getFieldsTableDerivativeTransactions()));
+
+    // Conectar las señales de tablas
     connect(ui->tableWidget, &QTableWidget::customContextMenuRequested,
             this, &MainWindow::onCustomContextMenuRequested);
     connect(ui->tableWidget, &QTableWidget::itemSelectionChanged,
@@ -35,99 +44,34 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::crearTablaTransaccionesBrutas()
+
+
+void MainWindow::cargarTransaccionesEnTabla() //TODO. MODIFICAR CAMPOS
 {
-    QStringList titulos;
-    ui->tableWidget->setColumnCount(5);
-    titulos << "Amount" << "Comment" << "Date" << "Currency" << "Processed";
-    ui->tableWidget->setHorizontalHeaderLabels(titulos);
 
-    // Configurar selección por filas completas
-    ui->tableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
-    ui->tableWidget->setSelectionMode(QAbstractItemView::SingleSelection);
-
-    // Ajustar el ancho de las columnas
-    ui->tableWidget->horizontalHeader()->setStretchLastSection(true);
-
-    // Habilitar el menú contextual
-    ui->tableWidget->setContextMenuPolicy(Qt::CustomContextMenu);
-}
-
-
-void MainWindow::crearTablaTransaccionesNetas(){
-
-    QStringList titulos;
-
-    ui->tableWidget_2->setColumnCount(5);
-    titulos << "Amount" << "Comment" << "Date" << "id_TB" << "Category";
-    ui->tableWidget_2->setHorizontalHeaderLabels(titulos);
-
-    // Configurar selección por filas completas
-    ui->tableWidget_2->setSelectionBehavior(QAbstractItemView::SelectRows);
-    ui->tableWidget_2->setSelectionMode(QAbstractItemView::SingleSelection);
-
-    // Ajustar el ancho de las columnas
-    ui->tableWidget_2->horizontalHeader()->setStretchLastSection(true);
-
-    // Habilitar el menú contextual
-    //ui->tableWidget->setContextMenuPolicy(Qt::CustomContextMenu);
-
-}
-
-void MainWindow::cargarTransaccionesEnTabla()
-{
-    // Limpiar tabla existente
     ui->tableWidget->setRowCount(0);
 
     // Obtener datos a través de la interfaz
-    auto transacciones = transaccionManager->getTransactions();
+    std::vector<std::vector<std::string>> transacciones = transaccionManager->getTransactions();
 
-    // Llenar la tabla con los datos
     for (const auto& transaccion : transacciones) {
         int newRow = ui->tableWidget->rowCount();
         ui->tableWidget->insertRow(newRow);
 
-        // Generar un ID único para esta fila
-        int nuevoId = transaccion.id;
+        // Verificar que el vector no esté vacío antes de acceder a [0]
+        if (transaccion.empty()) {
+            continue; // Saltar transacciones vacías
+        }
 
-        // Crear items y asignarles el ID
-        QTableWidgetItem* amountItem = new QTableWidgetItem(QString::number(transaccion.amount));
-        QTableWidgetItem* commentItem = new QTableWidgetItem(QString::fromStdString(transaccion.comment));
-        QTableWidgetItem* dateItem = new QTableWidgetItem(QString::fromStdString(transaccion.date));
-        QTableWidgetItem* currencyItem = new QTableWidgetItem(QString::fromStdString(transaccion.currency));
-        QTableWidgetItem* processedItem = new QTableWidgetItem(transaccion.processed ? "Yes" : "No");
+        int nuevoId = std::stoi(transaccion[0]); // almacena id (primer elemento)
 
-        // Asignar el ID a TODOS los items de la fila
-        amountItem->setData(IdRole, nuevoId);
-        commentItem->setData(IdRole, nuevoId);
-        dateItem->setData(IdRole, nuevoId);
-        currencyItem->setData(IdRole, nuevoId);
-        processedItem->setData(IdRole, nuevoId);
-        processedItem->setData(ProcessedRole, transaccion.processed);
-
-        // Agregar a la tabla
-        ui->tableWidget->setItem(newRow, AMOUNT, amountItem);
-        ui->tableWidget->setItem(newRow, COMMENT, commentItem);
-        ui->tableWidget->setItem(newRow, DATE, dateItem);
-        ui->tableWidget->setItem(newRow, CURRENCY, currencyItem);
-        ui->tableWidget->setItem(newRow, PROCESSED, processedItem);
-
-        qDebug() << "Fila" << newRow << "asignada ID:" << nuevoId;
+        // Usar size() en lugar de lenght() - length() no existe en std::vector
+        for (int i = 0; i < transaccion.size(); i++) {
+            QTableWidgetItem* item = new QTableWidgetItem(QString::fromStdString(transaccion[i]));
+            item->setData(IdRole, nuevoId);
+            ui->tableWidget->setItem(newRow, i, item);
+        }
     }
-}
-
-int MainWindow::obtenerIdDeFila(int fila) const
-{
-    if (fila < 0 || fila >= ui->tableWidget->rowCount()) {
-        return -1;
-    }
-
-    // Obtener el ID desde cualquier item de la fila (usamos la columna 0)
-    QTableWidgetItem* item = ui->tableWidget->item(fila, 0);
-    if (item) {
-        return item->data(IdRole).toInt();
-    }
-    return -1;
 }
 
 void MainWindow::establecerIdEnFila(int fila, int id)
@@ -151,8 +95,9 @@ int MainWindow::generarNuevoId()
     return ++contadorId;
 }
 
-void MainWindow::on_actionA_adir_transaccion_Basica_triggered()
+void MainWindow::on_actionA_adir_transaccion_Basica_triggered() //Esto no se puede hacer asi a la ligera
 {
+    /*
     int res;
     TransaccionBasicaDialog pd(this);
     pd.setWindowTitle("Transacciones brutas");
@@ -180,7 +125,7 @@ void MainWindow::on_actionA_adir_transaccion_Basica_triggered()
     dateItem->setData(IdRole, nuevoId);
     currencyItem->setData(IdRole, nuevoId);
     processedItem->setData(IdRole, nuevoId);
-    processedItem->setData(ProcessedRole, false);
+    //processedItem->setData(ProcessedRole, false);
 
     // Agregar a la tabla
     ui->tableWidget->setItem(newRow, AMOUNT, amountItem);
@@ -190,6 +135,7 @@ void MainWindow::on_actionA_adir_transaccion_Basica_triggered()
     ui->tableWidget->setItem(newRow, PROCESSED, processedItem);
 
     qDebug() << "Nueva transacción agregada con ID:" << nuevoId;
+*/
 }
 
 void MainWindow::onCustomContextMenuRequested(const QPoint &pos)
@@ -276,8 +222,7 @@ void MainWindow::onRowSelected()
     int currentRow = ui->tableWidget->currentRow();
     if (currentRow < 0) return;
 
-    int id = obtenerIdDeFila(currentRow);
-
+    int id = ui->tableWidget->item(currentRow, 0)->data(IdRole).toInt();
 
     // ¡Ahora tienes acceso al ID! Puedes hacer cualquier operación con él
     //qDebug() <<  "ID:" << id;
@@ -291,31 +236,27 @@ void MainWindow::onRowSelected()
     // Ejemplo: Filtrar otras tablas basado en este ID
     // filtrarTransaccionesRelacionadas(id);
 
-    /*
-    QMessageBox::information(this, "Fila Seleccionada",
-                             QString("Has seleccionado la transacción con ID: %1")
-                                 .arg(id));
-    */
 
     // Limpiar tabla existente
     ui->tableWidget_2->setRowCount(0);
 
     // Obtener datos a través de la interfaz
-    auto transacciones = transaccionManager->getDerivativeTransaccionesById(id);
+    std::vector<std::vector<std::string>> transacciones = transaccionManager->getDerivativeTransactionsById(id);
 
-    // Llenar la tabla con los datos
     for (const auto& transaccion : transacciones) {
         int newRow = ui->tableWidget_2->rowCount();
         ui->tableWidget_2->insertRow(newRow);
 
-        ui->tableWidget_2->setItem(newRow, 0, new QTableWidgetItem(QString::number(transaccion.amount)));
-        ui->tableWidget_2->setItem(newRow, 1, new QTableWidgetItem(QString::fromStdString(transaccion.comment)));
-        ui->tableWidget_2->setItem(newRow, 2, new QTableWidgetItem(QString::fromStdString(transaccion.date)));
-        ui->tableWidget_2->setItem(newRow, 3, new QTableWidgetItem(QString::number(transaccion.id_TB)));
-        ui->tableWidget_2->setItem(newRow, 4, new QTableWidgetItem(QString::fromStdString(transaccion.category)));
+        // Verificar que el vector no esté vacío antes de acceder a [0]
+        if (transaccion.empty()) {
+            continue; // Saltar transacciones vacías
+        }
 
+        // Usar size() en lugar de lenght() - length() no existe en std::vector
+        for (int i = 0; i < transaccion.size(); i++) {
+            ui->tableWidget_2->setItem(newRow, i, new QTableWidgetItem(QString::fromStdString(transaccion[i])));
+        }
     }
-
 }
 
 void MainWindow::on_actionQuitar_2_triggered()
@@ -323,3 +264,27 @@ void MainWindow::on_actionQuitar_2_triggered()
     close();
 }
 
+
+//Support functions
+QStringList vectorString_to_QStringList( std::vector<std::string> v){
+    QStringList result;
+
+    for (const auto& i : v) {
+        result << QString::fromStdString(i);
+    }
+    return result;
+}
+
+void setupTableWidget(QTableWidget* tableWidget, const QStringList& columnTitles)
+{
+    // Configurar número de columnas y títulos
+    tableWidget->setColumnCount(columnTitles.size());
+    tableWidget->setHorizontalHeaderLabels(columnTitles);
+
+    // Configurar selección por filas completas
+    tableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
+    tableWidget->setSelectionMode(QAbstractItemView::SingleSelection);
+
+    tableWidget->horizontalHeader()->setStretchLastSection(true);
+
+}

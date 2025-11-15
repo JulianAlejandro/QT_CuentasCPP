@@ -1,7 +1,7 @@
 #ifndef SQLMANAGER_H
 #define SQLMANAGER_H
 
-#include <QCoreApplication>
+//#include <QCoreApplication>
 #include <QSqlDatabase>
 #include "transactionmodel/transaction.h"
 #include "transactionmodel/derivativetransaction.h"

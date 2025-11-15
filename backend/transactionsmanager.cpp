@@ -1,73 +1,64 @@
 #include "transactionsmanager.h"
 #include "backend/transactionmodel/transaction.h"
 #include "backend/transactionmodel/derivativetransaction.h"
-//#include "backend/DerivativeTransaction.h"
 
-
-TransactionData convertirATransaccionData(Transaction transaccion){
-
-    TransactionData aux;
-    aux.amount =  transaccion.getAmount();
-    aux.comment = transaccion.getComment();
-    aux.date = transaccion.getDate();
-    aux.currency = transaccion.getCurrency();
-    aux.processed = transaccion.getStateProcessed();
-    aux.id = transaccion.getId();
-    return aux;
+// Función para convertir Transaction a vector de strings
+std::vector<std::string> convertirAStringVector(const Transaction& transaccion) {
+    return {
+        std::to_string(transaccion.getId()),
+        std::to_string(transaccion.getAmount()),
+        transaccion.getComment(),
+        transaccion.getDate(),
+        transaccion.getCurrency(),
+        transaccion.getStateProcessed() ? "true" : "false",
+    };
 }
 
-DerivativeTransactionData convertirATransaccionData(DerivativeTransaction transaccion){
-    /*
-    double amount;
-    std::string comment;
-    std::string date;
-    int id_TB;
-    std::string category;
-    */
-    DerivativeTransactionData aux;
-    aux.amount = transaccion.getAmount();
-    aux.comment = transaccion.getComment();
-    aux.date = transaccion.getDate();
-    aux.id_TB = transaccion.getId_TB();
-    aux.category = transaccion.getCategory();
-    return aux;
+// Función para convertir DerivativeTransaction a vector de strings
+std::vector<std::string> convertirAStringVectorDerivada(const DerivativeTransaction& transaccion) {
+    return {
+        std::to_string(transaccion.getAmount()),
+        transaccion.getComment(),
+        transaccion.getDate(),
+        std::to_string(transaccion.getId_TB()),
+        transaccion.getCategory()
+    };
 }
-
 
 TransactionsManager::TransactionsManager() {}
 
-/*
-QList<Transaction> TransactionsManager::getTransaccionesBrutas(){
+// Implementación CORREGIDA - mismos nombres que la interfaz
+std::vector<std::vector<std::string>> TransactionsManager::getTransactions() {
+    std::vector<std::vector<std::string>> resultado;
 
-    return m_gestorSQL.devuelve_todas_transacciones_brutas();
-
-}
-*/
-
-
-// Implementación de métodos de la interfaz
-std::vector<TransactionData> TransactionsManager::getTransactions() {
-    std::vector<TransactionData> resultado;
-
-    // Usar tu método existente y convertir
     QList<Transaction> brutas = m_gestorSQL.retrieveAllTransactions();
 
     for (const Transaction& transaccion : brutas) {
-        resultado.push_back(convertirATransaccionData(transaccion));
+        resultado.push_back(convertirAStringVector(transaccion));
     }
 
     return resultado;
 }
 
+std::vector<std::vector<std::string>> TransactionsManager::getDerivativeTransactionsById(int id_TB) {
+    std::vector<std::vector<std::string>> resultado;
 
-std::vector<DerivativeTransactionData> TransactionsManager::getDerivativeTransaccionesById(const int id){
-
-    std::vector<DerivativeTransactionData> resultado;
-
-    QList<DerivativeTransaction> netas = m_gestorSQL.retrieveDerivativeTransactionsWithId(id);
+    QList<DerivativeTransaction> netas = m_gestorSQL.retrieveDerivativeTransactionsWithId(id_TB);
 
     for (const DerivativeTransaction& transaccion : netas) {
-        resultado.push_back(convertirATransaccionData(transaccion));
+        resultado.push_back(convertirAStringVectorDerivada(transaccion));
     }
     return resultado;
 }
+
+std::vector<std::string> TransactionsManager::getFieldsTableTransactions(){ //TODO. esto depende del SQL
+
+    return {"id","Amount", "Comment", "date", "currency", "processed"};
+}
+
+std::vector<std::string> TransactionsManager::getFieldsTableDerivativeTransactions(){ //TODO. esto depende del SQL
+
+    return {"Amount", "Comment", "Date", "id_TB", "Category"};
+}
+
+
