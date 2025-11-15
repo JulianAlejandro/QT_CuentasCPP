@@ -1,15 +1,15 @@
 
-#ifndef TRANSACCIONNETA_H
-#define TRANSACCIONNETA_H
+#ifndef DERIVATIVETRANSACTION_H
+#define DERIVATIVETRANSACTION_H
 
-#include "TransaccionBase.h"
+#include "basetransaction.h"
 
-class TransaccionNeta : public TransaccionBase {
+class DerivativeTransaction : public BaseTransaction {
 public:
     // Constructor parametrizado CORREGIDO
-    TransaccionNeta(double amount, const std::string& comment, const std::string& date,
+    DerivativeTransaction(double amount, const std::string& comment, const std::string& date,
                     const int id_TB, const std::string& category);
-    TransaccionNeta();
+    DerivativeTransaction();
 
     // Getters para los nuevos atributos
     // Implementación de getters
@@ -26,7 +26,7 @@ private:
     int m_id_TB; // id de la transaccion bruta
     std::string m_category;
 
-    friend class Gestor_SQL;
+    friend class SQLManager;
 };
 
 

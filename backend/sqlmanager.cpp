@@ -1,4 +1,4 @@
-#include "gestor_sql.h"
+#include "sqlmanager.h"
 #include <qDebug>
 #include <QSqlError>
 #include <QSqlQuery>
@@ -7,7 +7,7 @@
 
 // Método template para asignar ID
 template<typename T>
-void Gestor_SQL::asignarIdDesdeBD(T& transaccion, QSqlQuery& query) {
+void SQLManager::asignarIdDesdeBD(T& transaccion, QSqlQuery& query) {
     int nuevoId = query.lastInsertId().toInt();
     if (nuevoId > 0) {
         transaccion.setId(nuevoId);
@@ -15,7 +15,7 @@ void Gestor_SQL::asignarIdDesdeBD(T& transaccion, QSqlQuery& query) {
     }
 }
 
-Gestor_SQL::Gestor_SQL()
+SQLManager::SQLManager()
 {
     if(!QSqlDatabase::isDriverAvailable("QSQLITE")){
         qDebug() << "Error: QSQLITE no esta disponible";
@@ -65,7 +65,7 @@ Gestor_SQL::Gestor_SQL()
 }
 
 
-bool Gestor_SQL::almacena_transaccion_bruta(TransaccionBruta& tb)  // Mejor pasar por referencia
+bool SQLManager::saveTransaction(Transaction& tb)  // Mejor pasar por referencia
 {
     if(!bd.isOpen()){  // Cambiado: verificar si ya está abierta
         if(!bd.open()){
@@ -81,7 +81,7 @@ bool Gestor_SQL::almacena_transaccion_bruta(TransaccionBruta& tb)  // Mejor pasa
                        "VALUES (:amount, :comment, :date, :currency, :processed)";
 
     q.prepare(queryStr);
-    // CORRECCIÓN: Usar los getters del objeto TransaccionBruta
+    // CORRECCIÓN: Usar los getters del objeto Transaction
     q.bindValue(":amount", tb.getAmount());
     q.bindValue(":comment", QString::fromStdString(tb.getComment()));
     q.bindValue(":date", QString::fromStdString(tb.getDate()));
@@ -103,7 +103,7 @@ bool Gestor_SQL::almacena_transaccion_bruta(TransaccionBruta& tb)  // Mejor pasa
 }
 
 
-bool Gestor_SQL::almacena_transaccion_neta(TransaccionNeta& tn)  // Cambié el parámetro a 'tn' para TransaccionNeta
+bool SQLManager::saveDerivativeTransaction(DerivativeTransaction& tn)  // Cambié el parámetro a 'tn' para DerivativeTransaction
 {
     if(!bd.isOpen()){  // Verificar si ya está abierta
         if(!bd.open()){
@@ -120,8 +120,8 @@ bool Gestor_SQL::almacena_transaccion_neta(TransaccionNeta& tn)  // Cambié el p
 
     q.prepare(queryStr);
 
-    // CORRECCIÓN: Usar los getters del objeto TransaccionNeta
-    // Asumiendo que TransaccionNeta tiene estos métodos (deberías crearlos si no existen)
+    // CORRECCIÓN: Usar los getters del objeto DerivativeTransaction
+    // Asumiendo que DerivativeTransaction tiene estos métodos (deberías crearlos si no existen)
     q.bindValue(":amount", tn.getAmount());
     q.bindValue(":comment", QString::fromStdString(tn.getComment()));
     q.bindValue(":date", QString::fromStdString(tn.getDate()));
@@ -144,9 +144,9 @@ bool Gestor_SQL::almacena_transaccion_neta(TransaccionNeta& tn)  // Cambié el p
 
 
 
-TransaccionBruta Gestor_SQL::devuelve_transaccion_bruta(const int id)
+Transaction SQLManager::retrieveTransactionById(const int id)
 {
-    TransaccionBruta tb;
+    Transaction tb;
 
     if(!bd.isOpen()){
         if(!bd.open()){
@@ -169,7 +169,7 @@ TransaccionBruta Gestor_SQL::devuelve_transaccion_bruta(const int id)
     }
 
     if(q.next()){
-        // Asignar los valores desde la base de datos al objeto TransaccionBruta
+        // Asignar los valores desde la base de datos al objeto Transaction
         tb.setId(q.value("id").toInt());
         tb.setAmount(q.value("amount").toDouble());
         tb.setComment(q.value("comment").toString().toStdString());
@@ -187,9 +187,9 @@ TransaccionBruta Gestor_SQL::devuelve_transaccion_bruta(const int id)
 }
 
 
-QList<TransaccionBruta> Gestor_SQL::devuelve_todas_transacciones_brutas()
+QList<Transaction> SQLManager::retrieveAllTransactions()
 {
-    QList<TransaccionBruta> listaTransacciones;
+    QList<Transaction> listaTransacciones;
 
     if(!bd.isOpen()){
         if(!bd.open()){
@@ -210,9 +210,9 @@ QList<TransaccionBruta> Gestor_SQL::devuelve_todas_transacciones_brutas()
 
     int contador = 0;
     while(q.next()){
-        TransaccionBruta tb;
+        Transaction tb;
 
-        // Asignar los valores desde la base de datos al objeto TransaccionBruta
+        // Asignar los valores desde la base de datos al objeto Transaction
         tb.setId(q.value("id").toInt());
         tb.setAmount(q.value("amount").toDouble());
         tb.setComment(q.value("comment").toString().toStdString());
@@ -231,9 +231,9 @@ QList<TransaccionBruta> Gestor_SQL::devuelve_todas_transacciones_brutas()
 }
 
 
-QList<TransaccionNeta> Gestor_SQL::devuelve_transacciones_netas(int id_TB)
+QList<DerivativeTransaction> SQLManager::retrieveDerivativeTransactionsWithId(int id_TB)
 {
-    QList<TransaccionNeta> listaTransacciones;
+    QList<DerivativeTransaction> listaTransacciones;
 
     if(!bd.isOpen()){
         if(!bd.open()){
@@ -257,9 +257,9 @@ QList<TransaccionNeta> Gestor_SQL::devuelve_transacciones_netas(int id_TB)
 
     int contador = 0;
     while(q.next()){
-        TransaccionNeta tn;
+        DerivativeTransaction tn;
 
-        // Asignar los valores desde la base de datos al objeto TransaccionNeta
+        // Asignar los valores desde la base de datos al objeto DerivativeTransaction
         tn.setId(q.value("id").toInt());
         tn.setAmount(q.value("amount").toDouble());
         tn.setComment(q.value("comment").toString().toStdString());

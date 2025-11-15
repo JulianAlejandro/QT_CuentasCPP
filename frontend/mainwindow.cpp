@@ -5,12 +5,12 @@
 #include <QMessageBox>
 #include <QTableWidget>
 #include <QHeaderView>
-#include "backend/gestortransacciones.h"
+#include "backend/transactionsmanager.h"
 
     MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
-    , transaccionManager(std::make_unique<gestorTransacciones>())
+    , transaccionManager(std::make_unique<TransactionsManager>())
     , contadorId(0)  // Inicializar contador de IDs
 {
     ui->setupUi(this);
@@ -80,7 +80,7 @@ void MainWindow::cargarTransaccionesEnTabla()
     ui->tableWidget->setRowCount(0);
 
     // Obtener datos a través de la interfaz
-    auto transacciones = transaccionManager->getTransaccionesBrutas();
+    auto transacciones = transaccionManager->getTransactions();
 
     // Llenar la tabla con los datos
     for (const auto& transaccion : transacciones) {
@@ -301,7 +301,7 @@ void MainWindow::onRowSelected()
     ui->tableWidget_2->setRowCount(0);
 
     // Obtener datos a través de la interfaz
-    auto transacciones = transaccionManager->getTransaccionesNetasPorIdTB(id);
+    auto transacciones = transaccionManager->getDerivativeTransaccionesById(id);
 
     // Llenar la tabla con los datos
     for (const auto& transaccion : transacciones) {

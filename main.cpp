@@ -2,8 +2,7 @@
 #include "frontend/mainwindow.h"
 
 #include <QApplication>
-#include "backend/transaccionneta.h"
-#include "backend/gestor_sql.h"
+
 
 int main(int argc, char *argv[])
 {

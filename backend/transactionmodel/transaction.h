@@ -1,15 +1,15 @@
-#ifndef TRANSACCIONBRUTA_H
-#define TRANSACCIONBRUTA_H
+#ifndef TRANSACTION_H
+#define TRANSACTION_H
 
-#include "TransaccionBase.h"
+#include "basetransaction.h"
 #include <string>
 
-class TransaccionBruta : public TransaccionBase {
+class Transaction : public BaseTransaction {
 public:
     // Constructor - quitar 'const' del bool (no es necesario)
-    TransaccionBruta(double amount, const std::string& comment, const std::string& date,
+    Transaction(double amount, const std::string& comment, const std::string& date,
                      const std::string& currency, bool processed);
-    TransaccionBruta();
+    Transaction();
 
     // Getters
     std::string getCurrency() const;
@@ -26,7 +26,7 @@ private:
     std::string m_currency;
     bool m_processed;
 
-    friend class Gestor_SQL;
+    friend class SQLManager;
 };
 
-#endif // TRANSACCIONBRUTA_H
+#endif // TRANSACTION_H

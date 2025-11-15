@@ -1,14 +1,14 @@
-#ifndef TRANSACCIONBASE_H
-#define TRANSACCIONBASE_H
+#ifndef BASETRANSACTION_H
+#define BASETRANSACTION_H
 
 //#include <iostream>
 #include <string>
 
-class TransaccionBase {
+class BaseTransaction {
 public:
     // Constructor parametrizado
-    TransaccionBase(const double amount, const std::string& comment, const std::string& date);
-    TransaccionBase();
+    BaseTransaction(const double amount, const std::string& comment, const std::string& date);
+    BaseTransaction();
 
     int getId() const;
     double getAmount() const;
@@ -28,7 +28,7 @@ private:
     std::string m_comment;
     std::string m_date;
 
-    friend class Gestor_SQL;
+    friend class Manager_SQL;
 };
 
-#endif // TRANSACCIONBASE_H
+#endif // BASETRANSACTION_H

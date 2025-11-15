@@ -3,7 +3,7 @@
 
 #include <QMainWindow>
 #include <memory>
-#include "backend/itransactionmanager.h"
+#include "backend/itransactionsmanager.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -31,7 +31,7 @@ private slots:
 
 private:
     Ui::MainWindow *ui;
-    std::unique_ptr<ITransaccionManager> transaccionManager;
+    std::unique_ptr<ITransaccionsManager> transaccionManager;
 
     // Roles personalizados para almacenar datos
     enum UserRoles {
