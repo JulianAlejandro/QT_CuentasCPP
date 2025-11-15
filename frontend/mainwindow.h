@@ -38,13 +38,9 @@ private:
         IdRole = Qt::UserRole + 1,  // TODO
     };
 
-    enum Columna {
-        AMOUNT, COMMENT, DATE, CURRENCY, PROCESSED
-    };
-
     // Métodos auxiliares
     //void setupTableWidget(QTableWidget* tableWidget, const QStringList& columnTitles);
-    void cargarTransaccionesEnTabla();
+    void loadTransactionsInTable();
 
     // Métodos para gestionar IDs
     //int obtenerIdDeFila(int fila) const;

@@ -1,5 +1,5 @@
 #include "transaction.h"
-#include <QDebug>
+#include <sstream>
 
 // Constructor CORREGIDO
 Transaction::Transaction(double amount, const std::string& comment,
@@ -17,7 +17,7 @@ Transaction::Transaction()
 }
 
 // Getters
-std::string Transaction::getCurrency() const {
+const std::string& Transaction::getCurrency() const {
     return m_currency;
 }
 
@@ -37,9 +37,10 @@ void Transaction::setProcessed(const bool processed){
     m_processed = processed;
 }
 
-void Transaction::show_info() const{
-    BaseTransaction::show_info();
+std::string Transaction::toString() const{
+    std::ostringstream oss;
 
-    qDebug() << "currency =" << m_currency << "processed =" << m_processed;
+    oss << BaseTransaction::toString() << "Currency: " << m_currency << ", Procesed: " << m_processed;
 
+    return oss.str();
 }

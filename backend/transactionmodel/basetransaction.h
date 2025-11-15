@@ -7,14 +7,16 @@
 class BaseTransaction {
 public:
     // Constructor parametrizado
-    BaseTransaction(const double amount, const std::string& comment, const std::string& date);
+    BaseTransaction(double amount, const std::string& comment, const std::string& date);
     BaseTransaction();
+
+    virtual ~BaseTransaction() = default;
 
     int getId() const;
     double getAmount() const;
-    std::string getComment() const;
-    std::string getDate() const;
-    void show_info() const;
+    const std::string& getComment() const;
+    const std::string& getDate() const;
+    virtual std::string toString() const;
 
 protected:
     void setId(int id);

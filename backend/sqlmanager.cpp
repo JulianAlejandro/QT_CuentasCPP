@@ -3,6 +3,8 @@
 #include <QSqlError>
 #include <QSqlQuery>
 #include <QCoreApplication>
+//#include <backend/transactionmodel/transaction.h>
+//#include <backend/transactionmodel/derivativetransaction.h>
 
 
 // Método template para asignar ID
@@ -264,8 +266,8 @@ QList<DerivativeTransaction> SQLManager::retrieveDerivativeTransactionsWithId(in
         tn.setAmount(q.value("amount").toDouble());
         tn.setComment(q.value("comment").toString().toStdString());
         tn.setDate(q.value("date").toString().toStdString());
-        tn.SetId_TB(q.value("id_TB").toInt());
-        tn.SetCategory(q.value("category").toString().toStdString());
+        tn.setId_TB(q.value("id_TB").toInt());
+        tn.setCategory(q.value("category").toString().toStdString());
 
         // Añadir a la lista
         listaTransacciones.append(tn);

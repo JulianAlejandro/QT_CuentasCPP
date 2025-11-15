@@ -1,6 +1,5 @@
-
 #include "DerivativeTransaction.h"
-#include <QDebug>
+#include <sstream>
 
 // Constructor CORREGIDO - parámetros consistentes
 DerivativeTransaction::DerivativeTransaction(double amount, const std::string& comment,
@@ -11,11 +10,10 @@ DerivativeTransaction::DerivativeTransaction(double amount, const std::string& c
 }
 
 DerivativeTransaction::DerivativeTransaction()
-    : BaseTransaction() // Llama al constructor de la clase base
-{
-    m_id_TB = 0;
-    m_category = "";
-}
+    : BaseTransaction(),  // Opcional - se llama automáticamente
+    m_id_TB(0),
+    m_category("")
+{}
 
 // Implementación de getters
 int DerivativeTransaction::getId_TB() const {
@@ -23,20 +21,23 @@ int DerivativeTransaction::getId_TB() const {
 }
 
 // Implementación de getters
-std::string DerivativeTransaction::getCategory() const {
+const std::string& DerivativeTransaction::getCategory() const {
     return m_category;
 }
 
 
-void DerivativeTransaction::SetId_TB (const int id_TB){
+void DerivativeTransaction::setId_TB (const int id_TB){
     m_id_TB = id_TB;
 }
-void DerivativeTransaction::SetCategory(const std::string& category){
+void DerivativeTransaction::setCategory(const std::string& category){
     m_category = category;
 }
 
 
-void DerivativeTransaction::show_info() const{
-    BaseTransaction::show_info();
-    qDebug() << "id Trans Bruta =" << m_id_TB << "Category =" << m_category;
+std::string DerivativeTransaction::toString() const {
+    std::ostringstream oss;
+
+    oss << BaseTransaction::toString() << "ID_tb: " << m_id_TB << ", category: " << m_category;
+
+    return oss.str();
 }

@@ -1,7 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
-#include "transaccionbasicadialog.h"
+//#include "transaccionbasicadialog.h"
 #include <QMessageBox>
 #include <QTableWidget>
 #include <QHeaderView>
@@ -36,7 +36,7 @@ QStringList vectorString_to_QStringList( std::vector<std::string> v);
             this, &MainWindow::onRowSelected);
 
     // Cargar datos iniciales usando la interfaz
-    cargarTransaccionesEnTabla();
+    loadTransactionsInTable();
 }
 
 MainWindow::~MainWindow()
@@ -45,8 +45,7 @@ MainWindow::~MainWindow()
 }
 
 
-
-void MainWindow::cargarTransaccionesEnTabla() //TODO. MODIFICAR CAMPOS
+void MainWindow::loadTransactionsInTable() //TODO. MODIFICAR CAMPOS
 {
 
     ui->tableWidget->setRowCount(0);
@@ -66,7 +65,7 @@ void MainWindow::cargarTransaccionesEnTabla() //TODO. MODIFICAR CAMPOS
         int nuevoId = std::stoi(transaccion[0]); // almacena id (primer elemento)
 
         // Usar size() en lugar de lenght() - length() no existe en std::vector
-        for (int i = 0; i < transaccion.size(); i++) {
+        for (size_t  i = 0; i < transaccion.size(); i++) {
             QTableWidgetItem* item = new QTableWidgetItem(QString::fromStdString(transaccion[i]));
             item->setData(IdRole, nuevoId);
             ui->tableWidget->setItem(newRow, i, item);
@@ -253,7 +252,7 @@ void MainWindow::onRowSelected()
         }
 
         // Usar size() en lugar de lenght() - length() no existe en std::vector
-        for (int i = 0; i < transaccion.size(); i++) {
+        for (size_t  i = 0; i < transaccion.size(); i++) {
             ui->tableWidget_2->setItem(newRow, i, new QTableWidgetItem(QString::fromStdString(transaccion[i])));
         }
     }

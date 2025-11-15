@@ -8,19 +8,20 @@ class DerivativeTransaction : public BaseTransaction {
 public:
     // Constructor parametrizado CORREGIDO
     DerivativeTransaction(double amount, const std::string& comment, const std::string& date,
-                    const int id_TB, const std::string& category);
+                    int id_TB, const std::string& category);
     DerivativeTransaction();
 
     // Getters para los nuevos atributos
     // Implementación de getters
     int getId_TB() const;
-    std::string getCategory() const;
+    const std::string& getCategory() const;
 
-    void show_info() const;
+    std::string toString() const override;
+
 
 protected:
-    void SetId_TB (const int id_TB);
-    void SetCategory(const std::string& category);
+    void setId_TB (int id_TB);
+    void setCategory(const std::string& category);
 
 private:
     int m_id_TB; // id de la transaccion bruta
@@ -29,6 +30,4 @@ private:
     friend class SQLManager;
 };
 
-
-
-#endif // TRANSACCIONBRUTA_H
+#endif // DERIVATIVETRANSACTION_H

@@ -1,13 +1,11 @@
 #ifndef TRANSACTIONSMANAGER_H
 #define TRANSACTIONSMANAGER_H
 
-#include <QObject>
 #include "backend/sqlmanager.h"
 #include "backend/itransactionsmanager.h"
 
-class TransactionsManager : public QObject, public ITransactionsManager
+class TransactionsManager : public ITransactionsManager
 {
-    Q_OBJECT
 public:
     TransactionsManager();
 

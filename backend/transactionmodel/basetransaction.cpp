@@ -1,5 +1,5 @@
 #include "basetransaction.h"
-#include <qDebug>
+#include <sstream>
 
 // Constructor parametrizado
 BaseTransaction::BaseTransaction(const double amount, const std::string& comment, const std::string& date)
@@ -8,13 +8,9 @@ BaseTransaction::BaseTransaction(const double amount, const std::string& comment
     // Inicialización mediante lista de inicialización
 }
 
-BaseTransaction::BaseTransaction(void)
-{
-    m_id = 0;
-    m_amount = 0;
-    m_comment = "";
-    m_date = "";
-}
+BaseTransaction::BaseTransaction()
+    : m_id(0), m_amount(0.0), m_comment(""), m_date("")
+{}
 
 // Getter para el ID
 int BaseTransaction::getId() const {
@@ -27,12 +23,12 @@ double BaseTransaction::getAmount() const {
 }
 
 // Getter para el comment (comentario)
-std::string BaseTransaction::getComment() const {
+const std::string& BaseTransaction::getComment() const {
     return m_comment;
 }
 
 // Getter para la date (fecha)
-std::string BaseTransaction::getDate() const {
+const std::string& BaseTransaction::getDate() const {
     return m_date;
 }
 
@@ -52,8 +48,9 @@ void BaseTransaction::setDate(const std::string& date){
     m_date = date;
 }
 
-void BaseTransaction::show_info() const{
-
-    qDebug() << "Id =" << m_id << "Amount =" << m_amount << " comment:" << m_comment << " Date:" << m_date;
-
+std::string BaseTransaction::toString() const {
+    std::ostringstream oss;
+    oss << "ID: " << m_id << ", Amount: " << m_amount
+        << ", Comment: " << m_comment << ", Date: " << m_date;
+    return oss.str();
 }

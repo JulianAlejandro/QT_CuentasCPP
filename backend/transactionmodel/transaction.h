@@ -12,16 +12,17 @@ public:
     Transaction();
 
     // Getters
-    std::string getCurrency() const;
+    const std::string& getCurrency() const;
     bool getStateProcessed() const;
 
     // Setters
     void setStateProcessed(bool state);
-    void show_info() const;
+    std::string toString() const override;
+
 
 protected:
     void setCurrency(const std::string& currency);
-    void setProcessed(const bool processed);
+    void setProcessed(bool processed);
 private:
     std::string m_currency;
     bool m_processed;
