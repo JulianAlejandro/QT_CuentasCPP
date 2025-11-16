@@ -31,7 +31,7 @@ TransactionsManager::TransactionsManager() {}
 std::vector<std::vector<std::string>> TransactionsManager::getTransactions() {
     std::vector<std::vector<std::string>> resultado;
 
-    QList<Transaction> brutas = m_gestorSQL.retrieveAllTransactions();
+    QList<Transaction> brutas = m_SQLManager.retrieveAllTransactions();
 
     for (const Transaction& transaccion : brutas) {
         resultado.push_back(convertirAStringVector(transaccion));
@@ -43,7 +43,7 @@ std::vector<std::vector<std::string>> TransactionsManager::getTransactions() {
 std::vector<std::vector<std::string>> TransactionsManager::getDerivativeTransactionsById(int id_TB) {
     std::vector<std::vector<std::string>> resultado;
 
-    QList<DerivativeTransaction> netas = m_gestorSQL.retrieveDerivativeTransactionsWithId(id_TB);
+    QList<DerivativeTransaction> netas = m_SQLManager.retrieveDerivativeTransactionsWithId(id_TB);
 
     for (const DerivativeTransaction& transaccion : netas) {
         resultado.push_back(convertirAStringVectorDerivada(transaccion));

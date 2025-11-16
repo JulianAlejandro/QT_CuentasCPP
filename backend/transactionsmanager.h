@@ -15,10 +15,10 @@ public:
     std::vector<std::string> getFieldsTableDerivativeTransactions() override;
 
     std::vector<std::vector<std::string>> getTransactions() override;
-    std::vector<std::vector<std::string>> getDerivativeTransactionsById(int id_TB) override;
+    std::vector<std::vector<std::string>> getDerivativeTransactionsById(int id) override;
 
 private:
-    SQLManager m_gestorSQL;
+    SQLManager m_SQLManager;
 };
 
 #endif // TRANSACTIONSMANAGER_H

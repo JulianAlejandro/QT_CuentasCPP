@@ -11,8 +11,7 @@
 void setupTableWidget(QTableWidget* tableWidget, const QStringList& columnTitles);
 QStringList vectorString_to_QStringList( std::vector<std::string> v);
 
-
-    MainWindow::MainWindow(QWidget *parent)
+MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
     , transaccionManager(std::make_unique<TransactionsManager>())
@@ -22,18 +21,22 @@ QStringList vectorString_to_QStringList( std::vector<std::string> v);
     setWindowTitle("App");
 
     // Configurar la tabla
-
-    //vectorString_to_QStringList (transaccionManager->getFieldsTableTransactions());
-
     setupTableWidget(ui->tableWidget, vectorString_to_QStringList (transaccionManager->getFieldsTableTransactions()));
-
     setupTableWidget(ui->tableWidget_2, vectorString_to_QStringList(transaccionManager->getFieldsTableDerivativeTransactions()));
+
+    // ✅ HABILITAR MENÚ CONTEXTUAL EN AMBAS TABLAS
+    ui->tableWidget->setContextMenuPolicy(Qt::CustomContextMenu);
+    ui->tableWidget_2->setContextMenuPolicy(Qt::CustomContextMenu);
 
     // Conectar las señales de tablas
     connect(ui->tableWidget, &QTableWidget::customContextMenuRequested,
             this, &MainWindow::onCustomContextMenuRequested);
     connect(ui->tableWidget, &QTableWidget::itemSelectionChanged,
             this, &MainWindow::onRowSelected);
+
+    // ✅ CONECTAR TAMBIÉN LA SEGUNDA TABLA
+    connect(ui->tableWidget_2, &QTableWidget::customContextMenuRequested,
+            this, &MainWindow::onCustomContextMenuRequested);
 
     // Cargar datos iniciales usando la interfaz
     loadTransactionsInTable();
@@ -139,19 +142,28 @@ void MainWindow::on_actionA_adir_transaccion_Basica_triggered() //Esto no se pue
 
 void MainWindow::onCustomContextMenuRequested(const QPoint &pos)
 {
-    QTableWidgetItem *item = ui->tableWidget->itemAt(pos);
+    QTableWidget* table = qobject_cast<QTableWidget*>(sender());
+    if (!table) return;
+
+    QTableWidgetItem *item = table->itemAt(pos);
     if (!item) return;
 
     QMenu *contextMenu = new QMenu(this);
+
+    // Acciones comunes para ambas tablas
     QAction *editAction = contextMenu->addAction("Editar");
     QAction *deleteAction = contextMenu->addAction("Eliminar");
-    QAction *markProcessedAction = contextMenu->addAction("Marcar como procesado");
+
+    // Acción específica solo para la primera tabla
+    if (table == ui->tableWidget) {
+        QAction *markProcessedAction = contextMenu->addAction("Marcar como procesado");
+        connect(markProcessedAction, &QAction::triggered, this, &MainWindow::onMarkProcessed);
+    }
 
     connect(editAction, &QAction::triggered, this, &MainWindow::onEditRow);
     connect(deleteAction, &QAction::triggered, this, &MainWindow::onDeleteRow);
-    connect(markProcessedAction, &QAction::triggered, this, &MainWindow::onMarkProcessed);
 
-    contextMenu->exec(ui->tableWidget->viewport()->mapToGlobal(pos));
+    contextMenu->exec(table->viewport()->mapToGlobal(pos));
     delete contextMenu;
 }
 
