@@ -1,41 +1,89 @@
 #ifndef SQLMANAGER_H
 #define SQLMANAGER_H
 
-//#include <QCoreApplication>
 #include <QSqlDatabase>
-#include "transactionmodel/transaction.h"
-#include "transactionmodel/derivativetransaction.h"
+#include <vector>
+#include <QString>
+#include <string>
+
+// Estructura para Transacción Bruta
+struct estructuraTB {
+    int id;
+    double amount;
+    std::string comment;
+    std::string date;
+    std::string currency;
+    bool processed;
+};
+
+// Estructura para Transacción Neta
+struct estructuraTN {
+    int id;
+    double amount;
+    std::string comment;
+    std::string date;
+    int id_TB;
+    std::string category_name; // Nombre de la categoría
+    int category_id;       // ID de la categoría
+};
+
+// Estructura para Categoría
+struct estructuraCategoria {
+    int id;
+    std::string nombre;
+    int id_padre;
+};
+
+// Estructura para Divisa
+struct estructuraDivisa {
+    std::string codigo;
+    std::string nombre;
+    std::string simbolo;
+};
 
 class SQLManager
 {
 public:
     SQLManager();
 
-    bool saveTransaction(Transaction& tb);
-    bool saveDerivativeTransaction(DerivativeTransaction& tn);
+    // Métodos para Transacciones Brutas
+    estructuraTB obtenerTransaccionBrutaPorId(int id);
+    std::vector<estructuraTB> obtenerTodasTransaccionesBrutas();
+    std::vector<estructuraTB> obtenerTransaccionesBrutasPorEstado(bool processed);
+    bool insertarTransaccionBruta(const estructuraTB& transaccion);
+    bool actualizarTransaccionBruta(const estructuraTB& transaccion);
+    bool eliminarTransaccionBruta(int id);
+    bool marcarTransaccionBrutaComoProcesada(int id, bool processed = true);
 
-    Transaction retrieveTransactionById(const int id);
-    QList<Transaction> retrieveAllTransactions();
+    // Métodos para Transacciones Netas
+    std::vector<estructuraTN> obtenerTransaccionesNetasConId_TB(int id_TB);
+    std::vector<estructuraTN> obtenerTodasTransaccionesNetas();
+    estructuraTN obtenerTransaccionNetaPorId(int id);
+    bool insertarTransaccionNeta(const estructuraTN& transaccion);
+    bool actualizarTransaccionNeta(const estructuraTN& transaccion);
+    bool eliminarTransaccionNeta(int id);
 
-    QList<DerivativeTransaction> retrieveDerivativeTransactionsWithId(int id_TB);
+    // Métodos para Categorías
+    std::vector<estructuraCategoria> obtenerTodasCategorias();
+    estructuraCategoria obtenerCategoriaPorId(int id);
+    //std::string obtenerNombreCategoriaPorId(int id);
+    std::vector<estructuraCategoria> obtenerCategoriasPorPadre(int id_padre);
+    bool insertarCategoria(const estructuraCategoria& categoria);
+    bool actualizarCategoria(const estructuraCategoria& categoria);
+    bool eliminarCategoria(int id);
 
-
-    //Transaction devuelve_transaccion_bruta(const int id);
-    //DerivativeTransaction devuelve_transaccion_neta(const int id);
-
-    //devuelve numero de transacciones_netas
-    //devuelve numero de transacciones_brutas
-
-    //bool borrar_transaccion_bruta()
-    //bool borrar_transaccion_neta()
-    //obtener tablas....es eso, ya toca lo otro porque sino complicado
+    // Métodos para Divisas
+    std::vector<estructuraDivisa> obtenerTodasDivisas();
+    estructuraDivisa obtenerDivisaPorCodigo(const std::string& codigo);
+    bool insertarDivisa(const estructuraDivisa& divisa);
+    bool actualizarDivisa(const estructuraDivisa& divisa);
+    bool eliminarDivisa(const std::string& codigo);
 
 private:
     QSqlDatabase bd;
+    bool abrirBD();
+    void cerrarBD();
 
-    // Método helper para asignar el ID
-    template<typename T>
-    void asignarIdDesdeBD(T& transaccion, QSqlQuery& query);
 };
 
 #endif // SQLMANAGER_H
