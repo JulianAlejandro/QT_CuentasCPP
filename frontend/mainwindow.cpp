@@ -1,7 +1,8 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
-//#include "transaccionbasicadialog.h"
+#include "frontend/transaccionbasicadialog.h"
+#include "frontend/addderivativetransactionsdialog.h"
 #include <QMessageBox>
 #include <QTableWidget>
 #include <QHeaderView>
@@ -99,7 +100,7 @@ int MainWindow::generarNuevoId()
 
 void MainWindow::on_actionA_adir_transaccion_Basica_triggered() //Esto no se puede hacer asi a la ligera
 {
-    /*
+
     int res;
     TransaccionBasicaDialog pd(this);
     pd.setWindowTitle("Transacciones brutas");
@@ -108,6 +109,9 @@ void MainWindow::on_actionA_adir_transaccion_Basica_triggered() //Esto no se pue
         return;
     }
 
+    //TODO: Aqui hay que pensar en como añadir al BBDD cada transacción.
+
+    /*
     int newRow = ui->tableWidget->rowCount();
     ui->tableWidget->insertRow(newRow);
 
@@ -138,6 +142,7 @@ void MainWindow::on_actionA_adir_transaccion_Basica_triggered() //Esto no se pue
 
     qDebug() << "Nueva transacción agregada con ID:" << nuevoId;
 */
+
 }
 
 void MainWindow::onCustomContextMenuRequested(const QPoint &pos)
@@ -151,24 +156,44 @@ void MainWindow::onCustomContextMenuRequested(const QPoint &pos)
     QMenu *contextMenu = new QMenu(this);
 
     // Acciones comunes para ambas tablas
-    QAction *editAction = contextMenu->addAction("Editar");
-    QAction *deleteAction = contextMenu->addAction("Eliminar");
+    QAction *addDerivativeTransactionAction = contextMenu->addAction("Añadir transacciones derivadas");
+    //QAction *deleteAction = contextMenu->addAction("Eliminar");
+
 
     // Acción específica solo para la primera tabla
+/*
     if (table == ui->tableWidget) {
         QAction *markProcessedAction = contextMenu->addAction("Marcar como procesado");
         connect(markProcessedAction, &QAction::triggered, this, &MainWindow::onMarkProcessed);
     }
-
-    connect(editAction, &QAction::triggered, this, &MainWindow::onEditRow);
-    connect(deleteAction, &QAction::triggered, this, &MainWindow::onDeleteRow);
+*/
+    connect(addDerivativeTransactionAction, &QAction::triggered, this, &MainWindow::onAddDerivativeTransaction);
+    //connect(deleteAction, &QAction::triggered, this, &MainWindow::onDeleteRow);
 
     contextMenu->exec(table->viewport()->mapToGlobal(pos));
     delete contextMenu;
 }
 
-void MainWindow::onEditRow()
+void MainWindow::onAddDerivativeTransaction()
 {
+
+    // TODO: Aqui se crea abre una nueva ventana, esta ventan contiene un QTableWidget en el que se pueden añadir nuevas filas.
+    // reglas
+    //
+
+    int res;
+    addDerivativeTransactionsDialog pd(this);
+    pd.setWindowTitle("Add derivative Transaction Dialog");
+    QTableWidget* table = pd.getPtrTableWidget();
+
+    setupTableWidget(table, vectorString_to_QStringList (transaccionManager->getFieldsTableTransactions()));
+
+    res = pd.exec();
+    if (res == QDialog::Rejected){
+        return;
+    }
+
+
     /*
     int currentRow = ui->tableWidget->currentRow();
     if (currentRow < 0) return;
@@ -183,9 +208,10 @@ void MainWindow::onEditRow()
 */
 }
 
+/*
 void MainWindow::onDeleteRow()
 {
-    /*
+
     int currentRow = ui->tableWidget->currentRow();
     if (currentRow < 0) return;
 
@@ -204,12 +230,13 @@ void MainWindow::onDeleteRow()
         ui->tableWidget->removeRow(currentRow);
         qDebug() << "Transacción ID" << id << "eliminada";
     }
-*/
-}
 
+}
+*/
+/*
 void MainWindow::onMarkProcessed()
 {
-    /*
+
     int currentRow = ui->tableWidget->currentRow();
     if (currentRow < 0) return;
 
@@ -225,9 +252,9 @@ void MainWindow::onMarkProcessed()
 
         qDebug() << "Transacción ID" << id << "marcada como procesada";
     }
-*/
-}
 
+}
+*/
 void MainWindow::onRowSelected()
 {
     int currentRow = ui->tableWidget->currentRow();

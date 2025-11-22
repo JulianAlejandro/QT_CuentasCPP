@@ -7,6 +7,8 @@ CONFIG += c++17 cmdline
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+        frontend/addderivativetransactionsdialog.cpp \
+        backend/categorymodel/categorynode.cpp \
         backend/transactionmodel/basetransaction.cpp \
         backend/transactionmodel/derivativetransaction.cpp \
         backend/sqlmanager.cpp \
@@ -23,6 +25,8 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 HEADERS += \
+    frontend/addderivativetransactionsdialog.h \
+    backend/categorymodel/categorynode.h \
     backend/transactionmodel/basetransaction.h \
     backend/transactionmodel/derivativetransaction.h \
     backend/itransactionsmanager.h \
@@ -36,5 +40,6 @@ HEADERS += \
 QMAKE_CXXFLAGS += -std=gnu++11
 
 FORMS += \
+    frontend/addderivativetransactionsdialog.ui \
     frontend/mainwindow.ui \
     frontend/transaccionbasicadialog.ui

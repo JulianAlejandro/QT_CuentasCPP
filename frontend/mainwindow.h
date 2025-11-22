@@ -22,9 +22,10 @@ public:
 private slots:
     void on_actionA_adir_transaccion_Basica_triggered();
     void onCustomContextMenuRequested(const QPoint &pos);
-    void onEditRow();
-    void onDeleteRow();
-    void onMarkProcessed();
+    void onAddDerivativeTransaction();
+
+    //void onDeleteRow();
+    //void onMarkProcessed();
     void onRowSelected();
 
     void on_actionQuitar_2_triggered();

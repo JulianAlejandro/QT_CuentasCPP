@@ -124,7 +124,7 @@ std::vector<std::string> TransactionsManager::getFieldsTableTransactions(){ //TO
 
 std::vector<std::string> TransactionsManager::getFieldsTableDerivativeTransactions(){ //TODO. esto depende del SQL
 
-    return {"Amount", "Comment", "Date", "id_TB", "Category"};
+    return {"id", "Amount", "Comment", "Date", "id_TB", "Category", "Category_id"};
 }
 
 
