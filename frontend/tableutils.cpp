@@ -7,7 +7,7 @@
 
  namespace TableUtils {
 
-    void setupTableWidget(QTableWidget* tableWidget,
+    void setFieldsTableWidget(QTableWidget* tableWidget,
                           const QStringList& columnTitles,
                           bool edit)
     {
@@ -35,7 +35,7 @@
 
 
 
- void loadTableTransactions(QTableWidget* table, std::vector<std::vector<std::string>> transacciones, int IdRole)
+ void loadTransactionsTableWidget(QTableWidget* table, std::vector<std::vector<std::string>> transacciones, int IdRole)
  {
 
      table->setRowCount(0);
@@ -56,28 +56,6 @@
             table->setItem(newRow, i, item);
         }
      }
-
-     // Obtener datos a través de la interfaz
-    // std::vector<std::vector<std::string>> transacciones = transaccionManager->getTransactions();
-
-    // for (const auto& transaccion : transacciones) { //para cada transaccion
-    //      int newRow = ui->tableWidget->rowCount();
-    //     ui->tableWidget->insertRow(newRow);
-
-         // Verificar que el vector no esté vacío antes de acceder a [0]
-    //     if (transaccion.empty()) {
-    //         continue; // Saltar transacciones vacías
-    //     }
-
-    //     int nuevoId = std::stoi(transaccion[0]); // almacena id (primer elemento)
-
-
-    //     for (size_t  i = 0; i < transaccion.size(); i++) { //añade para cada transacción
-    //         QTableWidgetItem* item = new QTableWidgetItem(QString::fromStdString(transaccion[i]));
-    //         item->setData(IdRole, nuevoId);
-    //         ui->tableWidget->setItem(newRow, i, item);
-    //     }
-    // }
  }
 
 } // namespace TableUtils

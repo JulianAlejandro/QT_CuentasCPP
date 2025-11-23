@@ -15,10 +15,11 @@ class addDerivativeTransactionsDialog : public QDialog
 public:
     explicit addDerivativeTransactionsDialog(QWidget *parent = nullptr);
     ~addDerivativeTransactionsDialog();
-    QTableWidget* getPtrTableWidget();
+    //QTableWidget* getPtrTableWidget();
+    void setFieldsTableWidget(const QStringList& columnTitles, bool edit);
+    void loadTransactionsTableWidget(std::vector<std::vector<std::string>> transacciones, int IdRole);
 
 private slots:
-
 
     void on_addPushButton_clicked();
 

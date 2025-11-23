@@ -21,8 +21,8 @@ MainWindow::MainWindow(QWidget *parent)
     setWindowTitle("App");
 
     // Configurar la tabla
-    TableUtils::setupTableWidget(ui->tableWidget, TableUtils::vectorString_to_QStringList (transaccionManager->getFieldsTableTransactions()), false);
-    TableUtils::setupTableWidget(ui->tableWidget_2, TableUtils::vectorString_to_QStringList(transaccionManager->getFieldsTableDerivativeTransactions()), false);
+    TableUtils::setFieldsTableWidget(ui->tableWidget, TableUtils::vectorString_to_QStringList (transaccionManager->getFieldsTableTransactions()), false);
+    TableUtils::setFieldsTableWidget(ui->tableWidget_2, TableUtils::vectorString_to_QStringList(transaccionManager->getFieldsTableDerivativeTransactions()), false);
 
     // ✅ HABILITAR MENÚ CONTEXTUAL EN AMBAS TABLAS
     ui->tableWidget->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -39,7 +39,7 @@ MainWindow::MainWindow(QWidget *parent)
     //        this, &MainWindow::onCustomContextMenuRequested);
 
     // Cargar datos iniciales usando la interfaz
-    TableUtils::loadTableTransactions(ui->tableWidget, transaccionManager->getTransactions(), IdRole);
+    TableUtils::loadTransactionsTableWidget(ui->tableWidget, transaccionManager->getTransactions(), IdRole);
 }
 
 MainWindow::~MainWindow()
@@ -99,18 +99,14 @@ int MainWindow::generarNuevoId()
 
 void MainWindow::on_actionA_adir_transaccion_Basica_triggered() //Esto no se puede hacer asi a la ligera
 {
-
     int res;
     TransaccionBasicaDialog pd(this);
     pd.setWindowTitle("Transacciones brutas");
     res = pd.exec();
 
-
     if (res == QDialog::Rejected){
         return;
     }
-
-
 
     //TODO: Aqui hay que pensar en como añadir al BBDD cada transacción.
 
@@ -211,48 +207,17 @@ void MainWindow::onAddDerivativeTransaction()
     addDerivativeTransactionsDialog pd(this);
     pd.setWindowTitle("Add/Edit derivative Transactions");
 
-    // Obtener puntero al QTableWidget interno del diálogo
-    QTableWidget* table = pd.getPtrTableWidget(); //TODO esto esta mal
+    pd.setFieldsTableWidget(
+        TableUtils::vectorString_to_QStringList(
+            transaccionManager->getFieldsTableDerivativeTransactions()
+            ), true);
 
-    // Configurar columnas
-    TableUtils::setupTableWidget(table,
-                     TableUtils::vectorString_to_QStringList(
-                         transaccionManager->getFieldsTableDerivativeTransactions()
-                         ), true);
 
-    // ------------------------------------------------------------------
-    //  🔥 CARGAR TRANSACCIONES DERIVADAS USANDO EL MISMO MÉTODO QUE onRowSelected
-    // ------------------------------------------------------------------
-
-    // Limpiar tabla del diálogo
-    table->setRowCount(0);
-
-    std::vector<std::vector<std::string>> derivadas =
-        transaccionManager->getDerivativeTransactionsById(id);
-
-    for (const auto& transaccion : derivadas)
-    {
-        int newRow = table->rowCount();
-        table->insertRow(newRow);
-
-        if (transaccion.empty())
-            continue;
-
-        for (size_t i = 0; i < transaccion.size(); i++)
-        {
-            table->setItem(newRow, i,
-                           new QTableWidgetItem(QString::fromStdString(transaccion[i])));
-        }
-    }
-
-    // ------------------------------------------------------------------
+    pd.loadTransactionsTableWidget(transaccionManager->getDerivativeTransactionsById(id), IdRole);
 
     res = pd.exec();
     if (res == QDialog::Rejected)
         return;
-
-    // Aquí luego guardarás los cambios cuando el usuario acepte
-
 }
 
 
@@ -310,7 +275,7 @@ void MainWindow::onRowSelected()
 
     int id = ui->tableWidget->item(currentRow, 0)->data(IdRole).toInt();
 
-    TableUtils::loadTableTransactions(ui->tableWidget_2, transaccionManager->getDerivativeTransactionsById(id), IdRole);
+    TableUtils::loadTransactionsTableWidget(ui->tableWidget_2, transaccionManager->getDerivativeTransactionsById(id), IdRole);
     /*
     // ¡Ahora tienes acceso al ID! Puedes hacer cualquier operación con él
     //qDebug() <<  "ID:" << id;

@@ -7,13 +7,7 @@
 namespace Ui {
 class categoryTreeWidgetDialog;
 }
-/*
-struct Categoria {
-    int id;
-    QString nombre;
-    int id_padre;
-};
-*/
+
 
 class categoryTreeWidgetDialog : public QDialog
 {
