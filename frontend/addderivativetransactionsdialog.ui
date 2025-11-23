@@ -28,7 +28,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="pushButton">
+          <widget class="QPushButton" name="addPushButton">
            <property name="text">
             <string>ADD</string>
            </property>
@@ -52,7 +52,7 @@
       </layout>
      </item>
      <item>
-      <widget class="QTableWidget" name="addDerTranTableWidget"/>
+      <widget class="QTableWidget" name="TableWidget"/>
      </item>
      <item>
       <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -70,14 +70,14 @@
         </spacer>
        </item>
        <item>
-        <widget class="QPushButton" name="pushButton_2">
+        <widget class="QPushButton" name="savePushButton">
          <property name="text">
           <string>SAVE</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="pushButton_3">
+        <widget class="QPushButton" name="quitPushButton">
          <property name="text">
           <string>Quit</string>
          </property>

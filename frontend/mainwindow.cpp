@@ -7,13 +7,9 @@
 #include <QTableWidget>
 #include <QHeaderView>
 #include "backend/transactionsmanager.h"
+#include "frontend/tableutils.h"
 
 //#include "categorytreewidgetdialog.h"//prueba
-
-
-//suport functions
-void setupTableWidget(QTableWidget* tableWidget, const QStringList& columnTitles);
-QStringList vectorString_to_QStringList( std::vector<std::string> v);
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -25,12 +21,12 @@ MainWindow::MainWindow(QWidget *parent)
     setWindowTitle("App");
 
     // Configurar la tabla
-    setupTableWidget(ui->tableWidget, vectorString_to_QStringList (transaccionManager->getFieldsTableTransactions()));
-    setupTableWidget(ui->tableWidget_2, vectorString_to_QStringList(transaccionManager->getFieldsTableDerivativeTransactions()));
+    TableUtils::setupTableWidget(ui->tableWidget, TableUtils::vectorString_to_QStringList (transaccionManager->getFieldsTableTransactions()), false);
+    TableUtils::setupTableWidget(ui->tableWidget_2, TableUtils::vectorString_to_QStringList(transaccionManager->getFieldsTableDerivativeTransactions()), false);
 
     // ✅ HABILITAR MENÚ CONTEXTUAL EN AMBAS TABLAS
     ui->tableWidget->setContextMenuPolicy(Qt::CustomContextMenu);
-    ui->tableWidget_2->setContextMenuPolicy(Qt::CustomContextMenu);
+    //ui->tableWidget_2->setContextMenuPolicy(Qt::CustomContextMenu);
 
     // Conectar las señales de tablas
     connect(ui->tableWidget, &QTableWidget::customContextMenuRequested,
@@ -39,11 +35,11 @@ MainWindow::MainWindow(QWidget *parent)
             this, &MainWindow::onRowSelected);
 
     // ✅ CONECTAR TAMBIÉN LA SEGUNDA TABLA
-    connect(ui->tableWidget_2, &QTableWidget::customContextMenuRequested,
-            this, &MainWindow::onCustomContextMenuRequested);
+    //connect(ui->tableWidget_2, &QTableWidget::customContextMenuRequested,
+    //        this, &MainWindow::onCustomContextMenuRequested);
 
     // Cargar datos iniciales usando la interfaz
-    loadTransactionsInTable();
+    TableUtils::loadTableTransactions(ui->tableWidget, transaccionManager->getTransactions(), IdRole);
 }
 
 MainWindow::~MainWindow()
@@ -51,7 +47,7 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-
+/*
 void MainWindow::loadTransactionsInTable() //TODO. MODIFICAR CAMPOS
 {
 
@@ -79,7 +75,7 @@ void MainWindow::loadTransactionsInTable() //TODO. MODIFICAR CAMPOS
         }
     }
 }
-
+*/
 void MainWindow::establecerIdEnFila(int fila, int id)
 {
     if (fila < 0 || fila >= ui->tableWidget->rowCount()) {
@@ -187,8 +183,7 @@ void MainWindow::onAddDerivativeTransaction()
     // TODO: Aqui se crea abre una nueva ventana, esta ventan contiene un QTableWidget en el que se pueden añadir nuevas filas.
     // reglas
     //
-
-
+/*
     int res;
     addDerivativeTransactionsDialog pd(this);
     pd.setWindowTitle("Add/Edit derivative Transactions");
@@ -200,31 +195,66 @@ void MainWindow::onAddDerivativeTransaction()
     if (res == QDialog::Rejected){
         return;
     }
-
-
-
-    /*
-    std::vector<estructuraCategoria> vec = transaccionManager->getCategories();
-    categoryTreeWidgetDialog p(this, vec);
-
-    p.exec();
-
-    */
-
-
-    /*
-    int currentRow = ui->tableWidget->currentRow();
-    if (currentRow < 0) return;
-
-    int id = obtenerIdDeFila(currentRow);
-    QMessageBox::information(this, "Editar",
-                             QString("Editando transacción - Fila: %1, ID: %2")
-                                 .arg(currentRow).arg(id));
-
-    // Aquí puedes implementar la lógica de edición usando el ID
-    // Por ejemplo: transaccionManager->editarTransaccion(id, nuevosDatos);
 */
+
+    int currentRow = ui->tableWidget->currentRow();
+    if (currentRow < 0) {
+        QMessageBox::warning(this, "Aviso",
+                             "Debe seleccionar una transacción primero.");
+        return;
+    }
+
+    // Obtener ID de la transacción seleccionada
+    int id = ui->tableWidget->item(currentRow, 0)->data(IdRole).toInt();
+
+    int res;
+    addDerivativeTransactionsDialog pd(this);
+    pd.setWindowTitle("Add/Edit derivative Transactions");
+
+    // Obtener puntero al QTableWidget interno del diálogo
+    QTableWidget* table = pd.getPtrTableWidget(); //TODO esto esta mal
+
+    // Configurar columnas
+    TableUtils::setupTableWidget(table,
+                     TableUtils::vectorString_to_QStringList(
+                         transaccionManager->getFieldsTableDerivativeTransactions()
+                         ), true);
+
+    // ------------------------------------------------------------------
+    //  🔥 CARGAR TRANSACCIONES DERIVADAS USANDO EL MISMO MÉTODO QUE onRowSelected
+    // ------------------------------------------------------------------
+
+    // Limpiar tabla del diálogo
+    table->setRowCount(0);
+
+    std::vector<std::vector<std::string>> derivadas =
+        transaccionManager->getDerivativeTransactionsById(id);
+
+    for (const auto& transaccion : derivadas)
+    {
+        int newRow = table->rowCount();
+        table->insertRow(newRow);
+
+        if (transaccion.empty())
+            continue;
+
+        for (size_t i = 0; i < transaccion.size(); i++)
+        {
+            table->setItem(newRow, i,
+                           new QTableWidgetItem(QString::fromStdString(transaccion[i])));
+        }
+    }
+
+    // ------------------------------------------------------------------
+
+    res = pd.exec();
+    if (res == QDialog::Rejected)
+        return;
+
+    // Aquí luego guardarás los cambios cuando el usuario acepte
+
 }
+
 
 /*
 void MainWindow::onDeleteRow()
@@ -280,19 +310,13 @@ void MainWindow::onRowSelected()
 
     int id = ui->tableWidget->item(currentRow, 0)->data(IdRole).toInt();
 
+    TableUtils::loadTableTransactions(ui->tableWidget_2, transaccionManager->getDerivativeTransactionsById(id), IdRole);
+    /*
     // ¡Ahora tienes acceso al ID! Puedes hacer cualquier operación con él
     //qDebug() <<  "ID:" << id;
 
-    // Ejemplo: Obtener más información usando el ID
-    // auto infoTransaccion = transaccionManager->obtenerTransaccionPorId(id);
 
-    // Ejemplo: Actualizar otra parte de la UI basada en este ID
-    // actualizarDetallesTransaccion(id);
-
-    // Ejemplo: Filtrar otras tablas basado en este ID
-    // filtrarTransaccionesRelacionadas(id);
-
-
+    // TODO. esta funcionalidad de cargar la tabla se añadira en tableutils
     // Limpiar tabla existente
     ui->tableWidget_2->setRowCount(0);
 
@@ -313,6 +337,7 @@ void MainWindow::onRowSelected()
             ui->tableWidget_2->setItem(newRow, i, new QTableWidgetItem(QString::fromStdString(transaccion[i])));
         }
     }
+    */
 }
 
 void MainWindow::on_actionQuitar_2_triggered()
@@ -321,26 +346,3 @@ void MainWindow::on_actionQuitar_2_triggered()
 }
 
 
-//Support functions
-QStringList vectorString_to_QStringList( std::vector<std::string> v){
-    QStringList result;
-
-    for (const auto& i : v) {
-        result << QString::fromStdString(i);
-    }
-    return result;
-}
-
-void setupTableWidget(QTableWidget* tableWidget, const QStringList& columnTitles)
-{
-    // Configurar número de columnas y títulos
-    tableWidget->setColumnCount(columnTitles.size());
-    tableWidget->setHorizontalHeaderLabels(columnTitles);
-
-    // Configurar selección por filas completas
-    tableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
-    tableWidget->setSelectionMode(QAbstractItemView::SingleSelection);
-
-    tableWidget->horizontalHeader()->setStretchLastSection(true);
-
-}

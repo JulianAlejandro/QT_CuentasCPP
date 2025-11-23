@@ -18,7 +18,8 @@ SOURCES += \
         frontend/transaccionbasicadialog.cpp \
         main.cpp \
         main_2.cpp \
-        frontend/mainwindow.cpp
+        frontend/mainwindow.cpp \
+        frontend/tableutils.cpp
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
@@ -37,7 +38,8 @@ HEADERS += \
     backend/transactionmodel/transaction.h \
     backend/transactionsmanager.h \
     frontend/mainwindow.h \
-    frontend/transaccionbasicadialog.h
+    frontend/transaccionbasicadialog.h \
+    frontend/tableutils.h
 
 
 QMAKE_CXXFLAGS += -std=gnu++11

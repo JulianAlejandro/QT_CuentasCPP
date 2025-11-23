@@ -17,6 +17,15 @@ public:
     ~addDerivativeTransactionsDialog();
     QTableWidget* getPtrTableWidget();
 
+private slots:
+
+
+    void on_addPushButton_clicked();
+
+    void on_savePushButton_clicked();
+
+    void on_quitPushButton_clicked();
+
 private:
     Ui::addDerivativeTransactionsDialog *ui;
 };

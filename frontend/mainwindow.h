@@ -42,7 +42,7 @@ private:
 
     // Métodos auxiliares
     //void setupTableWidget(QTableWidget* tableWidget, const QStringList& columnTitles);
-    void loadTransactionsInTable();
+    //void loadTransactionsInTable();
 
     // Métodos para gestionar IDs
     //int obtenerIdDeFila(int fila) const;
