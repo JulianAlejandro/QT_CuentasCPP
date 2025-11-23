@@ -515,7 +515,7 @@ estructuraDivisa SQLManager::obtenerDivisaPorCodigo(const std::string& codigo)
 }
 
 // Métodos para INSERTAR Transacciones Brutas
-bool SQLManager::insertarTransaccionBruta(const estructuraTB& transaccion)
+bool SQLManager::insertarTransaccionesBruta(const estructuraTB& transaccion)
 {
     if(!abrirBD()) return false;
 
@@ -540,6 +540,42 @@ bool SQLManager::insertarTransaccionBruta(const estructuraTB& transaccion)
     cerrarBD();
     return success;
 }
+
+
+bool SQLManager::insertarTransaccionesBrutas(const std::vector<estructuraTB>& transacciones)
+{
+    if (transacciones.empty()) return true;
+    if (!abrirBD()) return false;
+
+    QSqlQuery q;
+    bd.transaction(); // INICIO TRANSACCIÓN
+
+    QString queryStr =
+        "INSERT INTO transaccion_bruta (amount, comment, date, currency, processed) "
+        "VALUES (:amount, :comment, :date, :currency, :processed)";
+    q.prepare(queryStr);
+
+    for (const auto& t : transacciones) {
+        q.bindValue(":amount", t.amount);
+        q.bindValue(":comment", QString::fromStdString(t.comment));
+        q.bindValue(":date", QString::fromStdString(t.date));
+        q.bindValue(":currency", QString::fromStdString(t.currency));
+        q.bindValue(":processed", t.processed);
+
+        if (!q.exec()) {
+            qDebug() << "Error insertando transacción bruta en lote:" << q.lastError().text();
+            bd.rollback();     // ❌ Se cancela toda la operación
+            cerrarBD();
+            return false;
+        }
+    }
+
+    bd.commit(); // ✔️ COMMIT si todo fue bien
+    cerrarBD();
+    return true;
+}
+
+
 
 bool SQLManager::actualizarTransaccionBruta(const estructuraTB& transaccion)
 {
@@ -613,7 +649,7 @@ bool SQLManager::marcarTransaccionBrutaComoProcesada(int id, bool processed)
 }
 
 // Métodos para INSERTAR Transacciones Netas
-bool SQLManager::insertarTransaccionNeta(const estructuraTN& transaccion)
+bool SQLManager::insertarTransaccionesNetas(const estructuraTN& transaccion)
 {
     if(!abrirBD()) return false;
 
@@ -638,6 +674,41 @@ bool SQLManager::insertarTransaccionNeta(const estructuraTN& transaccion)
     cerrarBD();
     return success;
 }
+
+bool SQLManager::insertarTransaccionesNetas(const std::vector<estructuraTN>& transacciones)
+{
+    if (transacciones.empty()) return true;
+    if (!abrirBD()) return false;
+
+    QSqlQuery q;
+    bd.transaction(); // INICIO TRANSACCIÓN
+
+    QString queryStr =
+        "INSERT INTO transaccion_neta (amount, comment, date, id_TB, category_id) "
+        "VALUES (:amount, :comment, :date, :id_TB, :category_id)";
+    q.prepare(queryStr);
+
+    for (const auto& t : transacciones) {
+        q.bindValue(":amount", t.amount);
+        q.bindValue(":comment", QString::fromStdString(t.comment));
+        q.bindValue(":date", QString::fromStdString(t.date));
+        q.bindValue(":id_TB", t.id_TB);
+        q.bindValue(":category_id", t.category_id);
+
+        if (!q.exec()) {
+            qDebug() << "Error insertando transacción neta en lote:" << q.lastError().text();
+            bd.rollback();
+            cerrarBD();
+            return false;
+        }
+    }
+
+    bd.commit();
+    cerrarBD();
+    return true;
+}
+
+
 
 bool SQLManager::actualizarTransaccionNeta(const estructuraTN& transaccion)
 {

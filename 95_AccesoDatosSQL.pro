@@ -7,6 +7,7 @@ CONFIG += c++17 cmdline
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+        frontend/categorytreewidgetdialog.cpp \
         frontend/addderivativetransactionsdialog.cpp \
         backend/categorymodel/categorynode.cpp \
         backend/transactionmodel/basetransaction.cpp \
@@ -25,6 +26,8 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 HEADERS += \
+    common/DataTypes.h \
+    frontend/categorytreewidgetdialog.h \
     frontend/addderivativetransactionsdialog.h \
     backend/categorymodel/categorynode.h \
     backend/transactionmodel/basetransaction.h \
@@ -40,6 +43,7 @@ HEADERS += \
 QMAKE_CXXFLAGS += -std=gnu++11
 
 FORMS += \
+    frontend/categorytreewidgetdialog.ui \
     frontend/addderivativetransactionsdialog.ui \
     frontend/mainwindow.ui \
     frontend/transaccionbasicadialog.ui

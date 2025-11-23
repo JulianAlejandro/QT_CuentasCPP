@@ -8,6 +8,9 @@
 #include <QHeaderView>
 #include "backend/transactionsmanager.h"
 
+//#include "categorytreewidgetdialog.h"//prueba
+
+
 //suport functions
 void setupTableWidget(QTableWidget* tableWidget, const QStringList& columnTitles);
 QStringList vectorString_to_QStringList( std::vector<std::string> v);
@@ -105,9 +108,13 @@ void MainWindow::on_actionA_adir_transaccion_Basica_triggered() //Esto no se pue
     TransaccionBasicaDialog pd(this);
     pd.setWindowTitle("Transacciones brutas");
     res = pd.exec();
+
+
     if (res == QDialog::Rejected){
         return;
     }
+
+
 
     //TODO: Aqui hay que pensar en como añadir al BBDD cada transacción.
 
@@ -156,7 +163,7 @@ void MainWindow::onCustomContextMenuRequested(const QPoint &pos)
     QMenu *contextMenu = new QMenu(this);
 
     // Acciones comunes para ambas tablas
-    QAction *addDerivativeTransactionAction = contextMenu->addAction("Añadir transacciones derivadas");
+    QAction *addDerivativeTransactionAction = contextMenu->addAction("Añadir o editar transacciones derivadas");
     //QAction *deleteAction = contextMenu->addAction("Eliminar");
 
 
@@ -181,9 +188,10 @@ void MainWindow::onAddDerivativeTransaction()
     // reglas
     //
 
+
     int res;
     addDerivativeTransactionsDialog pd(this);
-    pd.setWindowTitle("Add derivative Transaction Dialog");
+    pd.setWindowTitle("Add/Edit derivative Transactions");
     QTableWidget* table = pd.getPtrTableWidget();
 
     setupTableWidget(table, vectorString_to_QStringList (transaccionManager->getFieldsTableTransactions()));
@@ -192,6 +200,16 @@ void MainWindow::onAddDerivativeTransaction()
     if (res == QDialog::Rejected){
         return;
     }
+
+
+
+    /*
+    std::vector<estructuraCategoria> vec = transaccionManager->getCategories();
+    categoryTreeWidgetDialog p(this, vec);
+
+    p.exec();
+
+    */
 
 
     /*

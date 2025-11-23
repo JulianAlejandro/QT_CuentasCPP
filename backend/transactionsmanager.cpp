@@ -43,7 +43,6 @@ struct estructuraDivisa {
 */
 
 
-
 // Función para convertir Transaction a vector de strings
 std::vector<std::string> convertirAStringVector(const estructuraTB& estructuraTB) {
     return {
@@ -84,7 +83,6 @@ std::vector<std::vector<std::string>> TransactionsManager::getTransactions() {
     for (const auto& transaccion : brutas) {
         resultado.push_back(convertirAStringVector(transaccion));
     }
-
 
     /*
     QList<Transaction> brutas = m_SQLManager.retrieveAllTransactions();
@@ -127,4 +125,27 @@ std::vector<std::string> TransactionsManager::getFieldsTableDerivativeTransactio
     return {"id", "Amount", "Comment", "Date", "id_TB", "Category", "Category_id"};
 }
 
+
+void TransactionsManager::addNewDerivativeTransactions(std::vector<std::vector<std::string>> vec){
+
+    std::vector<estructuraTN> result;
+    estructuraTN e = {0, 0.0, "", "", 0, "", 0};
+
+    for (const auto& v : vec){
+        e.id = std::stol(v[0]); // no se usa, con lo que puede tener cualquier valor
+        e.amount = std::stod(v[1]);
+        e.comment = v[2];
+        e.date = v[3];
+        e.id_TB = std::stoi(v[4]);
+        e.category_name = v[5];
+        e.category_id = std::stoi(v[6]);
+
+        result.push_back(e);
+    }
+    m_SQLManager.insertarTransaccionesNetas(result);
+}
+
+std::vector<estructuraCategoria> TransactionsManager::getCategories(){
+    return m_SQLManager.obtenerTodasCategorias();
+}
 

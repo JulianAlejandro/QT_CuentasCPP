@@ -20,6 +20,10 @@ public:
     std::vector<std::vector<std::string>> getTransactions() override;
     std::vector<std::vector<std::string>> getDerivativeTransactionsById(int id) override;
 
+    void addNewDerivativeTransactions(std::vector<std::vector<std::string>> vec) override;
+
+    std::vector<estructuraCategoria> getCategories() override;
+
 private:
     SQLManager m_SQLManager;
 };

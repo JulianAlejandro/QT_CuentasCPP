@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <memory>
 #include "backend/itransactionsmanager.h"
+#include "common/DataTypes.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {

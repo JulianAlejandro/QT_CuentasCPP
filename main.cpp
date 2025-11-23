@@ -3,6 +3,7 @@
 #include "frontend/mainwindow.h"
 
 #include <QApplication>
+#include "frontend/categorytreewidgetdialog.h"
 
 
 int main(int argc, char *argv[])

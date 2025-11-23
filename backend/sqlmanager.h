@@ -5,7 +5,8 @@
 #include <vector>
 #include <QString>
 #include <string>
-
+#include "common/DataTypes.h"
+/*
 // Estructura para Transacción Bruta
 struct estructuraTB {
     int id;
@@ -40,7 +41,7 @@ struct estructuraDivisa {
     std::string nombre;
     std::string simbolo;
 };
-
+*/
 class SQLManager
 {
 public:
@@ -50,7 +51,9 @@ public:
     estructuraTB obtenerTransaccionBrutaPorId(int id);
     std::vector<estructuraTB> obtenerTodasTransaccionesBrutas();
     std::vector<estructuraTB> obtenerTransaccionesBrutasPorEstado(bool processed);
-    bool insertarTransaccionBruta(const estructuraTB& transaccion);
+    bool insertarTransaccionesBruta(const estructuraTB& transaccion);
+    bool insertarTransaccionesBrutas(const std::vector<estructuraTB>& transacciones);
+
     bool actualizarTransaccionBruta(const estructuraTB& transaccion);
     bool eliminarTransaccionBruta(int id);
     bool marcarTransaccionBrutaComoProcesada(int id, bool processed = true);
@@ -59,7 +62,8 @@ public:
     std::vector<estructuraTN> obtenerTransaccionesNetasConId_TB(int id_TB);
     std::vector<estructuraTN> obtenerTodasTransaccionesNetas();
     estructuraTN obtenerTransaccionNetaPorId(int id);
-    bool insertarTransaccionNeta(const estructuraTN& transaccion);
+    bool insertarTransaccionesNetas(const estructuraTN& transaccion);
+    bool insertarTransaccionesNetas(const std::vector<estructuraTN>& transacciones);
     bool actualizarTransaccionNeta(const estructuraTN& transaccion);
     bool eliminarTransaccionNeta(int id);
 
