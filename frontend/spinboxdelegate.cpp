@@ -22,6 +22,7 @@ void SpinBoxDelegate::setEditorData(QWidget * editor,
 {
     QSpinBox *spinner = static_cast<QSpinBox *> (editor);
     spinner->setValue(index.data().toInt());
+    //spinner->selectAll();
 
 }
 void SpinBoxDelegate::setModelData(QWidget * editor,

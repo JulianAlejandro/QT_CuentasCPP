@@ -23,14 +23,18 @@ public:
     //QTableWidget* getPtrTableWidget();
     void setFieldsTableWidget(const QStringList& columnTitles, bool edit);
     void loadTransactionsTableWidget(std::vector<std::vector<std::string>> transacciones, int IdRole);
+    std::vector<std::vector<std::string>> getNewDerivativeTransactions();
 
 private slots:
 
     void on_addPushButton_clicked();
 
-    void on_savePushButton_clicked();
+    // En addderivativetransactionsdialog.h
+    void onCellDoubleClicked(const QModelIndex &index);
 
-    void on_quitPushButton_clicked();
+    void on_buttonBox_accepted();
+
+    void on_buttonBox_rejected();
 
 private:
     Ui::addDerivativeTransactionsDialog *ui;

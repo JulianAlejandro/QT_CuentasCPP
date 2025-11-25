@@ -9,6 +9,8 @@
 #include "backend/transactionsmanager.h"
 #include "frontend/tableutils.h"
 
+#include <QDebug>
+
 //#include "categorytreewidgetdialog.h"//prueba
 
 MainWindow::MainWindow(QWidget *parent)
@@ -218,6 +220,12 @@ void MainWindow::onAddDerivativeTransaction()
     res = pd.exec();
     if (res == QDialog::Rejected)
         return;
+
+    //pd obtener las nuevas transacciones.
+    //en este punto se consiguen las transacciones, despues de esto se va a comparar con lo que esta cargado en tabla..
+    //pd.getNewDerivativeTransactions();
+
+
 }
 
 
