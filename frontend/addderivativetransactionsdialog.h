@@ -8,6 +8,11 @@ namespace Ui {
 class addDerivativeTransactionsDialog;
 }
 
+class QStandardItemModel;
+class SpinBoxDelegate;
+class DoubleSpinBoxDelegate;
+class DateEditDelegate;
+
 class addDerivativeTransactionsDialog : public QDialog
 {
     Q_OBJECT
@@ -29,6 +34,12 @@ private slots:
 
 private:
     Ui::addDerivativeTransactionsDialog *ui;
+    QStandardItemModel *m_modelo;
+    SpinBoxDelegate *m_spinnerDelegate_id;
+    DoubleSpinBoxDelegate *m_DoubleSpinnerDelegate;
+    SpinBoxDelegate *m_spinnerDelegate_id_TB;
+    SpinBoxDelegate *m_spinnerDelegate_category_id;
+    DateEditDelegate *m_DateEditDelegate;
 };
 
 #endif // ADDDERIVATIVETRANSACTIONSDIALOG_H

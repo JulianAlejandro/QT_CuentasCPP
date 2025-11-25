@@ -7,6 +7,8 @@ CONFIG += c++17 cmdline
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+        frontend/dateeditdelegate.cpp \
+        frontend/doublespinboxdelegate.cpp \
         frontend/categorytreewidgetdialog.cpp \
         frontend/addderivativetransactionsdialog.cpp \
         backend/categorymodel/categorynode.cpp \
@@ -15,6 +17,7 @@ SOURCES += \
         backend/sqlmanager.cpp \
         backend/transactionmodel/transaction.cpp \
         backend/transactionsmanager.cpp \
+        frontend/spinboxdelegate.cpp \
         frontend/transaccionbasicadialog.cpp \
         main.cpp \
         main_2.cpp \
@@ -28,6 +31,8 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 HEADERS += \
     common/DataTypes.h \
+    frontend/dateeditdelegate.h \
+    frontend/doublespinboxdelegate.h \
     frontend/categorytreewidgetdialog.h \
     frontend/addderivativetransactionsdialog.h \
     backend/categorymodel/categorynode.h \
@@ -38,6 +43,7 @@ HEADERS += \
     backend/transactionmodel/transaction.h \
     backend/transactionsmanager.h \
     frontend/mainwindow.h \
+    frontend/spinboxdelegate.h \
     frontend/transaccionbasicadialog.h \
     frontend/tableutils.h
 
