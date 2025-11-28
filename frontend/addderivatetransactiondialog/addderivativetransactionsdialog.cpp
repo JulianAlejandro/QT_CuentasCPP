@@ -1,4 +1,3 @@
-
 #include "addderivativetransactionsdialog.h"
 #include "ui_addderivativetransactionsdialog.h"
 //#include "common/DataTypes.h"
@@ -159,7 +158,7 @@ void addDerivativeTransactionsDialog::on_addPushButton_clicked()
 
 void addDerivativeTransactionsDialog::onCellDoubleClicked(const QModelIndex &index)
 {
-   // m_modelo->setData(m_modelo->index(0, 0), "", Qt::DisplayRole);
+    // m_modelo->setData(m_modelo->index(0, 0), "", Qt::DisplayRole);
 
     if (!index.isValid()) return;
 
@@ -167,6 +166,21 @@ void addDerivativeTransactionsDialog::onCellDoubleClicked(const QModelIndex &ind
     int columna = index.column();
 
     m_modelo->setData(m_modelo->index(fila, columna), "", Qt::DisplayRole); // ocultar info caundo se le da 2 click para editar
+
+    /* ESTO ES LO NUEVO
+
+    if (!index.isValid()) return;
+
+    int columna = index.column();
+
+    // Si es la primera columna, no permitir edición
+    if (columna == 0) {
+        return; // Salir sin hacer nada
+    }
+
+    int fila = index.row();
+    m_modelo->setData(m_modelo->index(fila, columna), "", Qt::DisplayRole);
+    */
 
     /*
     // Obtener el valor de la celda
@@ -224,4 +238,3 @@ void addDerivativeTransactionsDialog::on_buttonBox_rejected()
 {
     rejected();
 }
-

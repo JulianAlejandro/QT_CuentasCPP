@@ -2,7 +2,7 @@
 #include "ui_mainwindow.h"
 
 #include "frontend/transaccionbasicadialog.h"
-#include "frontend/addderivativetransactionsdialog.h"
+#include "frontend/addderivatetransactiondialog/addderivativetransactionsdialog.h"
 #include <QMessageBox>
 #include <QTableWidget>
 #include <QHeaderView>
@@ -41,7 +41,8 @@ MainWindow::MainWindow(QWidget *parent)
     //        this, &MainWindow::onCustomContextMenuRequested);
 
     // Cargar datos iniciales usando la interfaz
-    TableUtils::loadTransactionsTableWidget(ui->tableWidget, transaccionManager->getTransactions(), IdRole);
+    last_transactionsloaded = transaccionManager->getTransactions();
+    TableUtils::loadTransactionsTableWidget(ui->tableWidget, last_transactionsloaded, IdRole);
 }
 
 MainWindow::~MainWindow()
@@ -221,9 +222,11 @@ void MainWindow::onAddDerivativeTransaction()
     if (res == QDialog::Rejected)
         return;
 
+
     //pd obtener las nuevas transacciones.
     //en este punto se consiguen las transacciones, despues de esto se va a comparar con lo que esta cargado en tabla..
     //pd.getNewDerivativeTransactions();
+    //faltan cosas...
 
 
 }
@@ -283,7 +286,10 @@ void MainWindow::onRowSelected()
 
     int id = ui->tableWidget->item(currentRow, 0)->data(IdRole).toInt();
 
-    TableUtils::loadTransactionsTableWidget(ui->tableWidget_2, transaccionManager->getDerivativeTransactionsById(id), IdRole);
+    last_DerivativeTransactionsLoaded = transaccionManager->getDerivativeTransactionsById(id);
+    TableUtils::loadTransactionsTableWidget(ui->tableWidget_2, last_DerivativeTransactionsLoaded, IdRole);
+
+
     /*
     // ¡Ahora tienes acceso al ID! Puedes hacer cualquier operación con él
     //qDebug() <<  "ID:" << id;

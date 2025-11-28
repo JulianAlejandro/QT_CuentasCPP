@@ -12,7 +12,7 @@ class TransactionsManager : public ITransactionsManager
 public:
     TransactionsManager();
 
-    // Métodos que coinciden EXACTAMENTE con la interfaz
+    // Métodos que coinciden EXACTAMENTE con la int erfaz
 
     std::vector<std::string> getFieldsTableTransactions() override;
     std::vector<std::string> getFieldsTableDerivativeTransactions() override;

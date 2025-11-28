@@ -35,6 +35,9 @@ private:
     Ui::MainWindow *ui;
     std::unique_ptr<ITransactionsManager> transaccionManager;
 
+    std::vector<std::vector<std::string>> last_transactionsloaded;
+    std::vector<std::vector<std::string>> last_DerivativeTransactionsLoaded;
+
     // Roles personalizados para almacenar datos
     enum UserRoles {
         IdRole = Qt::UserRole + 1,  // TODO
