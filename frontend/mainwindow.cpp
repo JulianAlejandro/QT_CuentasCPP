@@ -214,7 +214,7 @@ void MainWindow::onAddDerivativeTransaction()
         TableUtils::arrayString_to_QStringList(transaccionManager->getFieldsTableDerivativeTransactions()), true);
 
 
-    //pd.loadTransactionsTableWidget(transaccionManager->getDerivativeTransactionsById(id), IdRole);
+    pd.loadTransactionsTableWidget(transaccionManager->getDerivativeTransactionsById(id), IdRole);
 
     res = pd.exec();
     if (res == QDialog::Rejected)

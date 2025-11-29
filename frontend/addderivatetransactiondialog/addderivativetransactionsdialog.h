@@ -3,6 +3,7 @@
 
 #include <QDialog>
 #include <QTableWidget>
+#include "commonDataTypes.h"
 
 namespace Ui {
 class addDerivativeTransactionsDialog;
@@ -22,7 +23,7 @@ public:
     ~addDerivativeTransactionsDialog();
     //QTableWidget* getPtrTableWidget();
     void setFieldsTableWidget(const QStringList& columnTitles, bool edit);
-    void loadTransactionsTableWidget(std::vector<std::vector<std::string>> transacciones, int IdRole);
+    void loadTransactionsTableWidget(const std::vector<DT_Structure>& transacciones, int IdRole);
     std::vector<std::vector<std::string>> getNewDerivativeTransactions();
 
 private slots:

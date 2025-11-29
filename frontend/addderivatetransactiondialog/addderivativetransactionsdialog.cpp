@@ -11,6 +11,8 @@
 #include "doublespinboxdelegate.h"
 #include "dateeditdelegate.h"
 #include <QStandardItemModel>
+
+#include "commonDataTypes.h"
 //#include "sliderdelegate.h"
 //#include "fontcomboboxdelegate.h"
 
@@ -123,32 +125,46 @@ void addDerivativeTransactionsDialog::setFieldsTableWidget(const QStringList& co
 }
 */
 
-void addDerivativeTransactionsDialog::loadTransactionsTableWidget(std::vector<std::vector<std::string>> transacciones, int IdRole)
+void addDerivativeTransactionsDialog::loadTransactionsTableWidget(
+    const std::vector<DT_Structure>& transacciones,
+    int IdRole)
 {
-    /*
     // Limpiar el modelo actual
     m_modelo->removeRows(0, m_modelo->rowCount());
 
     // Establecer el número de filas según las transacciones
-    m_modelo->setRowCount(transacciones.size());
+    m_modelo->setRowCount(static_cast<int>(transacciones.size()));
 
-    // Llenar el modelo con los datos del vector
+    // Llenar el modelo con los datos del vector de estructuras
     for (size_t row = 0; row < transacciones.size(); ++row) {
-        const std::vector<std::string>& fila = transacciones[row];
 
-        for (size_t col = 0; col < fila.size() && col < static_cast<size_t>(m_modelo->columnCount()); ++col) {
-            // Convertir std::string to QString
+        const auto& fila = transacciones[row].values;  // <-- ahora usamos el array interno
+
+        for (size_t col = 0;
+             col < fila.size() && col < static_cast<size_t>(m_modelo->columnCount());
+             ++col)
+        {
             QString valor = QString::fromStdString(fila[col]);
 
-            // Establecer el valor en el modelo
-            m_modelo->setData(m_modelo->index(row, col), valor);
+            QModelIndex idx = m_modelo->index(static_cast<int>(row),
+                                              static_cast<int>(col));
+
+            m_modelo->setData(idx, valor);
         }
+
+        // Si deseas guardar el ID en un rol, por ejemplo:
+        // (Opcional)
+        m_modelo->setData(
+            m_modelo->index(static_cast<int>(row), 0),
+            transacciones[row].id,
+            IdRole
+            );
     }
 
-    // Ajustar el tamaño de las columnas al contenido
-    //ui->tableView->resizeColumnsToContents();
-    */
+    // Opcional: ajustar columnas
+    // ui->tableView->resizeColumnsToContents();
 }
+
 
 
 void addDerivativeTransactionsDialog::on_addPushButton_clicked()
