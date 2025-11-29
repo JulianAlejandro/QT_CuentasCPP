@@ -17,13 +17,18 @@
 //#include "fontcomboboxdelegate.h"
 
 //void setupTableWidget(QTableWidget* tableWidget, const QStringList& columnTitles, bool edit);
-
+#include <QMenu>
 
 addDerivativeTransactionsDialog::addDerivativeTransactionsDialog(QWidget *parent)
     : QDialog(parent)
     , ui(new Ui::addDerivativeTransactionsDialog)
 {
     ui->setupUi(this);
+    ui->tableView->setContextMenuPolicy(Qt::CustomContextMenu);
+
+    connect(ui->tableView, &QTableView::customContextMenuRequested,
+            this, &addDerivativeTransactionsDialog::onCustomContextMenuRequested);
+
 
     m_modelo = new QStandardItemModel(this);
     m_spinnerDelegate_id = new SpinBoxDelegate(this);
@@ -266,4 +271,34 @@ void addDerivativeTransactionsDialog::on_buttonBox_accepted()
 void addDerivativeTransactionsDialog::on_buttonBox_rejected()
 {
     rejected();
+}
+
+
+void addDerivativeTransactionsDialog::onCustomContextMenuRequested(const QPoint &pos)
+{
+    QModelIndex index = ui->tableView->indexAt(pos);
+    if (!index.isValid()) return;
+
+    // Seleccionar la fila completa
+    ui->tableView->selectRow(index.row());
+
+    // Crear menú
+    QMenu menu(this);
+    QAction *deleteAction = menu.addAction("Borrar transacción");
+
+    // Conectar acción
+    connect(deleteAction, &QAction::triggered, this, &addDerivativeTransactionsDialog::borrarFilaSeleccionada);
+
+    // Mostrar menú en la posición del cursor
+    menu.exec(ui->tableView->viewport()->mapToGlobal(pos));
+}
+
+
+void addDerivativeTransactionsDialog::borrarFilaSeleccionada()
+{
+    QModelIndex index = ui->tableView->currentIndex();
+    if (!index.isValid()) return;
+
+    int fila = index.row();
+    m_modelo->removeRow(fila);
 }

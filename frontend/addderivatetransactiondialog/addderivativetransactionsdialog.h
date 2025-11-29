@@ -28,6 +28,9 @@ public:
 
 private slots:
 
+    void onCustomContextMenuRequested(const QPoint &pos);
+    void borrarFilaSeleccionada();
+
     void on_addPushButton_clicked();
 
     // En addderivativetransactionsdialog.h
