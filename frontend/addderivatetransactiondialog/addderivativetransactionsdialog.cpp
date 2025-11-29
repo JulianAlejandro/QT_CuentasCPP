@@ -170,8 +170,18 @@ void addDerivativeTransactionsDialog::loadTransactionsTableWidget(
 
 void addDerivativeTransactionsDialog::on_addPushButton_clicked()
 {
+    int newRow = m_modelo->rowCount();           // Número de la nueva fila
+    m_modelo->insertRow(newRow);                 // Añadir fila vacía
 
+    // Opcional: inicializar todas las columnas con cadenas vacías
+    for (int c = 0; c < m_modelo->columnCount(); ++c) {
+        m_modelo->setData(m_modelo->index(newRow, c), "");
+    }
+
+    // Opcional: mover selección a la nueva fila
+    ui->tableView->selectRow(newRow);
 }
+
 
 
 
