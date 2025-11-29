@@ -83,11 +83,12 @@ void addDerivativeTransactionsDialog::setFieldsTableWidget(const QStringList& co
 
     if (edit) {
         // MODO EDICIÓN HABILITADO
-        ui->tableView->setItemDelegateForColumn(0, m_spinnerDelegate_id);
-        ui->tableView->setItemDelegateForColumn(1, m_DoubleSpinnerDelegate);
-        ui->tableView->setItemDelegateForColumn(3, m_DateEditDelegate);
-        ui->tableView->setItemDelegateForColumn(4, m_spinnerDelegate_id_TB);
-        ui->tableView->setItemDelegateForColumn(6, m_spinnerDelegate_category_id);
+        ui->tableView->setItemDelegateForColumn(0, m_DateEditDelegate);
+        ui->tableView->setItemDelegateForColumn(2, m_DoubleSpinnerDelegate);
+        //ui->tableView->setItemDelegateForColumn(1, m_DoubleSpinnerDelegate);
+        //ui->tableView->setItemDelegateForColumn(3, m_DateEditDelegate);
+        //ui->tableView->setItemDelegateForColumn(4, m_spinnerDelegate_id_TB);
+        //ui->tableView->setItemDelegateForColumn(6, m_spinnerDelegate_category_id);
 
         // SOLUCIÓN: Usar solo DoubleClicked y EditKeyPressed
         // Esto evita que se concatene al presionar teclas
