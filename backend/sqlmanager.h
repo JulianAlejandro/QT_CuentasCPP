@@ -5,7 +5,7 @@
 #include <vector>
 #include <QString>
 #include <string>
-#include "common/DataTypes.h"
+#include "DataTypes.h"
 /*
 // Estructura para Transacción Bruta
 struct estructuraTB {

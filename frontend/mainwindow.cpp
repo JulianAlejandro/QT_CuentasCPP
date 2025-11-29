@@ -23,8 +23,8 @@ MainWindow::MainWindow(QWidget *parent)
     setWindowTitle("App");
 
     // Configurar la tabla
-    TableUtils::setFieldsTableWidget(ui->tableWidget, TableUtils::vectorString_to_QStringList (transaccionManager->getFieldsTableTransactions()), false);
-    TableUtils::setFieldsTableWidget(ui->tableWidget_2, TableUtils::vectorString_to_QStringList(transaccionManager->getFieldsTableDerivativeTransactions()), false);
+    TableUtils::setFieldsTableWidget(ui->tableWidget, TableUtils::arrayString_to_QStringList(transaccionManager->getFieldsTableTransactions()), false);
+    TableUtils::setFieldsTableWidget(ui->tableWidget_2, TableUtils::arrayString_to_QStringList(transaccionManager->getFieldsTableDerivativeTransactions()), false);
 
     // ✅ HABILITAR MENÚ CONTEXTUAL EN AMBAS TABLAS
     ui->tableWidget->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -211,12 +211,10 @@ void MainWindow::onAddDerivativeTransaction()
     pd.setWindowTitle("Add/Edit derivative Transactions");
 
     pd.setFieldsTableWidget(
-        TableUtils::vectorString_to_QStringList(
-            transaccionManager->getFieldsTableDerivativeTransactions()
-            ), true);
+        TableUtils::arrayString_to_QStringList(transaccionManager->getFieldsTableDerivativeTransactions()), true);
 
 
-    pd.loadTransactionsTableWidget(transaccionManager->getDerivativeTransactionsById(id), IdRole);
+    //pd.loadTransactionsTableWidget(transaccionManager->getDerivativeTransactionsById(id), IdRole);
 
     res = pd.exec();
     if (res == QDialog::Rejected)

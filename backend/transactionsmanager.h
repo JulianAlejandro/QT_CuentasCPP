@@ -1,6 +1,3 @@
-
-
-
 #ifndef TRANSACTIONSMANAGER_H
 #define TRANSACTIONSMANAGER_H
 
@@ -14,15 +11,15 @@ public:
 
     // Métodos que coinciden EXACTAMENTE con la int erfaz
 
-    std::vector<std::string> getFieldsTableTransactions() override;
-    std::vector<std::string> getFieldsTableDerivativeTransactions() override;
+    std::array<std::string, N_FIELDS_T> getFieldsTableTransactions() override;
+    std::array<std::string, N_FIELDS_DT> getFieldsTableDerivativeTransactions() override;
 
-    std::vector<std::vector<std::string>> getTransactions() override;
-    std::vector<std::vector<std::string>> getDerivativeTransactionsById(int id) override;
+    std::vector<T_Structure> getTransactions() override;
+    std::vector<DT_Structure> getDerivativeTransactionsById(int id) override;
 
-    void addNewDerivativeTransactions(std::vector<std::vector<std::string>> vec) override;
+    //void addNewDerivativeTransactions(std::vector<DT_Structure> vec) override;
 
-    std::vector<estructuraCategoria> getCategories() override;
+    //std::vector<Category_Structure> getCategories() override;
 
 private:
     SQLManager m_SQLManager;

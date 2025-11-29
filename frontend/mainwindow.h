@@ -2,9 +2,9 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include <memory>
+//#include <memory>
 #include "backend/itransactionsmanager.h"
-#include "common/DataTypes.h"
+#include "commonDataTypes.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -35,8 +35,8 @@ private:
     Ui::MainWindow *ui;
     std::unique_ptr<ITransactionsManager> transaccionManager;
 
-    std::vector<std::vector<std::string>> last_transactionsloaded;
-    std::vector<std::vector<std::string>> last_DerivativeTransactionsLoaded;
+    std::vector<T_Structure> last_transactionsloaded; // TODO
+    std::vector<DT_Structure> last_DerivativeTransactionsLoaded; //TODO
 
     // Roles personalizados para almacenar datos
     enum UserRoles {

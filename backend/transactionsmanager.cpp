@@ -42,7 +42,7 @@ struct estructuraDivisa {
 };
 */
 
-
+/*
 // Función para convertir Transaction a vector de strings
 std::vector<std::string> convertirAStringVector(const estructuraTB& estructuraTB) {
     return {
@@ -69,63 +69,75 @@ std::vector<std::string> convertirAStringVectorNeta(const estructuraTN& estructu
         std::to_string(estructuraTN.category_id)
     };
 }
+*/
+
+
+
+T_Structure obtain_TStruct(const estructuraTB& estructuraTB) {
+    T_Structure e;
+    e.id = estructuraTB.id;
+    e.processed = estructuraTB.processed;
+   // std::array<std::string, e.values.size()> data = {estructuraTB.date, estructuraTB.comment,
+   //                                             std::to_string(estructuraTB.amount), estructuraTB.currency};
+
+   // for(int i = 0; i < e.values.size(); i++){
+    e.values={estructuraTB.date, estructuraTB.comment,
+            std::to_string(estructuraTB.amount), estructuraTB.currency};
+
+    return e;
+}
+
+DT_Structure obtain_DT_Struct(const estructuraTN& estructuraTN){
+    DT_Structure e;
+    e.id = estructuraTN.id;
+    e.id_T = estructuraTN.id_TB;
+    e.values = {estructuraTN.date, estructuraTN.comment, std::to_string(estructuraTN.amount),
+                estructuraTN.category_name};
+    return e;
+}
 
 
 TransactionsManager::TransactionsManager() {}
 
 // Implementación CORREGIDA - mismos nombres que la interfaz
-std::vector<std::vector<std::string>> TransactionsManager::getTransactions() {
-    std::vector<std::vector<std::string>> resultado;
-
+std::vector<T_Structure> TransactionsManager::getTransactions() {
+    std::vector<T_Structure> resultado;
 
     std::vector<estructuraTB> brutas = m_SQLManager.obtenerTodasTransaccionesBrutas();
 
     for (const auto& transaccion : brutas) {
-        resultado.push_back(convertirAStringVector(transaccion));
+        resultado.push_back(obtain_TStruct(transaccion));
     }
-
-    /*
-    QList<Transaction> brutas = m_SQLManager.retrieveAllTransactions();
-
-    for (const Transaction& transaccion : brutas) {
-        resultado.push_back(convertirAStringVector(transaccion));
-    }
-    */
-
 
     return resultado;
 }
 
-std::vector<std::vector<std::string>> TransactionsManager::getDerivativeTransactionsById(int id_TB) {
-    std::vector<std::vector<std::string>> resultado;
-
+std::vector<DT_Structure> TransactionsManager::getDerivativeTransactionsById(int id_TB) {
+    std::vector<DT_Structure> resultado;
     std::vector<estructuraTN> netas = m_SQLManager.obtenerTransaccionesNetasConId_TB(id_TB);
 
     for (const auto& transaccion : netas){
-        resultado.push_back(convertirAStringVectorNeta(transaccion));
+        resultado.push_back(obtain_DT_Struct(transaccion));
     }
 
-    /*
-    QList<DerivativeTransaction> netas = m_SQLManager.retrieveDerivativeTransactionsWithId(id_TB);
-
-    for (const DerivativeTransaction& transaccion : netas) {
-        resultado.push_back(convertirAStringVectorDerivada(transaccion));
-    }
-    */
     return resultado;
 }
 
-std::vector<std::string> TransactionsManager::getFieldsTableTransactions(){ //TODO. esto depende del SQL
 
-    return {"id","Amount", "Comment", "date", "currency", "processed"};
-}
+std::array<std::string, N_FIELDS_T> TransactionsManager::getFieldsTableTransactions(){
 
-std::vector<std::string> TransactionsManager::getFieldsTableDerivativeTransactions(){ //TODO. esto depende del SQL
-
-    return {"id", "Amount", "Comment", "Date", "id_TB", "Category", "Category_id"};
+    return T_FIELD_TITLES;
 }
 
 
+
+std::array<std::string, N_FIELDS_DT> TransactionsManager::getFieldsTableDerivativeTransactions(){
+
+    return DT_FIELD_TITLES;
+}
+
+
+/*
 void TransactionsManager::addNewDerivativeTransactions(std::vector<std::vector<std::string>> vec){
 
     std::vector<estructuraTN> result;
@@ -149,3 +161,4 @@ std::vector<estructuraCategoria> TransactionsManager::getCategories(){
     return m_SQLManager.obtenerTodasCategorias();
 }
 
+*/

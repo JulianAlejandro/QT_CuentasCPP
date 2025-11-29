@@ -23,7 +23,7 @@
             tableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
         }
     }
-
+/*
     QStringList vectorString_to_QStringList( std::vector<std::string> v){
         QStringList result;
 
@@ -32,57 +32,58 @@
         }
         return result;
     }
+    */
+    /*
+    void loadTransactionsTableWidget(QTableWidget* table, std::vector<std::vector<std::string>> transacciones, int IdRole) //TODO
+    {
 
+        table->setRowCount(0);
 
+        for (const auto& transaccion : transacciones){
+            int newRow = table->rowCount();
+            table->insertRow(newRow);
 
- void loadTransactionsTableWidget(QTableWidget* table, std::vector<std::vector<std::string>> transacciones, int IdRole)
- {
+            if (transaccion.empty()) {
+               continue; // Saltar transacciones vacías
+            }
 
-     table->setRowCount(0);
+            int nuevoId = std::stoi(transaccion[0]);
 
-     for (const auto& transaccion : transacciones){
-         int newRow = table->rowCount();
-         table->insertRow(newRow);
-
-         if (transaccion.empty()) {
-            continue; // Saltar transacciones vacías
-         }
-
-         int nuevoId = std::stoi(transaccion[0]);
-
-        for (size_t  i = 0; i < transaccion.size(); i++) { //añade para cada transacción
-            QTableWidgetItem* item = new QTableWidgetItem(QString::fromStdString(transaccion[i]));
-            item->setData(IdRole, nuevoId);
-            table->setItem(newRow, i, item);
+            for (size_t  i = 0; i < transaccion.size(); i++) { //añade para cada transacción
+                QTableWidgetItem* item = new QTableWidgetItem(QString::fromStdString(transaccion[i]));
+                item->setData(IdRole, nuevoId);
+                table->setItem(newRow, i, item);
+            }
         }
-     }
- }
+    }
+    */
 
 
- bool compareTransactions(const std::vector<std::vector<std::string>>& v1,
+
+    bool compareTransactions(const std::vector<std::vector<std::string>>& v1,
                  const std::vector<std::vector<std::string>>& v2) {
-     // Verificar tamaño del vector externo
-     if (v1.size() != v2.size()) {
-         return false;
-     }
+        // Verificar tamaño del vector externo
+        if (v1.size() != v2.size()) {
+            return false;
+        }
 
-     // Comparar cada vector interno
-     for (size_t i = 0; i < v1.size(); ++i) {
-         // Verificar tamaño del vector interno
-         if (v1[i].size() != v2[i].size()) {
-             return false;
-         }
+        // Comparar cada vector interno
+        for (size_t i = 0; i < v1.size(); ++i) {
+            // Verificar tamaño del vector interno
+            if (v1[i].size() != v2[i].size()) {
+                return false;
+            }
 
-         // Comparar cada string
-         for (size_t j = 0; j < v1[i].size(); ++j) {
-             if (v1[i][j] != v2[i][j]) {
-                 return false;
-             }
-         }
-     }
+            // Comparar cada string
+            for (size_t j = 0; j < v1[i].size(); ++j) {
+                 if (v1[i][j] != v2[i][j]) {
+                     return false;
+                 }
+            }
+        }
 
-     return true;
- }
+        return true;
+    }
 
 
 } // namespace TableUtils

@@ -30,7 +30,8 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 HEADERS += \
-    common/DataTypes.h \
+    backend/DataTypes.h \
+    commonDataTypes.h \
     frontend/addderivatetransactiondialog/addderivativetransactionsdialog.h \
     frontend/addderivatetransactiondialog/dateeditdelegate.h \
     frontend/addderivatetransactiondialog/doublespinboxdelegate.h \

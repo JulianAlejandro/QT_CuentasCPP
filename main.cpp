@@ -1,5 +1,4 @@
 
-
 #include "frontend/mainwindow.h"
 
 #include <QApplication>
@@ -16,7 +15,64 @@ int main(int argc, char *argv[])
 
 
 /*
+#include <QCoreApplication>
+#include <QDebug>
+#include <memory>  // Asegúrate de incluir este header
+#include "backend/itransactionsmanager.h"
+#include "backend/transactionsmanager.h"
+#include <vector>
+#include "frontend/tableutils.h"
+#include "commonDataTypes.h"
 
+#include <QStringList>
+
+int main(int argc, char *argv[])
+{
+    QCoreApplication app(argc, argv);
+
+    // CORRECTO: Asignación con =
+    std::unique_ptr<ITransactionsManager> transaccionManager;
+    transaccionManager = std::make_unique<TransactionsManager>();
+
+    // O directamente inicializado
+    // std::unique_ptr<ITransactionsManager> transaccionManager = std::make_unique<TransactionsManager>();
+
+
+    // Ahora puedes usar transaccionManager
+    //auto transactions = transaccionManager->getFieldsTableTransactions();
+    //for (const auto& t : transactions){
+    //    qDebug() << t;
+    //}
+
+
+    //QStringList l = TableUtils::arrayString_to_QStringList(transaccionManager->getFieldsTableTransactions());
+
+
+    //for (const auto& i : l){
+    //    qDebug() << i;
+    //}
+
+
+    std::vector<T_Structure> a = transaccionManager->getTransactions();
+
+    std::vector<std::array<std::string, N_FIELDS_T>> v;
+    v.reserve(a.size());
+
+    std::transform(a.begin(), a.end(), std::back_inserter(v),
+                   [](const T_Structure& s){ return s.values; });
+
+    for (const auto& i : v){
+        for (const auto& ix : i){
+            qDebug() << ix;
+        }
+    }
+
+    return 0;
+    // return app.exec();  // Si necesitas el event loop de Qt
+}
+*/
+
+/*
 #include <QCoreApplication>
 #include <QDebug>
 #include "backend/sqlmanager.h"

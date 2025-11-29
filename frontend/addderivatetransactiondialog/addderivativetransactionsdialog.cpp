@@ -125,6 +125,7 @@ void addDerivativeTransactionsDialog::setFieldsTableWidget(const QStringList& co
 
 void addDerivativeTransactionsDialog::loadTransactionsTableWidget(std::vector<std::vector<std::string>> transacciones, int IdRole)
 {
+    /*
     // Limpiar el modelo actual
     m_modelo->removeRows(0, m_modelo->rowCount());
 
@@ -146,6 +147,7 @@ void addDerivativeTransactionsDialog::loadTransactionsTableWidget(std::vector<st
 
     // Ajustar el tamaño de las columnas al contenido
     //ui->tableView->resizeColumnsToContents();
+    */
 }
 
 

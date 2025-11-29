@@ -1,8 +1,9 @@
+/*
 #ifndef CATEGORYTREEWIDGETDIALOG_H
 #define CATEGORYTREEWIDGETDIALOG_H
 
 #include <QDialog>
-#include "common/DataTypes.h"
+#include "commonDataTypes.h"
 
 namespace Ui {
 class categoryTreeWidgetDialog;
@@ -28,3 +29,5 @@ private:
 };
 
 #endif // CATEGORYTREEWIDGETDIALOG_H
+
+*/
