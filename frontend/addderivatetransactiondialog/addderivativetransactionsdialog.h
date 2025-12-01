@@ -24,7 +24,7 @@ public:
     //QTableWidget* getPtrTableWidget();
     void setFieldsTableWidget(const QStringList& columnTitles, bool edit);
     void loadTransactionsTableWidget(const std::vector<DT_Structure>& transacciones, int IdRole);
-    std::vector<std::vector<std::string>> getNewDerivativeTransactions();
+    std::vector<std::array<std::string, N_FIELDS_DT>> getDerivativeTransactionsModifications();
 
 private slots:
 
@@ -43,10 +43,10 @@ private slots:
 private:
     Ui::addDerivativeTransactionsDialog *ui;
     QStandardItemModel *m_modelo;
-    SpinBoxDelegate *m_spinnerDelegate_id;
+    //SpinBoxDelegate *m_spinnerDelegate_id;
     DoubleSpinBoxDelegate *m_DoubleSpinnerDelegate;
-    SpinBoxDelegate *m_spinnerDelegate_id_TB;
-    SpinBoxDelegate *m_spinnerDelegate_category_id;
+    //SpinBoxDelegate *m_spinnerDelegate_id_TB;
+    //SpinBoxDelegate *m_spinnerDelegate_category_id;
     DateEditDelegate *m_DateEditDelegate;
 };
 

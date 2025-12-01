@@ -204,7 +204,7 @@ void MainWindow::onAddDerivativeTransaction()
     }
 
     // Obtener ID de la transacción seleccionada
-    int id = ui->tableWidget->item(currentRow, 0)->data(IdRole).toInt();
+    int id_t = ui->tableWidget->item(currentRow, 0)->data(IdRole).toInt();
 
     int res;
     addDerivativeTransactionsDialog pd(this);
@@ -213,19 +213,72 @@ void MainWindow::onAddDerivativeTransaction()
     pd.setFieldsTableWidget(
         TableUtils::arrayString_to_QStringList(transaccionManager->getFieldsTableDerivativeTransactions()), true);
 
-
-    pd.loadTransactionsTableWidget(transaccionManager->getDerivativeTransactionsById(id), IdRole);
+    std::vector<DT_Structure> dt_transactions = transaccionManager->getDerivativeTransactionsById(id_t);
+    pd.loadTransactionsTableWidget(dt_transactions, IdRole);
 
     res = pd.exec();
-    if (res == QDialog::Rejected)
+    if (res == QDialog::Rejected){
         return;
-
+    }
 
     //pd obtener las nuevas transacciones.
     //en este punto se consiguen las transacciones, despues de esto se va a comparar con lo que esta cargado en tabla..
-    //pd.getNewDerivativeTransactions();
-    //faltan cosas...
+    std::vector<std::array<std::string, N_FIELDS_DT>> new_DT = pd.getDerivativeTransactionsModifications();
+    if(new_DT.empty()){
+        QMessageBox::information(this, "message", "vacio");
+        return;
+    }
+    for(int i = 0; i < new_DT.size(); i++){
+        for(int j = 0; j < new_DT[i].size(); j++){
+            if(new_DT[i][j].empty()){
+                QMessageBox::information(this, "message", "Valores vacios, incorrecto");
+                return;
+            }
+        }
+    }
 
+    bool modificado = false;
+    if(dt_transactions.size() == new_DT.size()){
+        for (size_t i = 0; i < dt_transactions.size(); i++){
+            for(size_t j = 0; j < dt_transactions[i].values.size(); j++){
+                if (dt_transactions[i].values[j] != new_DT[i][j]){
+                    modificado = true;
+                }
+            }
+        }
+        if (modificado){
+            QMessageBox::information(this, "message", "se actualizan las tablas");
+            for (const auto& i : dt_transactions){
+                transaccionManager->deleteDerivativeTransactionsById(i.id);
+            }
+
+            transaccionManager->insertDerivativeTransactions(id_t, new_DT);
+            return;
+        }else{
+            QMessageBox::information(this, "message", "se quedan igual");
+            return;
+        }
+
+    }
+    // como son de distinto tamaño, se actualiza la tabla
+    QMessageBox::information(this, "message", "se actualizan las tablas");
+
+        //se borra la anterior tabla y se pone la nueva    
+    for (const auto& i : dt_transactions){
+        transaccionManager->deleteDerivativeTransactionsById(i.id);
+    }
+
+    transaccionManager->insertDerivativeTransactions(id_t, new_DT);
+
+        //transaccionManager->insertDerivativeTransactions(id_t, new_DT);
+
+        //insertarTransacciones netas nuevas
+        //std::vector<std::array<std::string, N_FIELDS_DT>> new_DT
+        //ID_T COMUN PARA TODOS
+
+
+        //for()
+        //std::vector<std::array<std::string, N_FIELDS_DT>> new_DT
 
 }
 

@@ -11,7 +11,7 @@ QWidget *DoubleSpinBoxDelegate::createEditor(QWidget * parent,
                                        const QModelIndex & index) const
 {
     QDoubleSpinBox *spinner = new QDoubleSpinBox(parent);
-    spinner->setMinimum(0.0);
+    spinner->setMinimum(-1000000.0);
     spinner->setMaximum(1000000.0);  // ✅ Usar valor double apropiado
     spinner->setDecimals(2);         // ✅ Establecer decimales
     spinner->setSingleStep(0.1);     // ✅ Paso incremental decimal

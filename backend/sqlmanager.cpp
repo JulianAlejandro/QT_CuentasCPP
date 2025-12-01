@@ -907,6 +907,39 @@ bool SQLManager::eliminarDivisa(const std::string& codigo)
     return success;
 }
 
+
+int SQLManager::obtenerIdCategoriaPorNombre(const std::string& nombre)
+{
+    if(!abrirBD()) return -1;
+
+    QSqlQuery q;
+    QString queryStr =
+        "SELECT id FROM categoria WHERE nombre = :nombre";
+
+    q.prepare(queryStr);
+    q.bindValue(":nombre", QString::fromStdString(nombre));
+
+    if(!q.exec()){
+        qDebug() << "Error obteniendo id de categoria por nombre:"
+                 << q.lastError().text();
+        cerrarBD();
+        return -1;
+    }
+
+    if(q.next()){
+        int id = q.value("id").toInt();
+        cerrarBD();
+        return id;
+    }
+
+    qDebug() << "No existe categoria con nombre:"
+             << QString::fromStdString(nombre);
+
+    cerrarBD();
+    return -1;   // indica que no existe
+}
+
+
 /*
 
 #include "sqlmanager.h"

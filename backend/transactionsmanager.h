@@ -17,6 +17,10 @@ public:
     std::vector<T_Structure> getTransactions() override;
     std::vector<DT_Structure> getDerivativeTransactionsById(int id) override;
 
+    void deleteDerivativeTransactionsById(const int id) override;
+    void insertDerivativeTransactions(const int id_t, const std::vector<std::array<std::string, N_FIELDS_DT>> values) override;
+
+    //void addNewDerivativeTransactions(std::vector<std::vector<std::string>> vec);
     //void addNewDerivativeTransactions(std::vector<DT_Structure> vec) override;
 
     //std::vector<Category_Structure> getCategories() override;

@@ -136,9 +136,42 @@ std::array<std::string, N_FIELDS_DT> TransactionsManager::getFieldsTableDerivati
     return DT_FIELD_TITLES;
 }
 
+void TransactionsManager::deleteDerivativeTransactionsById(const int id){
+    m_SQLManager.eliminarTransaccionNeta(id);
+}
+
+
+void TransactionsManager::insertDerivativeTransactions(const int id_t, const std::vector<std::array<std::string, N_FIELDS_DT>> values){
+
+   estructuraTN e;
+   for (const auto& i : values){
+       e.id = 0; // da igual el valor
+       e.amount = std::stod(i[dt_AMOUNT]);
+       e.comment = i[dt_CONCEPT];
+       e.date = i[dt_DATE];
+       e.id_TB = id_t;
+       e.category_name = i[dt_CATEGORY];
+       e.category_id = m_SQLManager.obtenerIdCategoriaPorNombre(i[dt_CATEGORY]);
+       m_SQLManager.insertarTransaccionesNetas(e);
+   }
+}
+
+
+/*
+struct estructuraTN {
+    int id;
+    double amount;
+    std::string comment;
+    std::string date;
+    int id_TB;
+    std::string category_name;
+    int category_id;
+};
+*/
 
 /*
 void TransactionsManager::addNewDerivativeTransactions(std::vector<std::vector<std::string>> vec){
+
 
     std::vector<estructuraTN> result;
     estructuraTN e = {0, 0.0, "", "", 0, "", 0};
@@ -152,13 +185,15 @@ void TransactionsManager::addNewDerivativeTransactions(std::vector<std::vector<s
         e.category_name = v[5];
         e.category_id = std::stoi(v[6]);
 
-        result.push_back(e);
+        result.push_back(e);   
     }
     m_SQLManager.insertarTransaccionesNetas(result);
 }
+*/
 
+/*
 std::vector<estructuraCategoria> TransactionsManager::getCategories(){
     return m_SQLManager.obtenerTodasCategorias();
 }
-
 */
+

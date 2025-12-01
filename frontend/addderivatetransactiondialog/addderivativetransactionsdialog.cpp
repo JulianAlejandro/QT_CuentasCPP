@@ -7,7 +7,7 @@
 #include <QStyledItemDelegate>
 
 
-#include "spinboxdelegate.h"
+//#include "spinboxdelegate.h"
 #include "doublespinboxdelegate.h"
 #include "dateeditdelegate.h"
 #include <QStandardItemModel>
@@ -31,10 +31,10 @@ addDerivativeTransactionsDialog::addDerivativeTransactionsDialog(QWidget *parent
 
 
     m_modelo = new QStandardItemModel(this);
-    m_spinnerDelegate_id = new SpinBoxDelegate(this);
+    //m_spinnerDelegate_id = new SpinBoxDelegate(this);
     m_DoubleSpinnerDelegate = new DoubleSpinBoxDelegate(this);
-    m_spinnerDelegate_id_TB = new SpinBoxDelegate(this);
-    m_spinnerDelegate_category_id = new SpinBoxDelegate(this);
+    //m_spinnerDelegate_id_TB = new SpinBoxDelegate(this);
+    //m_spinnerDelegate_category_id = new SpinBoxDelegate(this);
     m_DateEditDelegate = new DateEditDelegate(this);
 
     m_modelo->setRowCount(7);
@@ -241,19 +241,19 @@ void addDerivativeTransactionsDialog::onCellDoubleClicked(const QModelIndex &ind
 */
 }
 
-std::vector<std::vector<std::string>> addDerivativeTransactionsDialog::getNewDerivativeTransactions()
+std::vector<std::array<std::string, N_FIELDS_DT>> addDerivativeTransactionsDialog::getDerivativeTransactionsModifications()
 {
-    std::vector<std::vector<std::string>> result;
+    std::vector<std::array<std::string, N_FIELDS_DT>> result;
 
     if (!m_modelo) return result;
 
     for (int fila = 0; fila < m_modelo->rowCount(); ++fila) {
-        std::vector<std::string> filaDatos;
+        std::array<std::string, N_FIELDS_DT> filaDatos;
 
         for (int columna = 0; columna < m_modelo->columnCount(); ++columna) {
             QVariant dato = m_modelo->data(m_modelo->index(fila, columna), Qt::EditRole);
             QString valor = dato.isValid() ? dato.toString() : "";
-            filaDatos.push_back(valor.toStdString());
+            filaDatos[columna] = valor.toStdString();
         }
 
         result.push_back(filaDatos);
@@ -270,7 +270,7 @@ void addDerivativeTransactionsDialog::on_buttonBox_accepted()
 
 void addDerivativeTransactionsDialog::on_buttonBox_rejected()
 {
-    rejected();
+    reject();
 }
 
 

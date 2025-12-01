@@ -16,7 +16,10 @@ public:
     virtual std::vector<T_Structure> getTransactions() = 0;
     virtual std::vector<DT_Structure> getDerivativeTransactionsById(const int id) = 0;
 
+    virtual void deleteDerivativeTransactionsById(const int id) = 0;
+    virtual void insertDerivativeTransactions(const int id_t, const std::vector<std::array<std::string, N_FIELDS_DT>> values) = 0;
     //virtual void addNewDerivativeTransactions(std::vector<DT_Structure> vec) = 0;
+    //virtual void addNewDerivativeTransactions(std::vector<std::vector<std::string>> vec) = 0;
 
     //virtual std::vector<Category_Structure> getCategories() = 0;
    // virtual bool addTransaccion(const TransaccionData& data) = 0;

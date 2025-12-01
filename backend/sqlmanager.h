@@ -70,6 +70,7 @@ public:
     // Métodos para Categorías
     std::vector<estructuraCategoria> obtenerTodasCategorias();
     estructuraCategoria obtenerCategoriaPorId(int id);
+    int obtenerIdCategoriaPorNombre(const std::string& nombre);
     //std::string obtenerNombreCategoriaPorId(int id);
     std::vector<estructuraCategoria> obtenerCategoriasPorPadre(int id_padre);
     bool insertarCategoria(const estructuraCategoria& categoria);
