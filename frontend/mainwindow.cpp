@@ -10,6 +10,7 @@
 #include "frontend/tableutils.h"
 
 #include <QDebug>
+#include <set>
 
 //#include "categorytreewidgetdialog.h"//prueba
 
@@ -178,24 +179,6 @@ void MainWindow::onCustomContextMenuRequested(const QPoint &pos)
 
 void MainWindow::onAddDerivativeTransaction()
 {
-
-    // TODO: Aqui se crea abre una nueva ventana, esta ventan contiene un QTableWidget en el que se pueden añadir nuevas filas.
-    // reglas
-    //
-/*
-    int res;
-    addDerivativeTransactionsDialog pd(this);
-    pd.setWindowTitle("Add/Edit derivative Transactions");
-    QTableWidget* table = pd.getPtrTableWidget();
-
-    setupTableWidget(table, vectorString_to_QStringList (transaccionManager->getFieldsTableTransactions()));
-
-    res = pd.exec();
-    if (res == QDialog::Rejected){
-        return;
-    }
-*/
-
     int currentRow = ui->tableWidget->currentRow();
     if (currentRow < 0) {
         QMessageBox::warning(this, "Aviso",
@@ -203,79 +186,245 @@ void MainWindow::onAddDerivativeTransaction()
         return;
     }
 
-    // Obtener ID de la transacción seleccionada
+    // Obtener ID de la transacción padre seleccionada
     int id_t = ui->tableWidget->item(currentRow, 0)->data(IdRole).toInt();
 
-    int res;
+    // Obtener transacciones derivadas actuales para esta transacción padre
+    std::vector<DT_Structure> current_DT = transaccionManager->getDerivativeTransactionsById(id_t);
+
+    // Crear y configurar el diálogo de edición
     addDerivativeTransactionsDialog pd(this);
     pd.setWindowTitle("Add/Edit derivative Transactions");
-
     pd.setFieldsTableWidget(
-        TableUtils::arrayString_to_QStringList(transaccionManager->getFieldsTableDerivativeTransactions()), true);
+        TableUtils::arrayString_to_QStringList(transaccionManager->getFieldsTableDerivativeTransactions()),
+        true);
+    pd.loadTransactionsTableWidget(current_DT, IdRole);
 
-    std::vector<DT_Structure> dt_transactions = transaccionManager->getDerivativeTransactionsById(id_t);
-    pd.loadTransactionsTableWidget(dt_transactions, IdRole);
-
-    res = pd.exec();
-    if (res == QDialog::Rejected){
-        return;
+    int res = pd.exec();
+    if (res == QDialog::Rejected) {
+        return; // Usuario canceló
     }
 
-    //pd obtener las nuevas transacciones.
-    //en este punto se consiguen las transacciones, despues de esto se va a comparar con lo que esta cargado en tabla..
-
+    // Obtener las transacciones modificadas del diálogo
     std::vector<DT_Structure> new_DT = pd.getDerivativeTransactionsModifications(IdRole);
 
-    // se aqui se obtiene unas transacciones nuevas ,que tienen id y values, pero no tienen id_t
-    //algunas tienen id, otras no , las que no tienen id tiene un -1. entonces ahora es facil
+    // Validar que no hay valores vacíos
+    for (const auto& dt_n : new_DT) {
+        for (size_t idx = 0; idx < dt_n.values.size(); ++idx) {
+            if (dt_n.values[idx].empty()) {
+                QMessageBox::warning(this, "Error",
+                                     "No se permiten valores vacíos en las transacciones.");
+                return;
+            }
+        }
+    }
 
-    if (new_DT.empty()){
-         QMessageBox::information(this, "message", "esta vacio, no se permite");
+    // Si no hay cambios, no hacer nada
+    if (transactionsAreEqual(current_DT, new_DT, id_t)) {
         return;
     }
-    /*
-    if(new_DT.size() < dt_transactions){
-        for (const auto& i : dt_transactions){
 
+    // Procesar los cambios
+    processDerivativeTransactionsChanges(current_DT, new_DT, id_t);
+
+    // Actualizar la tabla de transacciones derivadas en la interfaz
+    last_DerivativeTransactionsLoaded = transaccionManager->getDerivativeTransactionsById(id_t);
+    TableUtils::loadTransactionsTableWidget(ui->tableWidget_2, last_DerivativeTransactionsLoaded, IdRole);
+
+    QMessageBox::information(this, "Éxito", "Transacciones derivadas actualizadas correctamente.");
+}
+
+// Método auxiliar para comparar si dos conjuntos de transacciones son iguales
+bool MainWindow::transactionsAreEqual(const std::vector<DT_Structure>& oldTransactions,
+                                      const std::vector<DT_Structure>& newTransactions,
+                                      int parentId)
+{
+    // Primero comparar tamaños
+    if (oldTransactions.size() != newTransactions.size()) {
+        return false;
+    }
+
+    // Crear mapas para comparación más eficiente
+    std::map<int, DT_Structure> oldMap, newMap;
+
+    for (const auto& dt : oldTransactions) {
+        oldMap[dt.id] = dt;
+    }
+
+    for (const auto& dt : newTransactions) {
+        // Para transacciones nuevas (id = -1), las consideramos diferentes
+        if (dt.id == -1) {
+            return false;
         }
-    }*/
+        newMap[dt.id] = dt;
+    }
 
-    //transaccionManager->deleteDerivativeTransactionsById(id); // si se borran elementos de la tabla, buscar que elementos se borraron y borrarlos
+    // Comparar cada transacción
+    for (const auto& [id, oldDT] : oldMap) {
+        auto it = newMap.find(id);
+        if (it == newMap.end()) {
+            return false; // Transacción eliminada
+        }
 
-    for (auto& dt_n : new_DT){
-        dt_n.id_T = id_t; // añadimos de informacion la estructura
-        if(dt_n.id != -1){
-            // hay que buscar las transacciones que tienen ese id
-            bool modify = false;
-            for(const auto& dt : dt_transactions){
-                if(dt.id == dt_n.id){
-                    for (size_t idx = 0; idx < dt.values.size(); idx++){
-                        if(dt_n.values[idx].empty()){
-                            QMessageBox::information(this, "message", "No se permiten valores vacios");
-                            return;
-                        }else if(dt.values[idx] != dt_n.values[idx]){
-                            modify = true;
-                        }
-                    }
-                    if (modify){
-                        //(actualizamos)
+        const auto& newDT = it->second;
 
-                        //transaccionManager->actualizarDerivativeTransaction(dt_n);
+        // Comparar todos los valores
+        for (size_t i = 0; i < oldDT.values.size(); ++i) {
+            if (oldDT.values[i] != newDT.values[i]) {
+                return false; // Valor modificado
+            }
+        }
+    }
 
-                    }else{
+    return true;
+}
 
-                    }
+// Método para procesar todos los cambios
+void MainWindow::processDerivativeTransactionsChanges(
+    const std::vector<DT_Structure>& oldTransactions,
+    const std::vector<DT_Structure>& newTransactions,
+    int parentId)
+{
+    // Crear mapas para las transacciones
+    std::map<int, DT_Structure> oldMap;
+    std::map<int, DT_Structure> newMap;
+
+    for (const auto& dt : oldTransactions) {
+        oldMap[dt.id] = dt;
+    }
+
+    // Crear una copia modificable de newTransactions para establecer id_T
+    std::vector<DT_Structure> modifiedNewTransactions = newTransactions;
+
+    for (auto& dt : modifiedNewTransactions) {
+        dt.id_T = parentId; // Establecer el ID padre
+        if (dt.id != -1) {
+            newMap[dt.id] = dt;
+        }
+    }
+
+    // 1. Encontrar transacciones eliminadas (están en oldMap pero no en newMap)
+    for (const auto& [id, oldDT] : oldMap) {
+        if (newMap.find(id) == newMap.end()) {
+            // Transacción eliminada
+            //transaccionManager->eliminarDerivativeTransaction(id);
+            transaccionManager->deleteDerivativeTransactionsById(id);
+            qDebug() << "Transacción derivada ID" << id << "eliminada";
+        }
+    }
+
+    // 2. Encontrar transacciones modificadas
+    for (const auto& [id, newDT] : newMap) {
+        auto oldIt = oldMap.find(id);
+        if (oldIt != oldMap.end()) {
+            // La transacción existe, verificar si fue modificada
+            const auto& oldDT = oldIt->second;
+            bool modified = false;
+
+            // Comparar todos los valores
+            for (size_t i = 0; i < oldDT.values.size(); ++i) {
+                if (oldDT.values[i] != newDT.values[i]) {
+                    modified = true;
+                    break;
                 }
             }
-        }else{
-            //añadimos una nueva:
-            QMessageBox::information(this, "message", "añadimos una nueva");
-            transaccionManager->insertDerivativeTransaction(dt_n);
-        }
 
+            if (modified) {
+                // Transacción modificada
+                transaccionManager->actualizeDerivativeTransaction(newDT);
+                qDebug() << "Transacción derivada ID" << id << "actualizada";
+            }
+        }
+    }
+
+    // 3. Encontrar transacciones nuevas (id = -1)
+    for (const auto& newDT : modifiedNewTransactions) {
+        if (newDT.id == -1) {
+            // Transacción nueva
+            transaccionManager->insertDerivativeTransaction(newDT);
+            qDebug() << "Nueva transacción derivada añadida para transacción padre ID" << parentId;
+        }
     }
 }
 
+// Método auxiliar para obtener transacciones eliminadas
+std::vector<int> MainWindow::findDeletedTransactions(
+    const std::vector<DT_Structure>& oldTransactions,
+    const std::vector<DT_Structure>& newTransactions)
+{
+    std::vector<int> deletedIds;
+    std::set<int> newIds;
+
+    // Recoger todos los IDs de las nuevas transacciones (excluyendo -1)
+    for (const auto& dt : newTransactions) {
+        if (dt.id != -1) {
+            newIds.insert(dt.id);
+        }
+    }
+
+    // Buscar IDs que están en las viejas pero no en las nuevas
+    for (const auto& dt : oldTransactions) {
+        if (newIds.find(dt.id) == newIds.end()) {
+            deletedIds.push_back(dt.id);
+        }
+    }
+
+    return deletedIds;
+}
+
+// Método auxiliar para obtener transacciones modificadas
+std::vector<DT_Structure> MainWindow::findModifiedTransactions(
+    const std::vector<DT_Structure>& oldTransactions,
+    const std::vector<DT_Structure>& newTransactions)
+{
+    std::vector<DT_Structure> modifiedTransactions;
+    std::map<int, DT_Structure> oldMap;
+
+    // Crear mapa de transacciones antiguas
+    for (const auto& dt : oldTransactions) {
+        oldMap[dt.id] = dt;
+    }
+
+    // Comparar con las nuevas
+    for (const auto& newDT : newTransactions) {
+        if (newDT.id == -1) continue; // Saltar nuevas
+
+        auto it = oldMap.find(newDT.id);
+        if (it != oldMap.end()) {
+            const auto& oldDT = it->second;
+
+            // Verificar si hay cambios
+            bool changed = false;
+            for (size_t i = 0; i < oldDT.values.size(); ++i) {
+                if (oldDT.values[i] != newDT.values[i]) {
+                    changed = true;
+                    break;
+                }
+            }
+
+            if (changed) {
+                modifiedTransactions.push_back(newDT);
+            }
+        }
+    }
+
+    return modifiedTransactions;
+}
+
+// Método auxiliar para obtener transacciones nuevas
+std::vector<DT_Structure> MainWindow::findNewTransactions(
+    const std::vector<DT_Structure>& newTransactions)
+{
+    std::vector<DT_Structure> newTrans;
+
+    for (const auto& dt : newTransactions) {
+        if (dt.id == -1) {
+            newTrans.push_back(dt);
+        }
+    }
+
+    return newTrans;
+}
 
 /*
 void MainWindow::onDeleteRow()

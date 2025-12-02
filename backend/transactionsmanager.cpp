@@ -168,6 +168,19 @@ void TransactionsManager::insertDerivativeTransaction(const DT_Structure s){
 }
 
 
+void TransactionsManager::actualizeDerivativeTransaction(const DT_Structure s){
+    estructuraTN e;
+    e.id = s.id;
+    e.amount = std::stod(s.values[dt_AMOUNT]);
+    e.comment = s.values[dt_CONCEPT];
+    e.date = s.values[dt_DATE];
+    e.id_TB = s.id_T;
+    e.category_name = s.values[dt_CATEGORY];
+    e.category_id = m_SQLManager.obtenerIdCategoriaPorNombre(s.values[dt_CATEGORY]);
+
+    m_SQLManager.actualizarTransaccionNeta(e);
+}
+
 /*
 struct estructuraTN {
     int id;

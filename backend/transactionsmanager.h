@@ -20,6 +20,8 @@ public:
     void deleteDerivativeTransactionsById(const int id) override;
     void insertDerivativeTransaction(const DT_Structure s) override;
 
+    void actualizeDerivativeTransaction(const DT_Structure s) override;
+
     //void addNewDerivativeTransactions(std::vector<std::vector<std::string>> vec);
     //void addNewDerivativeTransactions(std::vector<DT_Structure> vec) override;
 
