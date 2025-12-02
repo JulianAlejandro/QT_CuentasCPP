@@ -223,63 +223,57 @@ void MainWindow::onAddDerivativeTransaction()
 
     //pd obtener las nuevas transacciones.
     //en este punto se consiguen las transacciones, despues de esto se va a comparar con lo que esta cargado en tabla..
-    std::vector<std::array<std::string, N_FIELDS_DT>> new_DT = pd.getDerivativeTransactionsModifications();
-    if(new_DT.empty()){
-        QMessageBox::information(this, "message", "vacio");
+
+    std::vector<DT_Structure> new_DT = pd.getDerivativeTransactionsModifications(IdRole);
+
+    // se aqui se obtiene unas transacciones nuevas ,que tienen id y values, pero no tienen id_t
+    //algunas tienen id, otras no , las que no tienen id tiene un -1. entonces ahora es facil
+
+    if (new_DT.empty()){
+         QMessageBox::information(this, "message", "esta vacio, no se permite");
         return;
     }
-    for(int i = 0; i < new_DT.size(); i++){
-        for(int j = 0; j < new_DT[i].size(); j++){
-            if(new_DT[i][j].empty()){
-                QMessageBox::information(this, "message", "Valores vacios, incorrecto");
-                return;
-            }
-        }
-    }
+    /*
+    if(new_DT.size() < dt_transactions){
+        for (const auto& i : dt_transactions){
 
-    bool modificado = false;
-    if(dt_transactions.size() == new_DT.size()){
-        for (size_t i = 0; i < dt_transactions.size(); i++){
-            for(size_t j = 0; j < dt_transactions[i].values.size(); j++){
-                if (dt_transactions[i].values[j] != new_DT[i][j]){
-                    modificado = true;
+        }
+    }*/
+
+    //transaccionManager->deleteDerivativeTransactionsById(id); // si se borran elementos de la tabla, buscar que elementos se borraron y borrarlos
+
+    for (auto& dt_n : new_DT){
+        dt_n.id_T = id_t; // añadimos de informacion la estructura
+        if(dt_n.id != -1){
+            // hay que buscar las transacciones que tienen ese id
+            bool modify = false;
+            for(const auto& dt : dt_transactions){
+                if(dt.id == dt_n.id){
+                    for (size_t idx = 0; idx < dt.values.size(); idx++){
+                        if(dt_n.values[idx].empty()){
+                            QMessageBox::information(this, "message", "No se permiten valores vacios");
+                            return;
+                        }else if(dt.values[idx] != dt_n.values[idx]){
+                            modify = true;
+                        }
+                    }
+                    if (modify){
+                        //(actualizamos)
+
+                        //transaccionManager->actualizarDerivativeTransaction(dt_n);
+
+                    }else{
+
+                    }
                 }
             }
-        }
-        if (modificado){
-            QMessageBox::information(this, "message", "se actualizan las tablas");
-            for (const auto& i : dt_transactions){
-                transaccionManager->deleteDerivativeTransactionsById(i.id);
-            }
-
-            transaccionManager->insertDerivativeTransactions(id_t, new_DT);
-            return;
         }else{
-            QMessageBox::information(this, "message", "se quedan igual");
-            return;
+            //añadimos una nueva:
+            QMessageBox::information(this, "message", "añadimos una nueva");
+            transaccionManager->insertDerivativeTransaction(dt_n);
         }
 
     }
-    // como son de distinto tamaño, se actualiza la tabla
-    QMessageBox::information(this, "message", "se actualizan las tablas");
-
-        //se borra la anterior tabla y se pone la nueva    
-    for (const auto& i : dt_transactions){
-        transaccionManager->deleteDerivativeTransactionsById(i.id);
-    }
-
-    transaccionManager->insertDerivativeTransactions(id_t, new_DT);
-
-        //transaccionManager->insertDerivativeTransactions(id_t, new_DT);
-
-        //insertarTransacciones netas nuevas
-        //std::vector<std::array<std::string, N_FIELDS_DT>> new_DT
-        //ID_T COMUN PARA TODOS
-
-
-        //for()
-        //std::vector<std::array<std::string, N_FIELDS_DT>> new_DT
-
 }
 
 

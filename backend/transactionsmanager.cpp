@@ -141,8 +141,18 @@ void TransactionsManager::deleteDerivativeTransactionsById(const int id){
 }
 
 
-void TransactionsManager::insertDerivativeTransactions(const int id_t, const std::vector<std::array<std::string, N_FIELDS_DT>> values){
+void TransactionsManager::insertDerivativeTransaction(const DT_Structure s){
+    estructuraTN e;
+    e.id = s.id; // no hay
+    e.amount = std::stod(s.values[dt_AMOUNT]);
+    e.comment = s.values[dt_CONCEPT];
+    e.date = s.values[dt_DATE];
+    e.id_TB = s.id_T;
+    e.category_name = s.values[dt_CATEGORY];
+    e.category_id = m_SQLManager.obtenerIdCategoriaPorNombre(s.values[dt_CATEGORY]);
 
+    m_SQLManager.insertarTransaccionesNetas(e);
+/*
    estructuraTN e;
    for (const auto& i : values){
        e.id = 0; // da igual el valor
@@ -154,6 +164,7 @@ void TransactionsManager::insertDerivativeTransactions(const int id_t, const std
        e.category_id = m_SQLManager.obtenerIdCategoriaPorNombre(i[dt_CATEGORY]);
        m_SQLManager.insertarTransaccionesNetas(e);
    }
+*/
 }
 
 

@@ -17,7 +17,7 @@ public:
     virtual std::vector<DT_Structure> getDerivativeTransactionsById(const int id) = 0;
 
     virtual void deleteDerivativeTransactionsById(const int id) = 0;
-    virtual void insertDerivativeTransactions(const int id_t, const std::vector<std::array<std::string, N_FIELDS_DT>> values) = 0;
+    virtual void insertDerivativeTransaction(const DT_Structure s) = 0;
     //virtual void addNewDerivativeTransactions(std::vector<DT_Structure> vec) = 0;
     //virtual void addNewDerivativeTransactions(std::vector<std::vector<std::string>> vec) = 0;
 

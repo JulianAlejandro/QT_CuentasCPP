@@ -24,7 +24,7 @@ public:
     //QTableWidget* getPtrTableWidget();
     void setFieldsTableWidget(const QStringList& columnTitles, bool edit);
     void loadTransactionsTableWidget(const std::vector<DT_Structure>& transacciones, int IdRole);
-    std::vector<std::array<std::string, N_FIELDS_DT>> getDerivativeTransactionsModifications();
+    std::vector<DT_Structure> getDerivativeTransactionsModifications(const int IdRole);
 
 private slots:
 

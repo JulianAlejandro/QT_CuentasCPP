@@ -241,19 +241,34 @@ void addDerivativeTransactionsDialog::onCellDoubleClicked(const QModelIndex &ind
 */
 }
 
-std::vector<std::array<std::string, N_FIELDS_DT>> addDerivativeTransactionsDialog::getDerivativeTransactionsModifications()
+std::vector<DT_Structure> addDerivativeTransactionsDialog::getDerivativeTransactionsModifications(const int IdRole)
 {
-    std::vector<std::array<std::string, N_FIELDS_DT>> result;
+    std::vector<DT_Structure> result;
 
     if (!m_modelo) return result;
 
     for (int fila = 0; fila < m_modelo->rowCount(); ++fila) {
-        std::array<std::string, N_FIELDS_DT> filaDatos;
+        DT_Structure filaDatos;
 
+        // Obtener el ID almacenado en el rol personalizado (IdRole)
+        QVariant idVariant = m_modelo->data(m_modelo->index(fila, 0), IdRole);
+
+        if (idVariant.isValid()) {
+            // Si hay un ID válido en el rol, usarlo
+            filaDatos.id = idVariant.toInt();
+        } else {
+            // Si no hay ID en el rol, intentar obtenerlo del contenido de la celda
+            QVariant cellData = m_modelo->data(m_modelo->index(fila, 0), Qt::EditRole);
+            bool ok;
+            int idFromCell = cellData.toInt(&ok);
+            filaDatos.id = ok ? idFromCell : -1; // -1 o 0 para indicar que no tiene ID
+        }
+
+        // Obtener los valores de las demás columnas
         for (int columna = 0; columna < m_modelo->columnCount(); ++columna) {
             QVariant dato = m_modelo->data(m_modelo->index(fila, columna), Qt::EditRole);
             QString valor = dato.isValid() ? dato.toString() : "";
-            filaDatos[columna] = valor.toStdString();
+            filaDatos.values[columna] = valor.toStdString();
         }
 
         result.push_back(filaDatos);
