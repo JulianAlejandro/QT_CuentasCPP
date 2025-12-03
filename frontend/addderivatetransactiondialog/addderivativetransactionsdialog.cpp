@@ -4,6 +4,7 @@
 //#include "frontend/tableutils.h"
 #include <QMessageBox>
 #include <QDate>
+
 #include <QStyledItemDelegate>
 
 
@@ -18,6 +19,9 @@
 
 //void setupTableWidget(QTableWidget* tableWidget, const QStringList& columnTitles, bool edit);
 #include <QMenu>
+
+
+#include "../categorytreewidgetdialog.h"
 
 addDerivativeTransactionsDialog::addDerivativeTransactionsDialog(QWidget *parent)
     : QDialog(parent)
@@ -192,53 +196,37 @@ void addDerivativeTransactionsDialog::on_addPushButton_clicked()
 
 void addDerivativeTransactionsDialog::onCellDoubleClicked(const QModelIndex &index)
 {
-    // m_modelo->setData(m_modelo->index(0, 0), "", Qt::DisplayRole);
-
     if (!index.isValid()) return;
 
     int fila = index.row();
     int columna = index.column();
 
-    m_modelo->setData(m_modelo->index(fila, columna), "", Qt::DisplayRole); // ocultar info caundo se le da 2 click para editar
-
-    /* ESTO ES LO NUEVO
-
-    if (!index.isValid()) return;
-
-    int columna = index.column();
-
-    // Si es la primera columna, no permitir edición
-    if (columna == 0) {
-        return; // Salir sin hacer nada
+    if (columna == 3) {
+        // Llamar directamente al procedimiento para la cuarta columna
+        ejecutarProcedimientoEspecial(fila);
+        return;
     }
 
-    int fila = index.row();
+    // Para las demás columnas, mantener el comportamiento original
     m_modelo->setData(m_modelo->index(fila, columna), "", Qt::DisplayRole);
-    */
+}
 
-    /*
-    // Obtener el valor de la celda
-    QVariant dato = m_modelo->data(index, Qt::DisplayRole);
-    QString valor = dato.toString();
+void addDerivativeTransactionsDialog::ejecutarProcedimientoEspecial(int fila)
+{
 
-    // Obtener el nombre de la columna
-    QString nombreColumna = m_modelo->headerData(columna, Qt::Horizontal).toString();
 
-    // Mostrar información (puedes cambiar esto por tu lógica)
-    QMessageBox::information(this,
-                             "Celda seleccionada",
-                             QString("Doble click en:\n"
-                                     "Fila: %1\n"
-                                     "Columna: %2 (%3)\n"
-                                     "Valor: %4")
-                                 .arg(fila + 1)
-                                 .arg(columna)
-                                 .arg(nombreColumna)
-                                 .arg(valor));
+    categoryTreeWidgetDialog cd(this, cat_struct);
 
-    // Aquí puedes agregar tu lógica específica
-    ejecutarAccionPersonalizada(fila, columna, valor);
-*/
+    cd.setWindowTitle("tree");
+
+
+
+    int res = cd.exec();
+    if (res == QDialog::Rejected) {
+        return; // Usuario canceló
+    }
+
+
 }
 
 std::vector<DT_Structure> addDerivativeTransactionsDialog::getDerivativeTransactionsModifications(const int IdRole)
@@ -316,4 +304,10 @@ void addDerivativeTransactionsDialog::borrarFilaSeleccionada()
 
     int fila = index.row();
     m_modelo->removeRow(fila);
+}
+
+
+void addDerivativeTransactionsDialog::setCategoryStructures(std::vector<Category_Structure> c){
+
+    cat_struct = c;
 }

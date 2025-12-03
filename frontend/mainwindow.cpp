@@ -51,35 +51,6 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-/*
-void MainWindow::loadTransactionsInTable() //TODO. MODIFICAR CAMPOS
-{
-
-    ui->tableWidget->setRowCount(0);
-
-    // Obtener datos a través de la interfaz
-    std::vector<std::vector<std::string>> transacciones = transaccionManager->getTransactions();
-
-    for (const auto& transaccion : transacciones) {
-        int newRow = ui->tableWidget->rowCount();
-        ui->tableWidget->insertRow(newRow);
-
-        // Verificar que el vector no esté vacío antes de acceder a [0]
-        if (transaccion.empty()) {
-            continue; // Saltar transacciones vacías
-        }
-
-        int nuevoId = std::stoi(transaccion[0]); // almacena id (primer elemento)
-
-        // Usar size() en lugar de lenght() - length() no existe en std::vector
-        for (size_t  i = 0; i < transaccion.size(); i++) {
-            QTableWidgetItem* item = new QTableWidgetItem(QString::fromStdString(transaccion[i]));
-            item->setData(IdRole, nuevoId);
-            ui->tableWidget->setItem(newRow, i, item);
-        }
-    }
-}
-*/
 void MainWindow::establecerIdEnFila(int fila, int id)
 {
     if (fila < 0 || fila >= ui->tableWidget->rowCount()) {
@@ -194,6 +165,7 @@ void MainWindow::onAddDerivativeTransaction()
 
     // Crear y configurar el diálogo de edición
     addDerivativeTransactionsDialog pd(this);
+    pd.setCategoryStructures(transaccionManager->getCategoryTable());
     pd.setWindowTitle("Add/Edit derivative Transactions");
     pd.setFieldsTableWidget(
         TableUtils::arrayString_to_QStringList(transaccionManager->getFieldsTableDerivativeTransactions()),
@@ -483,34 +455,6 @@ void MainWindow::onRowSelected()
     last_DerivativeTransactionsLoaded = transaccionManager->getDerivativeTransactionsById(id);
     TableUtils::loadTransactionsTableWidget(ui->tableWidget_2, last_DerivativeTransactionsLoaded, IdRole);
 
-
-    /*
-    // ¡Ahora tienes acceso al ID! Puedes hacer cualquier operación con él
-    //qDebug() <<  "ID:" << id;
-
-
-    // TODO. esta funcionalidad de cargar la tabla se añadira en tableutils
-    // Limpiar tabla existente
-    ui->tableWidget_2->setRowCount(0);
-
-    // Obtener datos a través de la interfaz
-    std::vector<std::vector<std::string>> transacciones = transaccionManager->getDerivativeTransactionsById(id);
-
-    for (const auto& transaccion : transacciones) {
-        int newRow = ui->tableWidget_2->rowCount();
-        ui->tableWidget_2->insertRow(newRow);
-
-        // Verificar que el vector no esté vacío antes de acceder a [0]
-        if (transaccion.empty()) {
-            continue; // Saltar transacciones vacías
-        }
-
-        // Usar size() en lugar de lenght() - length() no existe en std::vector
-        for (size_t  i = 0; i < transaccion.size(); i++) {
-            ui->tableWidget_2->setItem(newRow, i, new QTableWidgetItem(QString::fromStdString(transaccion[i])));
-        }
-    }
-    */
 }
 
 void MainWindow::on_actionQuitar_2_triggered()

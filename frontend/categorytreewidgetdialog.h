@@ -1,4 +1,4 @@
-/*
+
 #ifndef CATEGORYTREEWIDGETDIALOG_H
 #define CATEGORYTREEWIDGETDIALOG_H
 
@@ -17,17 +17,17 @@ class categoryTreeWidgetDialog : public QDialog
 public:
     explicit categoryTreeWidgetDialog(
         QWidget *parent,
-        const std::vector<estructuraCategoria> &categorias
+        const std::vector<Category_Structure> &categorias
         );
 
     ~categoryTreeWidgetDialog();
 
 private:
     Ui::categoryTreeWidgetDialog *ui;
-    std::vector<estructuraCategoria> m_categorias;   // <-- miembro real
+    std::vector<Category_Structure> m_categorias;   // <-- miembro real
 
 };
 
 #endif // CATEGORYTREEWIDGETDIALOG_H
 
-*/
+

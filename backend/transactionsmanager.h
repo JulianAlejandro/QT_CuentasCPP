@@ -22,6 +22,8 @@ public:
 
     void actualizeDerivativeTransaction(const DT_Structure s) override;
 
+    std::vector<Category_Structure> getCategoryTable() override;
+
     //void addNewDerivativeTransactions(std::vector<std::vector<std::string>> vec);
     //void addNewDerivativeTransactions(std::vector<DT_Structure> vec) override;
 

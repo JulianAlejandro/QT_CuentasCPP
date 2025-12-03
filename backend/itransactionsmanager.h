@@ -20,6 +20,7 @@ public:
     virtual void insertDerivativeTransaction(const DT_Structure s) = 0;
 
     virtual void actualizeDerivativeTransaction(const DT_Structure s) = 0;
+    virtual std::vector<Category_Structure> getCategoryTable() = 0;
     //virtual void addNewDerivativeTransactions(std::vector<DT_Structure> vec) = 0;
     //virtual void addNewDerivativeTransactions(std::vector<std::vector<std::string>> vec) = 0;
 

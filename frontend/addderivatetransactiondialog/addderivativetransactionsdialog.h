@@ -26,6 +26,8 @@ public:
     void loadTransactionsTableWidget(const std::vector<DT_Structure>& transacciones, int IdRole);
     std::vector<DT_Structure> getDerivativeTransactionsModifications(const int IdRole);
 
+    void setCategoryStructures(std::vector<Category_Structure> c);
+
 private slots:
 
     void onCustomContextMenuRequested(const QPoint &pos);
@@ -40,7 +42,11 @@ private slots:
 
     void on_buttonBox_rejected();
 
+
+
 private:
+    void ejecutarProcedimientoEspecial(int fila);
+
     Ui::addDerivativeTransactionsDialog *ui;
     QStandardItemModel *m_modelo;
     //SpinBoxDelegate *m_spinnerDelegate_id;
@@ -48,6 +54,7 @@ private:
     //SpinBoxDelegate *m_spinnerDelegate_id_TB;
     //SpinBoxDelegate *m_spinnerDelegate_category_id;
     DateEditDelegate *m_DateEditDelegate;
+    std::vector<Category_Structure> cat_struct;
 };
 
 #endif // ADDDERIVATIVETRANSACTIONSDIALOG_H
