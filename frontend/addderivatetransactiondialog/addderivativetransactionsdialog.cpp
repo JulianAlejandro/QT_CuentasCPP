@@ -213,20 +213,46 @@ void addDerivativeTransactionsDialog::onCellDoubleClicked(const QModelIndex &ind
 
 void addDerivativeTransactionsDialog::ejecutarProcedimientoEspecial(int fila)
 {
-
-
-    categoryTreeWidgetDialog cd(this, cat_struct);
-
-    cd.setWindowTitle("tree");
-
-
-
-    int res = cd.exec();
-    if (res == QDialog::Rejected) {
-        return; // Usuario canceló
+    // Verificar que tenemos categorías disponibles
+    if (cat_struct.empty()) {
+        QMessageBox::warning(this, "Advertencia",
+                             "No hay categorías disponibles para seleccionar.");
+        return;
     }
 
+    // Crear y mostrar el diálogo de categorías
+    categoryTreeWidgetDialog cd(this, cat_struct);
+    cd.setWindowTitle("Seleccionar Categoría");
 
+    int res = cd.exec();
+
+    if (res == QDialog::Accepted) {
+        // Obtener la categoría seleccionada
+        QString nombreCategoria = cd.getSelectedCategoryName();
+        int idCategoria = cd.getSelectedCategoryId();
+
+        if (!nombreCategoria.isEmpty()) {
+            // Añadir el nombre de la categoría a la columna 3 (cuarta columna)
+            QModelIndex index = m_modelo->index(fila, 3); // Columna 3
+
+            // Establecer el nombre de la categoría como valor
+            m_modelo->setData(index, nombreCategoria, Qt::EditRole);
+
+            // Opcional: también guardar el ID en una propiedad de la celda
+            // Puedes usar Qt::UserRole + algún número
+            m_modelo->setData(index, idCategoria, Qt::UserRole + 1);
+
+            // Opcional: si quieres mostrar un mensaje de confirmación
+            // qDebug() << "Categoría seleccionada: " << nombreCategoria
+            //          << " (ID: " << idCategoria << ")";
+        } else {
+            QMessageBox::information(this, "Información",
+                                     "No se seleccionó ninguna categoría.");
+        }
+    } else {
+        // Usuario canceló o cerró el diálogo sin seleccionar
+        // qDebug() << "Selección de categoría cancelada";
+    }
 }
 
 std::vector<DT_Structure> addDerivativeTransactionsDialog::getDerivativeTransactionsModifications(const int IdRole)
