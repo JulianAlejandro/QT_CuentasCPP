@@ -33,7 +33,7 @@ private slots:
 
 private:
     Ui::MainWindow *ui;
-    std::unique_ptr<ITransactionsManager> transaccionManager;
+    std::unique_ptr<ITransactionsManager> transactionManager;
 
     std::vector<T_Structure> last_transactionsloaded; // TODO
     std::vector<DT_Structure> last_DerivativeTransactionsLoaded; //TODO

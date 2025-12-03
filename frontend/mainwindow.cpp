@@ -17,15 +17,15 @@
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
-    , transaccionManager(std::make_unique<TransactionsManager>())
+    , transactionManager(std::make_unique<TransactionsManager>())
     , contadorId(0)  // Inicializar contador de IDs
 {
     ui->setupUi(this);
     setWindowTitle("App");
 
     // Configurar la tabla
-    TableUtils::setFieldsTableWidget(ui->tableWidget, TableUtils::arrayString_to_QStringList(transaccionManager->getFieldsTableTransactions()), false);
-    TableUtils::setFieldsTableWidget(ui->tableWidget_2, TableUtils::arrayString_to_QStringList(transaccionManager->getFieldsTableDerivativeTransactions()), false);
+    TableUtils::setFieldsTableWidget(ui->tableWidget, TableUtils::arrayString_to_QStringList(transactionManager->getFieldsTableTransactions()), false);
+    TableUtils::setFieldsTableWidget(ui->tableWidget_2, TableUtils::arrayString_to_QStringList(transactionManager->getFieldsTableDerivativeTransactions()), false);
 
     // ✅ HABILITAR MENÚ CONTEXTUAL EN AMBAS TABLAS
     ui->tableWidget->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -42,7 +42,7 @@ MainWindow::MainWindow(QWidget *parent)
     //        this, &MainWindow::onCustomContextMenuRequested);
 
     // Cargar datos iniciales usando la interfaz
-    last_transactionsloaded = transaccionManager->getTransactions();
+    last_transactionsloaded = transactionManager->getTransactions();
     TableUtils::loadTransactionsTableWidget(ui->tableWidget, last_transactionsloaded, IdRole);
 }
 
@@ -161,14 +161,14 @@ void MainWindow::onAddDerivativeTransaction()
     int id_t = ui->tableWidget->item(currentRow, 0)->data(IdRole).toInt();
 
     // Obtener transacciones derivadas actuales para esta transacción padre
-    std::vector<DT_Structure> current_DT = transaccionManager->getDerivativeTransactionsById(id_t);
+    std::vector<DT_Structure> current_DT = transactionManager->getDerivativeTransactionsById(id_t);
 
     // Crear y configurar el diálogo de edición
     addDerivativeTransactionsDialog pd(this);
-    pd.setCategoryStructures(transaccionManager->getCategoryTable());
+    pd.setCategoryStructures(transactionManager->getCategoryTable());
     pd.setWindowTitle("Add/Edit derivative Transactions");
     pd.setFieldsTableWidget(
-        TableUtils::arrayString_to_QStringList(transaccionManager->getFieldsTableDerivativeTransactions()),
+        TableUtils::arrayString_to_QStringList(transactionManager->getFieldsTableDerivativeTransactions()),
         true);
     pd.loadTransactionsTableWidget(current_DT, IdRole);
 
@@ -177,8 +177,11 @@ void MainWindow::onAddDerivativeTransaction()
         return; // Usuario canceló
     }
 
+
     // Obtener las transacciones modificadas del diálogo
     std::vector<DT_Structure> new_DT = pd.getDerivativeTransactionsModifications(IdRole);
+
+    // aqui cambiamos toda esta funcionalidad del frontend al backend
 
     // Validar que no hay valores vacíos
     for (const auto& dt_n : new_DT) {
@@ -200,7 +203,7 @@ void MainWindow::onAddDerivativeTransaction()
     processDerivativeTransactionsChanges(current_DT, new_DT, id_t);
 
     // Actualizar la tabla de transacciones derivadas en la interfaz
-    last_DerivativeTransactionsLoaded = transaccionManager->getDerivativeTransactionsById(id_t);
+    last_DerivativeTransactionsLoaded = transactionManager->getDerivativeTransactionsById(id_t);
     TableUtils::loadTransactionsTableWidget(ui->tableWidget_2, last_DerivativeTransactionsLoaded, IdRole);
 
     QMessageBox::information(this, "Éxito", "Transacciones derivadas actualizadas correctamente.");
@@ -279,8 +282,8 @@ void MainWindow::processDerivativeTransactionsChanges(
     for (const auto& [id, oldDT] : oldMap) {
         if (newMap.find(id) == newMap.end()) {
             // Transacción eliminada
-            //transaccionManager->eliminarDerivativeTransaction(id);
-            transaccionManager->deleteDerivativeTransactionsById(id);
+            //transactionManager->eliminarDerivativeTransaction(id);
+            transactionManager->deleteDerivativeTransactionsById(id);
             qDebug() << "Transacción derivada ID" << id << "eliminada";
         }
     }
@@ -303,7 +306,7 @@ void MainWindow::processDerivativeTransactionsChanges(
 
             if (modified) {
                 // Transacción modificada
-                transaccionManager->actualizeDerivativeTransaction(newDT);
+                transactionManager->actualizeDerivativeTransaction(newDT);
                 qDebug() << "Transacción derivada ID" << id << "actualizada";
             }
         }
@@ -313,7 +316,7 @@ void MainWindow::processDerivativeTransactionsChanges(
     for (const auto& newDT : modifiedNewTransactions) {
         if (newDT.id == -1) {
             // Transacción nueva
-            transaccionManager->insertDerivativeTransaction(newDT);
+            transactionManager->insertDerivativeTransaction(newDT);
             qDebug() << "Nueva transacción derivada añadida para transacción padre ID" << parentId;
         }
     }
@@ -415,7 +418,7 @@ void MainWindow::onDeleteRow()
 
     if (reply == QMessageBox::Yes) {
         // Aquí llamarías al backend para eliminar por ID
-        // transaccionManager->eliminarTransaccion(id);
+        // transactionManager->eliminarTransaccion(id);
 
         ui->tableWidget->removeRow(currentRow);
         qDebug() << "Transacción ID" << id << "eliminada";
@@ -438,7 +441,7 @@ void MainWindow::onMarkProcessed()
         processedItem->setData(ProcessedRole, true);
 
         // Aquí llamarías al backend para marcar como procesado
-        // transaccionManager->marcarComoProcesado(id);
+        // transactionManager->marcarComoProcesado(id);
 
         qDebug() << "Transacción ID" << id << "marcada como procesada";
     }
@@ -452,7 +455,7 @@ void MainWindow::onRowSelected()
 
     int id = ui->tableWidget->item(currentRow, 0)->data(IdRole).toInt();
 
-    last_DerivativeTransactionsLoaded = transaccionManager->getDerivativeTransactionsById(id);
+    last_DerivativeTransactionsLoaded = transactionManager->getDerivativeTransactionsById(id);
     TableUtils::loadTransactionsTableWidget(ui->tableWidget_2, last_DerivativeTransactionsLoaded, IdRole);
 
 }
