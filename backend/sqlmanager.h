@@ -6,42 +6,7 @@
 #include <QString>
 #include <string>
 #include "DataTypes.h"
-/*
-// Estructura para Transacción Bruta
-struct estructuraTB {
-    int id;
-    double amount;
-    std::string comment;
-    std::string date;
-    std::string currency;
-    bool processed;
-};
 
-// Estructura para Transacción Neta
-struct estructuraTN {
-    int id;
-    double amount;
-    std::string comment;
-    std::string date;
-    int id_TB;
-    std::string category_name; // Nombre de la categoría
-    int category_id;       // ID de la categoría
-};
-
-// Estructura para Categoría
-struct estructuraCategoria {
-    int id;
-    std::string nombre;
-    int id_padre;
-};
-
-// Estructura para Divisa
-struct estructuraDivisa {
-    std::string codigo;
-    std::string nombre;
-    std::string simbolo;
-};
-*/
 class SQLManager
 {
 public:
@@ -88,7 +53,6 @@ private:
     QSqlDatabase bd;
     bool abrirBD();
     void cerrarBD();
-
 };
 
 #endif // SQLMANAGER_H

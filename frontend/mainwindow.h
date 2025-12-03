@@ -48,31 +48,6 @@ private:
     //void loadTransactionsInTable();
 
 
-    // En la sección private de la clase MainWindow:
-
-    // Métodos para gestión de transacciones derivadas
-    void processDerivativeTransactionsChanges(
-        const std::vector<DT_Structure>& oldTransactions,
-        const std::vector<DT_Structure>& newTransactions,
-        int parentId);
-
-    bool transactionsAreEqual(
-        const std::vector<DT_Structure>& oldTransactions,
-        const std::vector<DT_Structure>& newTransactions,
-        int parentId);
-
-    std::vector<int> findDeletedTransactions(
-        const std::vector<DT_Structure>& oldTransactions,
-        const std::vector<DT_Structure>& newTransactions);
-
-    std::vector<DT_Structure> findModifiedTransactions(
-        const std::vector<DT_Structure>& oldTransactions,
-        const std::vector<DT_Structure>& newTransactions);
-
-    std::vector<DT_Structure> findNewTransactions(
-        const std::vector<DT_Structure>& newTransactions);
-
-
     // Métodos para gestionar IDs
     //int obtenerIdDeFila(int fila) const;
     void establecerIdEnFila(int fila, int id);

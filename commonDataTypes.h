@@ -11,14 +11,6 @@ constexpr size_t N_FIELDS_DT = 4;
 enum t_FIELDS{t_DATE, t_CONCEPT, t_AMOUNT, t_CURRENCY};
 enum dt_FIELDS{dt_DATE, dt_CONCEPT, dt_AMOUNT, dt_CATEGORY};
 
-// Arrays globales para títulos
-inline const std::array<std::string, N_FIELDS_T> T_FIELD_TITLES = {
-    "Date", "Concept", "Amount", "Currency"
-};
-
-inline const std::array<std::string, N_FIELDS_DT> DT_FIELD_TITLES = {
-    "Date", "Concept", "Amount", "Category"
-};
 
 struct T_Structure {
     int id;
