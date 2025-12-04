@@ -4,6 +4,15 @@
 #include <string>
 #include <array>
 
+enum class UpdateResult {
+    Success,
+    EmptyValues,
+    SumMismatch,
+    NoChanges,
+    DatabaseError,
+    ParentNotFound
+};
+
 // Tamaños fijos
 constexpr size_t N_FIELDS_T = 4;
 constexpr size_t N_FIELDS_DT = 4;

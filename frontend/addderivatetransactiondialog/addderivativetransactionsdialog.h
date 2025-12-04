@@ -21,38 +21,33 @@ class addDerivativeTransactionsDialog : public QDialog
 public:
     explicit addDerivativeTransactionsDialog(QWidget *parent = nullptr);
     ~addDerivativeTransactionsDialog();
-    //QTableWidget* getPtrTableWidget();
+
     void setFieldsTableWidget(const QStringList& columnTitles, bool edit);
     void loadTransactionsTableWidget(const std::vector<DT_Structure>& transacciones, int IdRole);
     std::vector<DT_Structure> getDerivativeTransactionsModifications(const int IdRole);
-
     void setCategoryStructures(std::vector<Category_Structure> c);
+    void setParentAmount(const double parent_amount);
 
 private slots:
-
     void onCustomContextMenuRequested(const QPoint &pos);
     void borrarFilaSeleccionada();
-
     void on_addPushButton_clicked();
-
-    // En addderivativetransactionsdialog.h
     void onCellDoubleClicked(const QModelIndex &index);
-
     void on_buttonBox_accepted();
-
     void on_buttonBox_rejected();
-
-
+    void onDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight);
 
 private:
     void ejecutarProcedimientoEspecial(int fila);
+    bool validateAmountSum() const;
+    void updateSumValidation();
+    void showValidationMessage();
 
     Ui::addDerivativeTransactionsDialog *ui;
+    double p_amount;
+
     QStandardItemModel *m_modelo;
-    //SpinBoxDelegate *m_spinnerDelegate_id;
     DoubleSpinBoxDelegate *m_DoubleSpinnerDelegate;
-    //SpinBoxDelegate *m_spinnerDelegate_id_TB;
-    //SpinBoxDelegate *m_spinnerDelegate_category_id;
     DateEditDelegate *m_DateEditDelegate;
     std::vector<Category_Structure> cat_struct;
 };

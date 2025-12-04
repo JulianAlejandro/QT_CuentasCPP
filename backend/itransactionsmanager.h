@@ -18,7 +18,7 @@ public:
 
     virtual std::vector<Category_Structure> getCategoryTable() = 0;
 
-    virtual void actualizeDerivativeTransactionsById_T(const std::vector<DT_Structure> current_DTs, const std::vector<DT_Structure> new_DTs, const int id_t) = 0;
+    virtual UpdateResult actualizeDerivativeTransactionsWithId_T(const std::vector<DT_Structure>& new_DTs, const int id_t) = 0;
 private:
 
     virtual void deleteDerivativeTransactionsById(const int id) = 0;

@@ -4,6 +4,9 @@
 #include "backend/sqlmanager.h"
 #include "backend/itransactionsmanager.h"
 
+// En el header (transactionsmanager.h)
+
+
 class TransactionsManager : public ITransactionsManager
 {
 public:
@@ -30,10 +33,14 @@ public:
 
     std::vector<Category_Structure> getCategoryTable() override;
 
-    void actualizeDerivativeTransactionsById_T(const std::vector<DT_Structure> current_DTs,const std::vector<DT_Structure> new_DTs, const int id_t) override;
-
+    UpdateResult actualizeDerivativeTransactionsWithId_T(const std::vector<DT_Structure>& new_DTs, const int id_t) override;
 private:
     SQLManager m_SQLManager;
+
+    std::vector<T_Structure> m_current_Ts;
+    std::vector<DT_Structure> m_current_DTs;
+
+    std::vector<Category_Structure> m_current_category_table;
 
     static constexpr std::array<const char*, N_FIELDS_T> TRANSACTION_FIELD_TITLES = {
         "Date", "Concept", "Amount", "Currency"
@@ -48,7 +55,7 @@ private:
     void insertDerivativeTransaction(const DT_Structure s) override;
     void actualizeDerivativeTransaction(const DT_Structure s) override;
 
-
+    bool validateDerivativeTransactionsSum(const std::vector<DT_Structure>& DTs, int parentId);
     void processDerivativeTransactionsChanges(
         const std::vector<DT_Structure>& oldTransactions,
         const std::vector<DT_Structure>& newTransactions,

@@ -46,7 +46,8 @@ std::vector<T_Structure> TransactionsManager::getTransactions() {
         resultado.push_back(obtain_TStruct(transaccion));
     }
 
-    return resultado;
+    m_current_Ts = resultado;
+    return m_current_Ts;
 }
 
 std::vector<DT_Structure> TransactionsManager::getDerivativeTransactionsById(int id_TB) {
@@ -56,8 +57,9 @@ std::vector<DT_Structure> TransactionsManager::getDerivativeTransactionsById(int
     for (const auto& transaccion : netas){
         resultado.push_back(obtain_DT_Struct(transaccion));
     }
+    m_current_DTs = resultado;
 
-    return resultado;
+    return m_current_DTs;
 }
 
 void TransactionsManager::deleteDerivativeTransactionsById(const int id){
@@ -106,8 +108,8 @@ std::vector<Category_Structure> TransactionsManager::getCategoryTable(){
         aux.name = i.nombre;
         c_struct.push_back(aux);
     }
-
-    return c_struct;
+    m_current_category_table = c_struct;
+    return m_current_category_table;
 
 }
 
@@ -117,17 +119,66 @@ std::vector<estructuraCategoria> TransactionsManager::getCategories(){
 }
 */
 
-void TransactionsManager::actualizeDerivativeTransactionsById_T(const std::vector<DT_Structure> current_DTs, const std::vector<DT_Structure> new_DTs, const int id_t){
+UpdateResult TransactionsManager::actualizeDerivativeTransactionsWithId_T(const std::vector<DT_Structure>& new_DTs, const int id_t){
 
-
-    // Si no hay cambios, no hacer nada
-    if (transactionsAreEqual(current_DTs, new_DTs)) {
-        return;
+    // 1. Validar que la suma de los montos coincide con la transacción padre
+    if(!validateDerivativeTransactionsSum(new_DTs, id_t)){
+        return UpdateResult::SumMismatch;
     }
 
-    // Procesar los cambios
-    processDerivativeTransactionsChanges(current_DTs, new_DTs, id_t);
+    // 2. Si no hay cambios, no hacer nada
+    if (transactionsAreEqual(m_current_DTs, new_DTs)) {
+        return UpdateResult::NoChanges;
+    }
 
+    // 3. Procesar los cambios
+    processDerivativeTransactionsChanges(m_current_DTs, new_DTs, id_t);
+    return UpdateResult::Success;
+}
+
+bool TransactionsManager::validateDerivativeTransactionsSum(const std::vector<DT_Structure>& DTs, int parentId) {
+    // Buscar la transacción padre en m_current_Ts
+    double parentAmount = 0.0;
+    bool parentFound = false;
+
+    for (const auto& t : m_current_Ts) {
+        if (t.id == parentId) {
+            try {
+                // Extraer el monto de la transacción padre
+                parentAmount = std::stod(t.values[t_AMOUNT]);
+                parentFound = true;
+                break;
+            } catch (const std::exception& e) {
+                throw std::runtime_error("Error al convertir el monto de la transacción padre: " +
+                                         std::string(e.what()));
+            }
+        }
+    }
+
+    if (!parentFound) {
+        throw std::runtime_error("Transacción padre con ID " + std::to_string(parentId) + " no encontrada");
+    }
+
+    // Calcular la suma de los montos de las transacciones derivadas
+    double sumDerivativeAmounts = 0.0;
+
+    for (const auto& dt : DTs) {
+        try {
+            sumDerivativeAmounts += std::stod(dt.values[dt_AMOUNT]);
+        } catch (const std::exception& e) {
+            throw std::runtime_error("Error al convertir el monto de una transacción derivada: " +
+                                     std::string(e.what()));
+        }
+    }
+
+    // Comparar con un margen de tolerancia para manejar errores de punto flotante
+    const double EPSILON = 0.001;
+
+    if (std::abs(sumDerivativeAmounts - parentAmount) > EPSILON) {
+        return false;
+    }else{
+        return true;
+    }
 }
 
 bool TransactionsManager::transactionsAreEqual(const std::vector<DT_Structure>& oldTransactions,

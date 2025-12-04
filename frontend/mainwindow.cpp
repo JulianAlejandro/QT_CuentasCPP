@@ -10,7 +10,7 @@
 #include "frontend/tableutils.h"
 
 #include <QDebug>
-
+#include "commonDataTypes.h"
 //#include "categorytreewidgetdialog.h"//prueba
 
 MainWindow::MainWindow(QWidget *parent)
@@ -163,23 +163,30 @@ void MainWindow::onAddDerivativeTransaction()
     std::vector<DT_Structure> current_DT = transactionManager->getDerivativeTransactionsById(id_t);
 
     // Crear y configurar el diálogo de edición
-    addDerivativeTransactionsDialog pd(this);
-    pd.setCategoryStructures(transactionManager->getCategoryTable());
-    pd.setWindowTitle("Add/Edit derivative Transactions");
-    pd.setFieldsTableWidget(
+    addDerivativeTransactionsDialog addDialog(this);
+    addDialog.setCategoryStructures(transactionManager->getCategoryTable());
+    addDialog.setWindowTitle("Add/Edit derivative Transactions");
+    addDialog.setFieldsTableWidget(
         TableUtils::arrayString_to_QStringList(transactionManager->getFieldsTableDerivativeTransactions()),
         true);
-    pd.loadTransactionsTableWidget(current_DT, IdRole);
+    addDialog.loadTransactionsTableWidget(current_DT, IdRole);
 
-    int res = pd.exec();
+    for(const auto& ltl : last_transactionsloaded){
+        if (ltl.id == id_t){
+            addDialog.setParentAmount(stod(ltl.values[t_AMOUNT]));
+        }
+    }
+
+    int res = addDialog.exec();
     if (res == QDialog::Rejected) {
         return; // Usuario canceló
     }
 
     // Obtener las transacciones modificadas del diálogo
-    std::vector<DT_Structure> new_DT = pd.getDerivativeTransactionsModifications(IdRole);
+    std::vector<DT_Structure> new_DT = addDialog.getDerivativeTransactionsModifications(IdRole);
 
     // Validar que no hay valores vacíos
+
     for (const auto& dt_n : new_DT) {
         for (size_t idx = 0; idx < dt_n.values.size(); ++idx) {
             if (dt_n.values[idx].empty()) {
@@ -191,7 +198,13 @@ void MainWindow::onAddDerivativeTransaction()
     }
 
     //actualizar la tabla
-    transactionManager->actualizeDerivativeTransactionsById_T(current_DT, new_DT, id_t);
+
+    UpdateResult r = transactionManager->actualizeDerivativeTransactionsWithId_T(new_DT, id_t); // es necesario pasar el Id_t porque desde el dialogo no se añade.
+    if(r == UpdateResult::SumMismatch){
+        QMessageBox::warning(this, "Error",
+                             "Valores incorrectos de amount");
+                             return;
+    }
 
     // Actualizar la tabla de transacciones derivadas en la interfaz
     last_DerivativeTransactionsLoaded = transactionManager->getDerivativeTransactionsById(id_t);
@@ -201,10 +214,6 @@ void MainWindow::onAddDerivativeTransaction()
 }
 
 // Método auxiliar para comparar si dos conjuntos de transacciones son iguales
-
-
-
-
 
 /*
 void MainWindow::onDeleteRow()
@@ -261,6 +270,7 @@ void MainWindow::onRowSelected()
     int id = ui->tableWidget->item(currentRow, 0)->data(IdRole).toInt();
 
     last_DerivativeTransactionsLoaded = transactionManager->getDerivativeTransactionsById(id);
+
     TableUtils::loadTransactionsTableWidget(ui->tableWidget_2, last_DerivativeTransactionsLoaded, IdRole);
 
 }
