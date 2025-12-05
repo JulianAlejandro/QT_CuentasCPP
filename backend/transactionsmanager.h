@@ -34,6 +34,14 @@ public:
     std::vector<Category_Structure> getCategoryTable() override;
 
     UpdateResult actualizeDerivativeTransactionsWithId_T(const std::vector<DT_Structure>& new_DTs, const int id_t) override;
+
+    void insertNewTransaction(T_Structure Ts) override;
+
+    std::vector<std::string> getCurrencies() override;
+
+
+    void deleteTransactionById(const int id) override;
+    void deleteDerivativeTransactionsBYId_T(const int id_t) override;
 private:
     SQLManager m_SQLManager;
 

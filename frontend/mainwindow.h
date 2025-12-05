@@ -25,7 +25,7 @@ private slots:
     void onCustomContextMenuRequested(const QPoint &pos);
     void onAddDerivativeTransaction();
 
-    //void onDeleteRow();
+    void onDeleteRow();
     //void onMarkProcessed();
     void onRowSelected();
 

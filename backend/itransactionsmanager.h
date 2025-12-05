@@ -19,6 +19,14 @@ public:
     virtual std::vector<Category_Structure> getCategoryTable() = 0;
 
     virtual UpdateResult actualizeDerivativeTransactionsWithId_T(const std::vector<DT_Structure>& new_DTs, const int id_t) = 0;
+
+    virtual void insertNewTransaction(T_Structure Ts) = 0;
+
+    virtual std::vector<std::string> getCurrencies() = 0;
+
+    virtual void deleteTransactionById(const int id) = 0;
+
+    virtual void deleteDerivativeTransactionsBYId_T(const int id_t) = 0;
 private:
 
     virtual void deleteDerivativeTransactionsById(const int id) = 0;

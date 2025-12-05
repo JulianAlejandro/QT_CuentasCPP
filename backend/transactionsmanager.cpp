@@ -373,3 +373,41 @@ std::vector<DT_Structure> TransactionsManager::findNewTransactions(
 
     return newTrans;
 }
+
+
+void TransactionsManager::insertNewTransaction(T_Structure Ts){
+
+    estructuraTB e;
+    e.id = Ts.id;
+    e.amount = stod(Ts.values[t_AMOUNT]);
+    e.comment = Ts.values[t_CONCEPT];
+    e.currency = Ts.values[t_CURRENCY];
+    e.date = Ts.values[t_DATE];
+    e.processed = Ts.processed;
+
+    m_SQLManager.insertarTransaccionesBruta(e);
+}
+
+
+std::vector<std::string> TransactionsManager::getCurrencies(){
+
+    std::vector<std::string> result;
+    std::vector<estructuraDivisa> e;
+    e = m_SQLManager.obtenerTodasDivisas();
+    for (const auto& i : e){
+        result.push_back(i.codigo);
+    }
+    return result;
+}
+
+
+void TransactionsManager::deleteTransactionById(const int id){
+    m_SQLManager.eliminarTransaccionBruta(id);
+}
+
+void TransactionsManager::deleteDerivativeTransactionsBYId_T(const int id_t){
+    for(const auto& i : m_current_DTs){
+        m_SQLManager.eliminarTransaccionNeta(i.id);
+    }
+    m_current_DTs.clear();
+}

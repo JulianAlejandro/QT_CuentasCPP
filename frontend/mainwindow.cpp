@@ -71,51 +71,20 @@ int MainWindow::generarNuevoId()
     return ++contadorId;
 }
 
-void MainWindow::on_actionA_adir_transaccion_Basica_triggered() //Esto no se puede hacer asi a la ligera
+void MainWindow::on_actionA_adir_transaccion_Basica_triggered()
 {
-    int res;
     TransaccionBasicaDialog pd(this);
     pd.setWindowTitle("Transacciones brutas");
-    res = pd.exec();
+    pd.setListCurrencies(transactionManager->getCurrencies());
 
-    if (res == QDialog::Rejected){
-        return;
+    // Usar QDialog::Accepted para mayor claridad
+    if (pd.exec() == QDialog::Accepted) {
+        // Solo aquí se ejecuta si el usuario hizo clic en OK/Aceptar
+        transactionManager->insertNewTransaction(pd.getNewTransaction());
     }
-
-    //TODO: Aqui hay que pensar en como añadir al BBDD cada transacción.
-
-    /*
-    int newRow = ui->tableWidget->rowCount();
-    ui->tableWidget->insertRow(newRow);
-
-    // Generar nuevo ID para esta transacción
-    int nuevoId = generarNuevoId();
-
-    // Crear items y asignarles el ID
-    QTableWidgetItem* amountItem = new QTableWidgetItem(QString::number(pd.amount()));
-    QTableWidgetItem* commentItem = new QTableWidgetItem(pd.comment());
-    QTableWidgetItem* dateItem = new QTableWidgetItem(pd.date());
-    QTableWidgetItem* currencyItem = new QTableWidgetItem(pd.currency());
-    QTableWidgetItem* processedItem = new QTableWidgetItem("No");
-
-    // Asignar el ID a todos los items
-    amountItem->setData(IdRole, nuevoId);
-    commentItem->setData(IdRole, nuevoId);
-    dateItem->setData(IdRole, nuevoId);
-    currencyItem->setData(IdRole, nuevoId);
-    processedItem->setData(IdRole, nuevoId);
-    //processedItem->setData(ProcessedRole, false);
-
-    // Agregar a la tabla
-    ui->tableWidget->setItem(newRow, AMOUNT, amountItem);
-    ui->tableWidget->setItem(newRow, COMMENT, commentItem);
-    ui->tableWidget->setItem(newRow, DATE, dateItem);
-    ui->tableWidget->setItem(newRow, CURRENCY, currencyItem);
-    ui->tableWidget->setItem(newRow, PROCESSED, processedItem);
-
-    qDebug() << "Nueva transacción agregada con ID:" << nuevoId;
-*/
-
+    // Si fue Rejected, no hacer nada (implícitamente)
+    last_transactionsloaded = transactionManager->getTransactions();
+    TableUtils::loadTransactionsTableWidget(ui->tableWidget, last_transactionsloaded, IdRole);
 }
 
 void MainWindow::onCustomContextMenuRequested(const QPoint &pos)
@@ -130,7 +99,7 @@ void MainWindow::onCustomContextMenuRequested(const QPoint &pos)
 
     // Acciones comunes para ambas tablas
     QAction *addDerivativeTransactionAction = contextMenu->addAction("Añadir o editar transacciones derivadas");
-    //QAction *deleteAction = contextMenu->addAction("Eliminar");
+    QAction *deleteAction = contextMenu->addAction("Eliminar");
 
 
     // Acción específica solo para la primera tabla
@@ -141,7 +110,7 @@ void MainWindow::onCustomContextMenuRequested(const QPoint &pos)
     }
 */
     connect(addDerivativeTransactionAction, &QAction::triggered, this, &MainWindow::onAddDerivativeTransaction);
-    //connect(deleteAction, &QAction::triggered, this, &MainWindow::onDeleteRow);
+    connect(deleteAction, &QAction::triggered, this, &MainWindow::onDeleteRow);
 
     contextMenu->exec(table->viewport()->mapToGlobal(pos));
     delete contextMenu;
@@ -215,14 +184,15 @@ void MainWindow::onAddDerivativeTransaction()
 
 // Método auxiliar para comparar si dos conjuntos de transacciones son iguales
 
-/*
+
 void MainWindow::onDeleteRow()
 {
+   // QMessageBox::information(this, "nada", "prueba");
 
     int currentRow = ui->tableWidget->currentRow();
     if (currentRow < 0) return;
 
-    int id = obtenerIdDeFila(currentRow);
+    int id = ui->tableWidget->item(currentRow, 0)->data(IdRole).toInt();
 
     QMessageBox::StandardButton reply;
     reply = QMessageBox::question(this, "Eliminar",
@@ -234,12 +204,17 @@ void MainWindow::onDeleteRow()
         // Aquí llamarías al backend para eliminar por ID
         // transactionManager->eliminarTransaccion(id);
 
-        ui->tableWidget->removeRow(currentRow);
+        transactionManager->deleteTransactionById(id);
+        transactionManager->deleteDerivativeTransactionsBYId_T(id);
+
+        last_transactionsloaded = transactionManager->getTransactions();
+        TableUtils::loadTransactionsTableWidget(ui->tableWidget, last_transactionsloaded, IdRole);
+        //ui->tableWidget->removeRow(currentRow);
         qDebug() << "Transacción ID" << id << "eliminada";
     }
 
 }
-*/
+
 /*
 void MainWindow::onMarkProcessed()
 {
