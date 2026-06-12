@@ -5,6 +5,8 @@
 #include <QCoreApplication>
 #include <vector>
 
+#include <QString>
+
 SQLManager::SQLManager()
 {
     if(!QSqlDatabase::isDriverAvailable("QSQLITE")){
@@ -12,11 +14,14 @@ SQLManager::SQLManager()
         return;
     }
 
-    bd = QSqlDatabase::addDatabase("QSQLITE");
-    bd.setDatabaseName(QCoreApplication::applicationDirPath() + "/datos_cuentas_cpp.db");
+    _bd = QSqlDatabase::addDatabase("QSQLITE");
+    _bd.setDatabaseName(BBDD_PATH);
+    QString s = BBDD_PATH;
 
-    if(!bd.open()){
-        qDebug() << "Error abriendo BD:" << bd.lastError().text();
+    qDebug() << s;
+
+    if(!_bd.open()){
+        qDebug() << "Error abriendo BD:" << _bd.lastError().text();
         return;
     }
 
@@ -92,14 +97,14 @@ SQLManager::SQLManager()
         }
     }
 
-    bd.close();
+    _bd.close();
 }
 
 bool SQLManager::abrirBD()
 {
-    if(!bd.isOpen()){
-        if(!bd.open()){
-            qDebug() << "Error abriendo BD:" << bd.lastError().text();
+    if(!_bd.isOpen()){
+        if(!_bd.open()){
+            qDebug() << "Error abriendo BD:" << _bd.lastError().text();
             return false;
         }
     }
@@ -108,8 +113,8 @@ bool SQLManager::abrirBD()
 
 void SQLManager::cerrarBD()
 {
-    if(bd.isOpen()){
-        bd.close();
+    if(_bd.isOpen()){
+        _bd.close();
     }
 }
 
@@ -548,7 +553,7 @@ bool SQLManager::insertarTransaccionesBrutas(const std::vector<estructuraTB>& tr
     if (!abrirBD()) return false;
 
     QSqlQuery q;
-    bd.transaction(); // INICIO TRANSACCIÓN
+    _bd.transaction(); // INICIO TRANSACCIÓN
 
     QString queryStr =
         "INSERT INTO transaccion_bruta (amount, comment, date, currency, processed) "
@@ -564,13 +569,13 @@ bool SQLManager::insertarTransaccionesBrutas(const std::vector<estructuraTB>& tr
 
         if (!q.exec()) {
             qDebug() << "Error insertando transacción bruta en lote:" << q.lastError().text();
-            bd.rollback();     // ❌ Se cancela toda la operación
+            _bd.rollback();     // ❌ Se cancela toda la operación
             cerrarBD();
             return false;
         }
     }
 
-    bd.commit(); // ✔️ COMMIT si todo fue bien
+    _bd.commit(); // ✔️ COMMIT si todo fue bien
     cerrarBD();
     return true;
 }
@@ -681,7 +686,7 @@ bool SQLManager::insertarTransaccionesNetas(const std::vector<estructuraTN>& tra
     if (!abrirBD()) return false;
 
     QSqlQuery q;
-    bd.transaction(); // INICIO TRANSACCIÓN
+    _bd.transaction(); // INICIO TRANSACCIÓN
 
     QString queryStr =
         "INSERT INTO transaccion_neta (amount, comment, date, id_TB, category_id) "
@@ -697,13 +702,13 @@ bool SQLManager::insertarTransaccionesNetas(const std::vector<estructuraTN>& tra
 
         if (!q.exec()) {
             qDebug() << "Error insertando transacción neta en lote:" << q.lastError().text();
-            bd.rollback();
+            _bd.rollback();
             cerrarBD();
             return false;
         }
     }
 
-    bd.commit();
+    _bd.commit();
     cerrarBD();
     return true;
 }

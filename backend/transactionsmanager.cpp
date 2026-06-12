@@ -32,7 +32,9 @@ DT_Structure obtain_DT_Struct(const estructuraTN& estructuraTN){
 }
 
 
-TransactionsManager::TransactionsManager() {
+TransactionsManager::TransactionsManager(std::shared_ptr<SQLManager> sqlManager)
+: _sqlManager(sqlManager)
+{
 }
 
 
@@ -40,30 +42,30 @@ TransactionsManager::TransactionsManager() {
 std::vector<T_Structure> TransactionsManager::getTransactions() {
     std::vector<T_Structure> resultado;
 
-    std::vector<estructuraTB> brutas = m_SQLManager.obtenerTodasTransaccionesBrutas();
+    std::vector<estructuraTB> brutas = _sqlManager->obtenerTodasTransaccionesBrutas();
 
     for (const auto& transaccion : brutas) {
         resultado.push_back(obtain_TStruct(transaccion));
     }
 
-    m_current_Ts = resultado;
-    return m_current_Ts;
+    _current_Ts = resultado;
+    return _current_Ts;
 }
 
 std::vector<DT_Structure> TransactionsManager::getDerivativeTransactionsById(int id_TB) {
     std::vector<DT_Structure> resultado;
-    std::vector<estructuraTN> netas = m_SQLManager.obtenerTransaccionesNetasConId_TB(id_TB);
+    std::vector<estructuraTN> netas = _sqlManager->obtenerTransaccionesNetasConId_TB(id_TB);
 
     for (const auto& transaccion : netas){
         resultado.push_back(obtain_DT_Struct(transaccion));
     }
-    m_current_DTs = resultado;
+    _current_DTs = resultado;
 
-    return m_current_DTs;
+    return _current_DTs;
 }
 
 void TransactionsManager::deleteDerivativeTransactionsById(const int id){
-    m_SQLManager.eliminarTransaccionNeta(id);
+    _sqlManager->eliminarTransaccionNeta(id);
 }
 
 
@@ -75,9 +77,9 @@ void TransactionsManager::insertDerivativeTransaction(const DT_Structure s){
     e.date = s.values[dt_DATE];
     e.id_TB = s.id_T;
     e.category_name = s.values[dt_CATEGORY];
-    e.category_id = m_SQLManager.obtenerIdCategoriaPorNombre(s.values[dt_CATEGORY]);
+    e.category_id = _sqlManager->obtenerIdCategoriaPorNombre(s.values[dt_CATEGORY]);
 
-    m_SQLManager.insertarTransaccionesNetas(e);
+    _sqlManager->insertarTransaccionesNetas(e);
 
 }
 
@@ -90,15 +92,15 @@ void TransactionsManager::actualizeDerivativeTransaction(const DT_Structure s){
     e.date = s.values[dt_DATE];
     e.id_TB = s.id_T;
     e.category_name = s.values[dt_CATEGORY];
-    e.category_id = m_SQLManager.obtenerIdCategoriaPorNombre(s.values[dt_CATEGORY]);
+    e.category_id = _sqlManager->obtenerIdCategoriaPorNombre(s.values[dt_CATEGORY]);
 
-    m_SQLManager.actualizarTransaccionNeta(e);
+    _sqlManager->actualizarTransaccionNeta(e);
 }
 
 std::vector<Category_Structure> TransactionsManager::getCategoryTable(){
 
     std::vector<Category_Structure> c_struct;
-    std::vector<estructuraCategoria> estr_c = m_SQLManager.obtenerTodasCategorias();
+    std::vector<estructuraCategoria> estr_c = _sqlManager->obtenerTodasCategorias();
 
     for (const auto& i : estr_c){
         Category_Structure aux;
@@ -108,8 +110,8 @@ std::vector<Category_Structure> TransactionsManager::getCategoryTable(){
         aux.name = i.nombre;
         c_struct.push_back(aux);
     }
-    m_current_category_table = c_struct;
-    return m_current_category_table;
+    _current_category_table = c_struct;
+    return _current_category_table;
 
 }
 
@@ -127,12 +129,12 @@ UpdateResult TransactionsManager::actualizeDerivativeTransactionsWithId_T(const 
     }
 
     // 2. Si no hay cambios, no hacer nada
-    if (transactionsAreEqual(m_current_DTs, new_DTs)) {
+    if (transactionsAreEqual(_current_DTs, new_DTs)) {
         return UpdateResult::NoChanges;
     }
 
     // 3. Procesar los cambios
-    processDerivativeTransactionsChanges(m_current_DTs, new_DTs, id_t);
+    processDerivativeTransactionsChanges(_current_DTs, new_DTs, id_t);
     return UpdateResult::Success;
 }
 
@@ -141,7 +143,7 @@ bool TransactionsManager::validateDerivativeTransactionsSum(const std::vector<DT
     double parentAmount = 0.0;
     bool parentFound = false;
 
-    for (const auto& t : m_current_Ts) {
+    for (const auto& t : _current_Ts) {
         if (t.id == parentId) {
             try {
                 // Extraer el monto de la transacción padre
@@ -385,7 +387,7 @@ void TransactionsManager::insertNewTransaction(T_Structure Ts){
     e.date = Ts.values[t_DATE];
     e.processed = Ts.processed;
 
-    m_SQLManager.insertarTransaccionesBruta(e);
+    _sqlManager->insertarTransaccionesBruta(e);
 }
 
 
@@ -393,7 +395,7 @@ std::vector<std::string> TransactionsManager::getCurrencies(){
 
     std::vector<std::string> result;
     std::vector<estructuraDivisa> e;
-    e = m_SQLManager.obtenerTodasDivisas();
+    e = _sqlManager->obtenerTodasDivisas();
     for (const auto& i : e){
         result.push_back(i.codigo);
     }
@@ -402,12 +404,14 @@ std::vector<std::string> TransactionsManager::getCurrencies(){
 
 
 void TransactionsManager::deleteTransactionById(const int id){
-    m_SQLManager.eliminarTransaccionBruta(id);
+    _sqlManager->eliminarTransaccionBruta(id);
 }
 
-void TransactionsManager::deleteDerivativeTransactionsBYId_T(const int id_t){
-    for(const auto& i : m_current_DTs){
-        m_SQLManager.eliminarTransaccionNeta(i.id);
+void TransactionsManager::deleteDerivativeTransactionsBYId_T(const int id_t){//TODO ERROR AQUI? ESTO TIENE QUE ESTAR MAL
+    // esto esta mal, funciona de momento porque hay una casualidad....arreglar correctametne
+    for(const auto& i : _current_DTs){
+        _sqlManager->eliminarTransaccionNeta(i.id);
     }
-    m_current_DTs.clear();
+    _current_DTs.clear();
+
 }

@@ -2,7 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-//#include <memory>
+#include <memory>
 #include "backend/itransactionsmanager.h"
 #include "commonDataTypes.h"
 
@@ -17,7 +17,7 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    MainWindow(QWidget *parent = nullptr);
+    MainWindow(std::shared_ptr<ITransactionsManager> backend, QWidget *parent = nullptr);
     ~MainWindow();
 
 private slots:
@@ -32,11 +32,11 @@ private slots:
     void on_actionQuitar_2_triggered();
 
 private:
-    Ui::MainWindow *ui;
-    std::unique_ptr<ITransactionsManager> transactionManager;
+    Ui::MainWindow *_ui;
+    std::shared_ptr<ITransactionsManager> _transactionManager;
 
-    std::vector<T_Structure> last_transactionsloaded; // TODO
-    std::vector<DT_Structure> last_DerivativeTransactionsLoaded; //TODO
+    std::vector<T_Structure> _last_transactionsloaded; // TODO
+    std::vector<DT_Structure> _last_DerivativeTransactionsLoaded; //TODO
 
     // Roles personalizados para almacenar datos
     enum UserRoles {
@@ -54,6 +54,6 @@ private:
     int generarNuevoId();  // Generador de IDs únicos
 
     // Contador para IDs (podrías usar una base de datos después)
-    int contadorId;
+    int _contadorId;
 };
 #endif // MAINWINDOW_H

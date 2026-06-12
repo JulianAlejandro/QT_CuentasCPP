@@ -3,6 +3,7 @@ build/
 
 # Archivos de configuración de Qt Creator
 *.pro.user
+.qtcreator/
 
 # Archivos objeto y binarios
 *.o

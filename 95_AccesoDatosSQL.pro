@@ -49,7 +49,7 @@ HEADERS += \
     frontend/tableutils.h
 
 
-QMAKE_CXXFLAGS += -std=gnu++11
+#QMAKE_CXXFLAGS += -std=gnu++11
 
 FORMS += \
     frontend/addderivatetransactiondialog/addderivativetransactionsdialog.ui \

@@ -13,27 +13,27 @@
 #include "commonDataTypes.h"
 //#include "categorytreewidgetdialog.h"//prueba
 
-MainWindow::MainWindow(QWidget *parent)
+MainWindow::MainWindow(std::shared_ptr<ITransactionsManager> backend, QWidget *parent)
     : QMainWindow(parent)
-    , ui(new Ui::MainWindow)
-    , transactionManager(std::make_unique<TransactionsManager>())
-    , contadorId(0)  // Inicializar contador de IDs
+    , _ui(new Ui::MainWindow)
+    , _transactionManager(backend)
+    , _contadorId(0)  // Inicializar contador de IDs
 {
-    ui->setupUi(this);
+    _ui->setupUi(this);
     setWindowTitle("App");
 
     // Configurar la tabla
-    TableUtils::setFieldsTableWidget(ui->tableWidget, TableUtils::arrayString_to_QStringList(transactionManager->getFieldsTableTransactions()), false);
-    TableUtils::setFieldsTableWidget(ui->tableWidget_2, TableUtils::arrayString_to_QStringList(transactionManager->getFieldsTableDerivativeTransactions()), false);
+    TableUtils::setFieldsTableWidget(_ui->tableWidget, TableUtils::arrayString_to_QStringList(_transactionManager->getFieldsTableTransactions()), false);
+    TableUtils::setFieldsTableWidget(_ui->tableWidget_2, TableUtils::arrayString_to_QStringList(_transactionManager->getFieldsTableDerivativeTransactions()), false);
 
     // ✅ HABILITAR MENÚ CONTEXTUAL EN AMBAS TABLAS
-    ui->tableWidget->setContextMenuPolicy(Qt::CustomContextMenu);
-    //ui->tableWidget_2->setContextMenuPolicy(Qt::CustomContextMenu);
+    _ui->tableWidget->setContextMenuPolicy(Qt::CustomContextMenu);
+    //_ui->tableWidget_2->setContextMenuPolicy(Qt::CustomContextMenu);
 
     // Conectar las señales de tablas
-    connect(ui->tableWidget, &QTableWidget::customContextMenuRequested,
+    connect(_ui->tableWidget, &QTableWidget::customContextMenuRequested,
             this, &MainWindow::onCustomContextMenuRequested);
-    connect(ui->tableWidget, &QTableWidget::itemSelectionChanged,
+    connect(_ui->tableWidget, &QTableWidget::itemSelectionChanged,
             this, &MainWindow::onRowSelected);
 
     // ✅ CONECTAR TAMBIÉN LA SEGUNDA TABLA
@@ -41,24 +41,24 @@ MainWindow::MainWindow(QWidget *parent)
     //        this, &MainWindow::onCustomContextMenuRequested);
 
     // Cargar datos iniciales usando la interfaz
-    last_transactionsloaded = transactionManager->getTransactions();
-    TableUtils::loadTransactionsTableWidget(ui->tableWidget, last_transactionsloaded, IdRole);
+    _last_transactionsloaded = _transactionManager->getTransactions();
+    TableUtils::loadTransactionsTableWidget(_ui->tableWidget, _last_transactionsloaded, IdRole);
 }
 
 MainWindow::~MainWindow()
 {
-    delete ui;
+    delete _ui;
 }
 
 void MainWindow::establecerIdEnFila(int fila, int id)
 {
-    if (fila < 0 || fila >= ui->tableWidget->rowCount()) {
+    if (fila < 0 || fila >= _ui->tableWidget->rowCount()) {
         return;
     }
 
     // Establecer el ID en todos los items de la fila
-    for (int col = 0; col < ui->tableWidget->columnCount(); ++col) {
-        QTableWidgetItem* item = ui->tableWidget->item(fila, col);
+    for (int col = 0; col < _ui->tableWidget->columnCount(); ++col) {
+        QTableWidgetItem* item = _ui->tableWidget->item(fila, col);
         if (item) {
             item->setData(IdRole, id);
         }
@@ -68,23 +68,23 @@ void MainWindow::establecerIdEnFila(int fila, int id)
 int MainWindow::generarNuevoId()
 {
     // Incrementar el contador y devolver el nuevo ID
-    return ++contadorId;
+    return ++_contadorId;
 }
 
 void MainWindow::on_actionA_adir_transaccion_Basica_triggered()
 {
     TransaccionBasicaDialog pd(this);
     pd.setWindowTitle("Transacciones brutas");
-    pd.setListCurrencies(transactionManager->getCurrencies());
+    pd.setListCurrencies(_transactionManager->getCurrencies());
 
     // Usar QDialog::Accepted para mayor claridad
     if (pd.exec() == QDialog::Accepted) {
         // Solo aquí se ejecuta si el usuario hizo clic en OK/Aceptar
-        transactionManager->insertNewTransaction(pd.getNewTransaction());
+        _transactionManager->insertNewTransaction(pd.getNewTransaction());
     }
     // Si fue Rejected, no hacer nada (implícitamente)
-    last_transactionsloaded = transactionManager->getTransactions();
-    TableUtils::loadTransactionsTableWidget(ui->tableWidget, last_transactionsloaded, IdRole);
+    _last_transactionsloaded = _transactionManager->getTransactions();
+    TableUtils::loadTransactionsTableWidget(_ui->tableWidget, _last_transactionsloaded, IdRole);
 }
 
 void MainWindow::onCustomContextMenuRequested(const QPoint &pos)
@@ -118,7 +118,7 @@ void MainWindow::onCustomContextMenuRequested(const QPoint &pos)
 
 void MainWindow::onAddDerivativeTransaction()
 {
-    int currentRow = ui->tableWidget->currentRow();
+    int currentRow = _ui->tableWidget->currentRow();
     if (currentRow < 0) {
         QMessageBox::warning(this, "Aviso",
                              "Debe seleccionar una transacción primero.");
@@ -126,21 +126,21 @@ void MainWindow::onAddDerivativeTransaction()
     }
 
     // Obtener ID de la transacción padre seleccionada
-    int id_t = ui->tableWidget->item(currentRow, 0)->data(IdRole).toInt();
+    int id_t = _ui->tableWidget->item(currentRow, 0)->data(IdRole).toInt();
 
     // Obtener transacciones derivadas actuales para esta transacción padre
-    std::vector<DT_Structure> current_DT = transactionManager->getDerivativeTransactionsById(id_t);
+    std::vector<DT_Structure> current_DT = _transactionManager->getDerivativeTransactionsById(id_t);
 
     // Crear y configurar el diálogo de edición
     addDerivativeTransactionsDialog addDialog(this);
-    addDialog.setCategoryStructures(transactionManager->getCategoryTable());
+    addDialog.setCategoryStructures(_transactionManager->getCategoryTable());
     addDialog.setWindowTitle("Add/Edit derivative Transactions");
     addDialog.setFieldsTableWidget(
-        TableUtils::arrayString_to_QStringList(transactionManager->getFieldsTableDerivativeTransactions()),
+        TableUtils::arrayString_to_QStringList(_transactionManager->getFieldsTableDerivativeTransactions()),
         true);
     addDialog.loadTransactionsTableWidget(current_DT, IdRole);
 
-    for(const auto& ltl : last_transactionsloaded){
+    for(const auto& ltl : _last_transactionsloaded){
         if (ltl.id == id_t){
             addDialog.setParentAmount(stod(ltl.values[t_AMOUNT]));
         }
@@ -168,7 +168,7 @@ void MainWindow::onAddDerivativeTransaction()
 
     //actualizar la tabla
 
-    UpdateResult r = transactionManager->actualizeDerivativeTransactionsWithId_T(new_DT, id_t); // es necesario pasar el Id_t porque desde el dialogo no se añade.
+    UpdateResult r = _transactionManager->actualizeDerivativeTransactionsWithId_T(new_DT, id_t); // es necesario pasar el Id_t porque desde el dialogo no se añade.
     if(r == UpdateResult::SumMismatch){
         QMessageBox::warning(this, "Error",
                              "Valores incorrectos de amount");
@@ -176,8 +176,8 @@ void MainWindow::onAddDerivativeTransaction()
     }
 
     // Actualizar la tabla de transacciones derivadas en la interfaz
-    last_DerivativeTransactionsLoaded = transactionManager->getDerivativeTransactionsById(id_t);
-    TableUtils::loadTransactionsTableWidget(ui->tableWidget_2, last_DerivativeTransactionsLoaded, IdRole);
+    _last_DerivativeTransactionsLoaded = _transactionManager->getDerivativeTransactionsById(id_t);
+    TableUtils::loadTransactionsTableWidget(_ui->tableWidget_2, _last_DerivativeTransactionsLoaded, IdRole);
 
     QMessageBox::information(this, "Éxito", "Transacciones derivadas actualizadas correctamente.");
 }
@@ -189,10 +189,10 @@ void MainWindow::onDeleteRow()
 {
    // QMessageBox::information(this, "nada", "prueba");
 
-    int currentRow = ui->tableWidget->currentRow();
+    int currentRow = _ui->tableWidget->currentRow();
     if (currentRow < 0) return;
 
-    int id = ui->tableWidget->item(currentRow, 0)->data(IdRole).toInt();
+    int id = _ui->tableWidget->item(currentRow, 0)->data(IdRole).toInt();
 
     QMessageBox::StandardButton reply;
     reply = QMessageBox::question(this, "Eliminar",
@@ -204,11 +204,11 @@ void MainWindow::onDeleteRow()
         // Aquí llamarías al backend para eliminar por ID
         // transactionManager->eliminarTransaccion(id);
 
-        transactionManager->deleteTransactionById(id);
-        transactionManager->deleteDerivativeTransactionsBYId_T(id);
+        _transactionManager->deleteTransactionById(id);
+        _transactionManager->deleteDerivativeTransactionsBYId_T(id);
 
-        last_transactionsloaded = transactionManager->getTransactions();
-        TableUtils::loadTransactionsTableWidget(ui->tableWidget, last_transactionsloaded, IdRole);
+        _last_transactionsloaded = _transactionManager->getTransactions();
+        TableUtils::loadTransactionsTableWidget(_ui->tableWidget, _last_transactionsloaded, IdRole);
         //ui->tableWidget->removeRow(currentRow);
         qDebug() << "Transacción ID" << id << "eliminada";
     }
@@ -239,14 +239,14 @@ void MainWindow::onMarkProcessed()
 */
 void MainWindow::onRowSelected()
 {
-    int currentRow = ui->tableWidget->currentRow();
+    int currentRow = _ui->tableWidget->currentRow();
     if (currentRow < 0) return;
 
-    int id = ui->tableWidget->item(currentRow, 0)->data(IdRole).toInt();
+    int id = _ui->tableWidget->item(currentRow, 0)->data(IdRole).toInt();
 
-    last_DerivativeTransactionsLoaded = transactionManager->getDerivativeTransactionsById(id);
+    _last_DerivativeTransactionsLoaded = _transactionManager->getDerivativeTransactionsById(id);
 
-    TableUtils::loadTransactionsTableWidget(ui->tableWidget_2, last_DerivativeTransactionsLoaded, IdRole);
+    TableUtils::loadTransactionsTableWidget(_ui->tableWidget_2, _last_DerivativeTransactionsLoaded, IdRole);
 
 }
 

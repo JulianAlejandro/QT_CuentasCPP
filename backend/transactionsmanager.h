@@ -3,6 +3,7 @@
 
 #include "backend/sqlmanager.h"
 #include "backend/itransactionsmanager.h"
+#include <memory>
 
 // En el header (transactionsmanager.h)
 
@@ -10,7 +11,7 @@
 class TransactionsManager : public ITransactionsManager
 {
 public:
-    TransactionsManager();
+    TransactionsManager(std::shared_ptr<SQLManager> sqlManager);
 
     std::array<std::string, N_FIELDS_T> getFieldsTableTransactions() override {
         std::array<std::string, N_FIELDS_T> result;
@@ -43,12 +44,12 @@ public:
     void deleteTransactionById(const int id) override;
     void deleteDerivativeTransactionsBYId_T(const int id_t) override;
 private:
-    SQLManager m_SQLManager;
+    std::shared_ptr<SQLManager> _sqlManager;
 
-    std::vector<T_Structure> m_current_Ts;
-    std::vector<DT_Structure> m_current_DTs;
+    std::vector<T_Structure> _current_Ts;
+    std::vector<DT_Structure> _current_DTs;
 
-    std::vector<Category_Structure> m_current_category_table;
+    std::vector<Category_Structure> _current_category_table;
 
     static constexpr std::array<const char*, N_FIELDS_T> TRANSACTION_FIELD_TITLES = {
         "Date", "Concept", "Amount", "Currency"

@@ -7,6 +7,8 @@
 #include <string>
 #include "DataTypes.h"
 
+#define BBDD_PATH QCoreApplication::applicationDirPath() + "/datos_cuentas_cpp.db" // TODO: no se si es buena idea poner asi el path
+
 class SQLManager
 {
 public:
@@ -50,7 +52,7 @@ public:
     bool eliminarDivisa(const std::string& codigo);
 
 private:
-    QSqlDatabase bd;
+    QSqlDatabase _bd;
     bool abrirBD();
     void cerrarBD();
 };

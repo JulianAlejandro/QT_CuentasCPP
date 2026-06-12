@@ -1,4 +1,27 @@
+#include "frontend/mainwindow.h"
+#include <QApplication>
+#include "backend/sqlmanager.h"
+#include "backend/transactionsmanager.h" // El tipo real
+#include <memory>
 
+int main(int argc, char *argv[])
+{
+    QApplication a(argc, argv);
+
+
+    auto sqlManager = std::make_shared<SQLManager>();
+    // 1. Creamos el backend una sola vez aquí
+    auto transactionManager = std::make_shared<TransactionsManager>(sqlManager);
+    // en un futuro hacer el gestor de estadisticas aquí y pasarselo al Mainwindow
+
+    // 2. Se lo pasamos al MainWindow al construirlo
+    MainWindow w(transactionManager);
+    w.show();
+
+    return a.exec();
+}
+
+/*
 #include "frontend/mainwindow.h"
 
 #include <QApplication>
@@ -12,7 +35,7 @@ int main(int argc, char *argv[])
     w.show();
     return a.exec();
 }
-
+*/
 
 /*
 #include <QCoreApplication>
