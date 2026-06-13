@@ -14,6 +14,7 @@ public:
     virtual std::array<std::string, N_FIELDS_DT> getFieldsTableDerivativeTransactions() = 0;
 
     virtual std::vector<T_Structure> getTransactions() = 0;
+    virtual std::vector<T_Structure> getTransactionsByMonth(const std::string& fecha) = 0;
     virtual std::vector<DT_Structure> getDerivativeTransactionsById(const int id) = 0;
 
     virtual std::vector<Category_Structure> getCategoryTable() = 0;

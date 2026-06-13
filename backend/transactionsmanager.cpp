@@ -4,6 +4,8 @@
 #include "backend/sqlmanager.h"
 #include <QMessageBox>
 #include <set>
+
+#include <QDate>
 //#include "backend/transactionmodel/transaction.h"
 //#include "backend/transactionmodel/derivativetransaction.h"
 
@@ -44,6 +46,37 @@ std::vector<T_Structure> TransactionsManager::getTransactions() {
 
     std::vector<estructuraTB> brutas = _sqlManager->obtenerTodasTransaccionesBrutas();
 
+    for (const auto& transaccion : brutas) {
+        resultado.push_back(obtain_TStruct(transaccion));
+    }
+
+    _current_Ts = resultado;
+    return _current_Ts;
+}
+
+std::vector<T_Structure> TransactionsManager::getTransactionsByMonth(const std::string& fecha) {
+    std::vector<T_Structure> resultado;
+
+    // 1. Convertimos el std::string ("2026-06") a QDate de Qt para calcular los días
+    // Le añadimos "-01" temporalmente para que Qt pueda interpretar una fecha válida
+    QString formatoMes = QString::fromStdString(fecha) + "-01";
+    QDate fechaAux = QDate::fromString(formatoMes, "yyyy-MM-dd");
+
+    if (!fechaAux.isValid()) {
+        qWarning() << "Error: La fecha recibida en el backend no es válida:" << formatoMes;
+        return resultado;
+    }
+
+    // 2. Construimos los strings de inicio y fin que necesita tu SQLManager
+    // fechaInicio será: "2026-06-01"
+    std::string fechaInicio = fechaAux.toString("yyyy-MM-01").toStdString();
+    // fechaFin será: "2026-06-30" (Qt calcula automáticamente si es 28, 29, 30 o 31)
+    std::string fechaFin = QDate(fechaAux.year(), fechaAux.month(), fechaAux.daysInMonth()).toString("yyyy-MM-dd").toStdString();
+
+    // 3. Llamamos a tu método de la base de datos que ya funciona perfectamente
+    std::vector<estructuraTB> brutas = _sqlManager->obtenerTransaccionesBrutasPorFecha(fechaInicio, fechaFin);
+
+    // 4. Mapeamos las estructuras a tu T_Structure de la app
     for (const auto& transaccion : brutas) {
         resultado.push_back(obtain_TStruct(transaccion));
     }

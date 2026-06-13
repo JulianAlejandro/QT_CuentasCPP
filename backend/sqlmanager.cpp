@@ -15,8 +15,8 @@ SQLManager::SQLManager()
     }
 
     _bd = QSqlDatabase::addDatabase("QSQLITE");
-    _bd.setDatabaseName(BBDD_PATH);
-    QString s = BBDD_PATH;
+    _bd.setDatabaseName(QCoreApplication::applicationDirPath() + BBDD_NAME);
+    QString s = QCoreApplication::applicationDirPath() + BBDD_NAME;
 
     qDebug() << s;
 
@@ -93,7 +93,7 @@ SQLManager::SQLManager()
     if(success){
         if(!q.exec("INSERT OR IGNORE INTO categoria (id, nombre, id_padre) VALUES (0, 'raiz', NULL)")){
             qDebug() << "Error insertando categoria raiz:" << q.lastError().text();
-            success = false;
+           // success = false;
         }
     }
 
@@ -153,7 +153,7 @@ estructuraTB SQLManager::obtenerTransaccionBrutaPorId(int id)
     return tb;
 }
 
-std::vector<estructuraTB> SQLManager::obtenerTodasTransaccionesBrutas()
+std::vector<estructuraTB> SQLManager::obtenerTodasTransaccionesBrutas() //TODO este me preocupa, pueden ser muchas
 {
     std::vector<estructuraTB> listaTransacciones;
 
@@ -182,6 +182,56 @@ std::vector<estructuraTB> SQLManager::obtenerTodasTransaccionesBrutas()
     }
 
     qDebug() << "Transacciones brutas recuperadas:" << listaTransacciones.size();
+    cerrarBD();
+    return listaTransacciones;
+}
+
+
+std::vector<estructuraTB> SQLManager::obtenerTransaccionesBrutasPorFecha(const std::string& fechaInicio, const std::string& fechaFin)
+{
+    std::vector<estructuraTB> listaTransacciones;
+
+    // 1. Intentar abrir la base de datos con tu método existente
+    if(!abrirBD()) return listaTransacciones;
+
+    QSqlQuery q;
+    // 2. Definimos la consulta usando BETWEEN para el rango de fechas.
+    // Ordenamos por fecha descendente para ver las más recientes primero.
+    QString queryStr = "SELECT id, amount, comment, date, currency, processed "
+                       "FROM transaccion_bruta "
+                       "WHERE date BETWEEN :fechaInicio AND :fechaFin "
+                       "ORDER BY date DESC, id DESC";
+
+    q.prepare(queryStr);
+    // 3. Vinculamos los parámetros convirtiendo los std::string a QString de Qt
+    q.bindValue(":fechaInicio", QString::fromStdString(fechaInicio));
+    q.bindValue(":fechaFin", QString::fromStdString(fechaFin));
+
+    // 4. Ejecutar la consulta y controlar errores
+    if(!q.exec()){
+        qDebug() << "Error ejecutando consulta por fechas:" << q.lastError().text();
+        cerrarBD();
+        return listaTransacciones;
+    }
+
+    // 5. Recorrer los registros de la base de datos y llenar el vector
+    while(q.next()){
+        estructuraTB tb;
+        tb.id = q.value("id").toInt();
+        tb.amount = q.value("amount").toDouble();
+        tb.comment = q.value("comment").toString().toStdString();
+        tb.date = q.value("date").toString().toStdString();
+        tb.currency = q.value("currency").toString().toStdString();
+        tb.processed = q.value("processed").toBool();
+
+        listaTransacciones.push_back(tb);
+    }
+
+    qDebug() << "Transacciones brutas recuperadas en el rango"
+             << QString::fromStdString(fechaInicio) << "al" << QString::fromStdString(fechaFin)
+             << ":" << listaTransacciones.size();
+
+    // 6. Cerrar la conexión limpiamente
     cerrarBD();
     return listaTransacciones;
 }

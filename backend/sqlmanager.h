@@ -7,7 +7,7 @@
 #include <string>
 #include "DataTypes.h"
 
-#define BBDD_PATH QCoreApplication::applicationDirPath() + "/datos_cuentas_cpp.db" // TODO: no se si es buena idea poner asi el path
+#define BBDD_NAME "/datos_cuentas_cpp.db" // TODO: no se si es buena idea poner asi el path
 
 class SQLManager
 {
@@ -17,6 +17,7 @@ public:
     // Métodos para Transacciones Brutas
     estructuraTB obtenerTransaccionBrutaPorId(int id);
     std::vector<estructuraTB> obtenerTodasTransaccionesBrutas();
+    std::vector<estructuraTB> obtenerTransaccionesBrutasPorFecha(const std::string& fechaInicio, const std::string& fechaFin);
     std::vector<estructuraTB> obtenerTransaccionesBrutasPorEstado(bool processed);
     bool insertarTransaccionesBruta(const estructuraTB& transaccion);
     bool insertarTransaccionesBrutas(const std::vector<estructuraTB>& transacciones);

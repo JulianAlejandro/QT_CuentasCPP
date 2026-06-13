@@ -5,6 +5,7 @@
 #include "backend/itransactionsmanager.h"
 #include <memory>
 
+
 // En el header (transactionsmanager.h)
 
 
@@ -30,6 +31,8 @@ public:
     }
 
     std::vector<T_Structure> getTransactions() override;
+    std::vector<T_Structure> getTransactionsByMonth(const std::string& fecha) override;
+
     std::vector<DT_Structure> getDerivativeTransactionsById(int id) override;
 
     std::vector<Category_Structure> getCategoryTable() override;

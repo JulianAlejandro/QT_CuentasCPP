@@ -26,6 +26,13 @@ MainWindow::MainWindow(std::shared_ptr<ITransactionsManager> backend, QWidget *p
     TableUtils::setFieldsTableWidget(_ui->tableWidget, TableUtils::arrayString_to_QStringList(_transactionManager->getFieldsTableTransactions()), false);
     TableUtils::setFieldsTableWidget(_ui->tableWidget_2, TableUtils::arrayString_to_QStringList(_transactionManager->getFieldsTableDerivativeTransactions()), false);
 
+    // Establecer el selector de fecha para que sea solo meses.
+    _ui->dateEdit->setDisplayFormat("MMMM yyyy");
+    _ui->dateEdit->setDate(QDate(2026, 6, 1));
+
+    QDate fechaSeleccionada = _ui->dateEdit->date();
+    QString fechaMes = fechaSeleccionada.toString("yyyy-MM");
+
     // ✅ HABILITAR MENÚ CONTEXTUAL EN AMBAS TABLAS
     _ui->tableWidget->setContextMenuPolicy(Qt::CustomContextMenu);
     //_ui->tableWidget_2->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -41,7 +48,9 @@ MainWindow::MainWindow(std::shared_ptr<ITransactionsManager> backend, QWidget *p
     //        this, &MainWindow::onCustomContextMenuRequested);
 
     // Cargar datos iniciales usando la interfaz
-    _last_transactionsloaded = _transactionManager->getTransactions();
+    //_last_transactionsloaded = _transactionManager->getTransactions();
+
+    _last_transactionsloaded = _transactionManager->getTransactionsByMonth(fechaMes.toStdString());
     TableUtils::loadTransactionsTableWidget(_ui->tableWidget, _last_transactionsloaded, IdRole);
 }
 
@@ -255,4 +264,17 @@ void MainWindow::on_actionQuitar_2_triggered()
     close();
 }
 
+
+
+void MainWindow::on_dateEdit_userDateChanged(const QDate &date)
+{
+    // 1. Convertimos el QDate al formato "yyyy-MM" que tu backend sabe procesar (ej: "2026-06")
+    QString fechaMes = date.toString("yyyy-MM");
+
+    // 2. Pedimos al backend las transacciones asociadas a ese mes
+    _last_transactionsloaded = _transactionManager->getTransactionsByMonth(fechaMes.toStdString());
+
+    // 3. Cargamos los datos limpios en la primera tabla
+    TableUtils::loadTransactionsTableWidget(_ui->tableWidget, _last_transactionsloaded, IdRole);
+}
 

@@ -31,6 +31,8 @@ private slots:
 
     void on_actionQuitar_2_triggered();
 
+    void on_dateEdit_userDateChanged(const QDate &date);
+
 private:
     Ui::MainWindow *_ui;
     std::shared_ptr<ITransactionsManager> _transactionManager;
