@@ -18,6 +18,7 @@ build/
 *~
 *.bak
 *.backup
+backend/borrar/
 
 # Archivos del sistema
 .DS_Store
