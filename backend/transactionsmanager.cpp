@@ -424,6 +424,39 @@ void TransactionsManager::insertNewTransaction(T_Structure Ts){
 }
 
 
+int TransactionsManager::insertNewTransactionWithDefaultDerivative(const T_Structure& Ts){
+
+    estructuraTB e;
+    e.id = Ts.id;
+    e.amount = stod(Ts.values[t_AMOUNT]);
+    e.comment = Ts.values[t_CONCEPT];
+    e.currency = Ts.values[t_CURRENCY];
+    e.date = Ts.values[t_DATE];
+    e.processed = Ts.processed;
+
+    int id_bruta = _sqlManager->insertarTransaccionesBruta(e);
+    if (id_bruta == -1) return -1;
+
+    std::string categoryName = _sqlManager->obtenerNombreCategoriaPorId(Ts.category_id);
+
+    estructuraTN tn;
+    tn.id = -1;
+    tn.amount = e.amount;
+    tn.comment = e.comment;
+    tn.date = e.date;
+    tn.id_TB = id_bruta;
+    tn.category_id = Ts.category_id;
+    tn.category_name = categoryName;
+
+    bool ok = _sqlManager->insertarTransaccionesNetas(tn);
+    if (!ok) return -1;
+
+    getDerivativeTransactionsById(id_bruta);
+
+    return id_bruta;
+}
+
+
 std::vector<std::string> TransactionsManager::getCurrencies(){
 
     std::vector<std::string> result;

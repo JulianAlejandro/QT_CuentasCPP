@@ -448,7 +448,6 @@ estructuraCategoria SQLManager::obtenerCategoriaPorId(int id)
     cerrarBD();
     return cat;
 }
-/*
 std::string SQLManager::obtenerNombreCategoriaPorId(int id){
     std::string name = "";
 
@@ -476,7 +475,6 @@ std::string SQLManager::obtenerNombreCategoriaPorId(int id){
     return name;
 
 }
-*/
 std::vector<estructuraCategoria> SQLManager::obtenerCategoriasPorPadre(int id_padre)
 {
     std::vector<estructuraCategoria> listaCategorias;
@@ -570,9 +568,9 @@ estructuraDivisa SQLManager::obtenerDivisaPorCodigo(const std::string& codigo)
 }
 
 // Métodos para INSERTAR Transacciones Brutas
-bool SQLManager::insertarTransaccionesBruta(const estructuraTB& transaccion)
+int SQLManager::insertarTransaccionesBruta(const estructuraTB& transaccion)
 {
-    if(!abrirBD()) return false;
+    if(!abrirBD()) return -1;
 
     QSqlQuery q;
     QString queryStr = "INSERT INTO transaccion_bruta (amount, comment, date, currency, processed) "
@@ -586,14 +584,16 @@ bool SQLManager::insertarTransaccionesBruta(const estructuraTB& transaccion)
     q.bindValue(":processed", transaccion.processed);
 
     bool success = q.exec();
+    int insertedId = -1;
     if(!success){
         qDebug() << "Error insertando transacción bruta:" << q.lastError().text();
     } else {
-        qDebug() << "Transacción bruta insertada correctamente, ID:" << q.lastInsertId().toInt();
+        insertedId = q.lastInsertId().toInt();
+        qDebug() << "Transacción bruta insertada correctamente, ID:" << insertedId;
     }
 
     cerrarBD();
-    return success;
+    return insertedId;
 }
 
 

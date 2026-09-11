@@ -17,7 +17,7 @@ MainWindow::MainWindow(std::shared_ptr<ITransactionsManager> backend, QWidget *p
     : QMainWindow(parent)
     , _ui(new Ui::MainWindow)
     , _transactionManager(backend)
-    , _contadorId(0)  // Inicializar contador de IDs
+    //, _contadorId(0)  // Inicializar contador de IDs
 {
     _ui->setupUi(this);
     setWindowTitle("App");
@@ -74,12 +74,12 @@ void MainWindow::establecerIdEnFila(int fila, int id)
         }
     }
 }
-
+/*
 int MainWindow::generarNuevoId()
 {
     // Incrementar el contador y devolver el nuevo ID
     return ++_contadorId;
-}
+}*/
 
 void MainWindow::on_actionA_adir_transaccion_Basica_triggered()
 {
@@ -92,11 +92,13 @@ void MainWindow::on_actionA_adir_transaccion_Basica_triggered()
     // Usar QDialog::Accepted para mayor claridad
     if (pd.exec() == QDialog::Accepted) {
         // Solo aquí se ejecuta si el usuario hizo clic en OK/Aceptar
-        _transactionManager->insertNewTransaction(pd.getNewTransaction());
+        _transactionManager->insertNewTransactionWithDefaultDerivative(pd.getNewTransaction());
     }
     // Si fue Rejected, no hacer nada (implícitamente)
     _last_transactionsloaded = _transactionManager->getTransactions();
     TableUtils::loadTransactionsTableWidget(_ui->tableWidget, _last_transactionsloaded, IdRole);
+
+
 }
 
 void MainWindow::onCustomContextMenuRequested(const QPoint &pos)

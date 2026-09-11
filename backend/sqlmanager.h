@@ -19,7 +19,7 @@ public:
     std::vector<estructuraTB> obtenerTodasTransaccionesBrutas();
     std::vector<estructuraTB> obtenerTransaccionesBrutasPorFecha(const std::string& fechaInicio, const std::string& fechaFin);
     std::vector<estructuraTB> obtenerTransaccionesBrutasPorEstado(bool processed);
-    bool insertarTransaccionesBruta(const estructuraTB& transaccion);
+    int insertarTransaccionesBruta(const estructuraTB& transaccion);
     bool insertarTransaccionesBrutas(const std::vector<estructuraTB>& transacciones);
 
     bool actualizarTransaccionBruta(const estructuraTB& transaccion);
@@ -39,7 +39,7 @@ public:
     std::vector<estructuraCategoria> obtenerTodasCategorias();
     estructuraCategoria obtenerCategoriaPorId(int id);
     int obtenerIdCategoriaPorNombre(const std::string& nombre);
-    //std::string obtenerNombreCategoriaPorId(int id);
+    std::string obtenerNombreCategoriaPorId(int id);
     std::vector<estructuraCategoria> obtenerCategoriasPorPadre(int id_padre);
     bool insertarCategoria(const estructuraCategoria& categoria);
     bool actualizarCategoria(const estructuraCategoria& categoria);

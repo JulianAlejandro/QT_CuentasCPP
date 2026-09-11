@@ -56,6 +56,6 @@ private:
     int generarNuevoId();  // Generador de IDs únicos
 
     // Contador para IDs (podrías usar una base de datos después)
-    int _contadorId;
+    //int _contadorId;
 };
 #endif // MAINWINDOW_H

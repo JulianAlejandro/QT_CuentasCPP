@@ -23,6 +23,8 @@ public:
 
     virtual void insertNewTransaction(T_Structure Ts) = 0;
 
+    virtual int insertNewTransactionWithDefaultDerivative(const T_Structure& Ts) = 0;
+
     virtual std::vector<std::string> getCurrencies() = 0;
 
     virtual void deleteTransactionById(const int id) = 0;

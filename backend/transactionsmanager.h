@@ -41,6 +41,8 @@ public:
 
     void insertNewTransaction(T_Structure Ts) override;
 
+    int insertNewTransactionWithDefaultDerivative(const T_Structure& Ts) override;
+
     std::vector<std::string> getCurrencies() override;
 
 
