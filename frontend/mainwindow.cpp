@@ -50,7 +50,8 @@ MainWindow::MainWindow(std::shared_ptr<ITransactionsManager> backend, QWidget *p
     // Cargar datos iniciales usando la interfaz
     //_last_transactionsloaded = _transactionManager->getTransactions();
 
-    _last_transactionsloaded = _transactionManager->getTransactionsByMonth(fechaMes.toStdString());
+    //_last_transactionsloaded = _transactionManager->getTransactionsByMonth(fechaMes.toStdString());
+    _last_transactionsloaded = _transactionManager->getTransactions();
     TableUtils::loadTransactionsTableWidget(_ui->tableWidget, _last_transactionsloaded, IdRole);
 }
 
@@ -85,6 +86,8 @@ void MainWindow::on_actionA_adir_transaccion_Basica_triggered()
     TransaccionBasicaDialog pd(this);
     pd.setWindowTitle("Transacciones brutas");
     pd.setListCurrencies(_transactionManager->getCurrencies());
+    pd.setListCategories(_transactionManager->getCategoryTable());
+
 
     // Usar QDialog::Accepted para mayor claridad
     if (pd.exec() == QDialog::Accepted) {
@@ -268,6 +271,7 @@ void MainWindow::on_actionQuitar_2_triggered()
 
 void MainWindow::on_dateEdit_userDateChanged(const QDate &date)
 {
+    /*
     // 1. Convertimos el QDate al formato "yyyy-MM" que tu backend sabe procesar (ej: "2026-06")
     QString fechaMes = date.toString("yyyy-MM");
 
@@ -276,5 +280,6 @@ void MainWindow::on_dateEdit_userDateChanged(const QDate &date)
 
     // 3. Cargamos los datos limpios en la primera tabla
     TableUtils::loadTransactionsTableWidget(_ui->tableWidget, _last_transactionsloaded, IdRole);
+    */
 }
 

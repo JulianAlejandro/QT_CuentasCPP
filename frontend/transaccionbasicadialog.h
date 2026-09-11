@@ -22,13 +22,19 @@ public:
 
     // Cambiado: ahora recibe vector<string> en lugar de QStringList
     void setListCurrencies(const std::vector<std::string> &list);
+    void setListCategories(const std::vector<Category_Structure> &list);
+    int getSelectedCategoryId() const;
 
 private slots:
     void on_buttonBox_accepted();
     void on_buttonBox_rejected();
+    void on_categorySelectButton_clicked();
 
 private:
     Ui::TransaccionBasicaDialog *ui;
+    std::vector<Category_Structure> _categories;
+    int _selectedCategoryId;
+    QString _selectedCategoryName;
 };
 
 #endif // TRANSACCIONBASICADIALOG_H

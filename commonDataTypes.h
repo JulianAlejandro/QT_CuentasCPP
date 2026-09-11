@@ -25,6 +25,7 @@ struct T_Structure {
     int id;
     std::array<std::string, N_FIELDS_T> values;
     bool processed;
+    int category_id;
 };
 
 struct DT_Structure {

@@ -2,14 +2,14 @@
 <ui version="4.0">
  <class>TransaccionBasicaDialog</class>
  <widget class="QDialog" name="TransaccionBasicaDialog">
-  <property name="geometry">
-   <rect>
-    <x>0</x>
-    <y>0</y>
-    <width>347</width>
-    <height>191</height>
-   </rect>
-  </property>
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>347</width>
+     <height>221</height>
+    </rect>
+   </property>
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
@@ -46,6 +46,13 @@
          </property>
         </widget>
        </item>
+       <item>
+        <widget class="QLabel" name="label_5">
+         <property name="text">
+          <string>Category</string>
+         </property>
+        </widget>
+       </item>
       </layout>
      </item>
      <item>
@@ -68,6 +75,24 @@
        </item>
        <item>
         <widget class="QComboBox" name="currencyComboBox"/>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_2">
+         <item>
+          <widget class="QLineEdit" name="categoryLineEdit">
+           <property name="readOnly">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="categorySelectButton">
+           <property name="text">
+            <string>...</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </item>
       </layout>
      </item>

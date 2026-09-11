@@ -1,10 +1,12 @@
 #include "transaccionbasicadialog.h"
 #include "ui_transaccionbasicadialog.h"
+#include "categorytreewidgetdialog.h"
 #include <QDebug>
 
 TransaccionBasicaDialog::TransaccionBasicaDialog(QWidget *parent)
     : QDialog(parent)
     , ui(new Ui::TransaccionBasicaDialog)
+    , _selectedCategoryId(0)
 {
     ui->setupUi(this);
 
@@ -12,8 +14,9 @@ TransaccionBasicaDialog::TransaccionBasicaDialog(QWidget *parent)
     ui->dateEdit->setDate(QDate::currentDate());
     ui->amountDubleSpinBox->setValue(0.0);
 
-    // Configurar formato de fecha si lo deseas
-    // ui->dateEdit->setDisplayFormat("yyyy-MM-dd");
+    // Inicializar categoría por defecto
+    _selectedCategoryName = "raiz";
+    ui->categoryLineEdit->setText(_selectedCategoryName);
 }
 
 TransaccionBasicaDialog::~TransaccionBasicaDialog()
@@ -47,6 +50,7 @@ T_Structure TransaccionBasicaDialog::getNewTransaction()
     result.values[t_CURRENCY] = selectedCurrency.toStdString();
 
     result.processed = false;
+    result.category_id = _selectedCategoryId;
 
     // Debug opcional
     qDebug() << "Nueva transacción creada:";
@@ -108,6 +112,23 @@ void TransaccionBasicaDialog::setListCurrencies(const std::vector<std::string> &
     qDebug() << "Cargadas" << list.size() << "divisas en el combobox";
 }
 
+void TransaccionBasicaDialog::setListCategories(const std::vector<Category_Structure> &list)
+{
+    _categories = list;
+
+    if (list.empty()) {
+        qWarning() << "Lista de categorías vacía proporcionada a setListCategories";
+        return;
+    }
+
+    qDebug() << "Cargadas" << list.size() << "categorías para el tree dialog";
+}
+
+int TransaccionBasicaDialog::getSelectedCategoryId() const
+{
+    return _selectedCategoryId;
+}
+
 void TransaccionBasicaDialog::on_buttonBox_accepted()
 {
     // Validación básica antes de aceptar
@@ -129,4 +150,15 @@ void TransaccionBasicaDialog::on_buttonBox_accepted()
 void TransaccionBasicaDialog::on_buttonBox_rejected()
 {
     reject();
+}
+
+void TransaccionBasicaDialog::on_categorySelectButton_clicked()
+{
+    categoryTreeWidgetDialog dialog(this, _categories);
+    if (dialog.exec() == QDialog::Accepted) {
+        _selectedCategoryId = dialog.getSelectedCategoryId();
+        _selectedCategoryName = dialog.getSelectedCategoryName();
+        ui->categoryLineEdit->setText(_selectedCategoryName);
+        qDebug() << "Categoría seleccionada:" << _selectedCategoryName << "ID:" << _selectedCategoryId;
+    }
 }
