@@ -161,24 +161,6 @@ SQLManager::SQLManager()
     }
 }
 
-bool SQLManager::abrirBD()
-{
-    if(!_bd.isOpen()){
-        if(!_bd.open()){
-            qDebug() << "Error abriendo BD:" << _bd.lastError().text();
-            return false;
-        }
-    }
-    return true;
-}
-
-void SQLManager::cerrarBD()
-{
-    if(_bd.isOpen()){
-        _bd.close();
-    }
-}
-
 estructuraTB SQLManager::obtenerTransaccionBrutaPorId(int id)
 {
     estructuraTB tb = {0, 0.0, "", "", "", false};

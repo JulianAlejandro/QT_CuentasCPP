@@ -3,11 +3,8 @@
 #include "transactionsmanager.h"
 #include "backend/sqlmanager.h"
 #include <QMessageBox>
-#include <set>
 
 #include <QDate>
-//#include "backend/transactionmodel/transaction.h"
-//#include "backend/transactionmodel/derivativetransaction.h"
 
 
 T_Structure obtain_TStruct(const estructuraTB& estructuraTB) {
@@ -144,12 +141,6 @@ std::vector<Category_Structure> TransactionsManager::getCategoryTable(){
     return _current_category_table;
 
 }
-
-/*
-std::vector<estructuraCategoria> TransactionsManager::getCategories(){
-    return m_SQLManager.obtenerTodasCategorias();
-}
-*/
 
 UpdateResult TransactionsManager::actualizeDerivativeTransactionsWithId_T(const std::vector<DT_Structure>& new_DTs, const int id_t){
 
@@ -308,86 +299,6 @@ void TransactionsManager::processDerivativeTransactionsChanges(
     }
 }
 
-
-
-// Método auxiliar para obtener transacciones eliminadas
-std::vector<int> TransactionsManager::findDeletedTransactions(
-    const std::vector<DT_Structure>& oldTransactions,
-    const std::vector<DT_Structure>& newTransactions)
-{
-    std::vector<int> deletedIds;
-    std::set<int> newIds;
-
-    // Recoger todos los IDs de las nuevas transacciones (excluyendo -1)
-    for (const auto& dt : newTransactions) {
-        if (dt.id != -1) {
-            newIds.insert(dt.id);
-        }
-    }
-
-    // Buscar IDs que están en las viejas pero no en las nuevas
-    for (const auto& dt : oldTransactions) {
-        if (newIds.find(dt.id) == newIds.end()) {
-            deletedIds.push_back(dt.id);
-        }
-    }
-
-    return deletedIds;
-}
-
-// Método auxiliar para obtener transacciones modificadas
-std::vector<DT_Structure> TransactionsManager::findModifiedTransactions(
-    const std::vector<DT_Structure>& oldTransactions,
-    const std::vector<DT_Structure>& newTransactions)
-{
-    std::vector<DT_Structure> modifiedTransactions;
-    std::map<int, DT_Structure> oldMap;
-
-    // Crear mapa de transacciones antiguas
-    for (const auto& dt : oldTransactions) {
-        oldMap[dt.id] = dt;
-    }
-
-    // Comparar con las nuevas
-    for (const auto& newDT : newTransactions) {
-        if (newDT.id == -1) continue; // Saltar nuevas
-
-        auto it = oldMap.find(newDT.id);
-        if (it != oldMap.end()) {
-            const auto& oldDT = it->second;
-
-            // Verificar si hay cambios
-            bool changed = false;
-            for (size_t i = 0; i < oldDT.values.size(); ++i) {
-                if (oldDT.values[i] != newDT.values[i]) {
-                    changed = true;
-                    break;
-                }
-            }
-
-            if (changed) {
-                modifiedTransactions.push_back(newDT);
-            }
-        }
-    }
-
-    return modifiedTransactions;
-}
-
-// Método auxiliar para obtener transacciones nuevas
-std::vector<DT_Structure> TransactionsManager::findNewTransactions(
-    const std::vector<DT_Structure>& newTransactions)
-{
-    std::vector<DT_Structure> newTrans;
-
-    for (const auto& dt : newTransactions) {
-        if (dt.id == -1) {
-            newTrans.push_back(dt);
-        }
-    }
-
-    return newTrans;
-}
 
 
 void TransactionsManager::insertNewTransaction(T_Structure Ts){

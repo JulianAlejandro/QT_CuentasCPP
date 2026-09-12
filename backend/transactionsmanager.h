@@ -75,17 +75,6 @@ private:
     bool transactionsAreEqual(
         const std::vector<DT_Structure>& oldTransactions,
         const std::vector<DT_Structure>& newTransactions);
-
-    std::vector<int> findDeletedTransactions(
-        const std::vector<DT_Structure>& oldTransactions,
-        const std::vector<DT_Structure>& newTransactions);
-
-    std::vector<DT_Structure> findModifiedTransactions(
-        const std::vector<DT_Structure>& oldTransactions,
-        const std::vector<DT_Structure>& newTransactions);
-
-    std::vector<DT_Structure> findNewTransactions(
-        const std::vector<DT_Structure>& newTransactions);
 };
 
 #endif // TRANSACTIONSMANAGER_H

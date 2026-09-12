@@ -38,8 +38,6 @@ public:
 
 private:
     QSqlDatabase _bd;
-    bool abrirBD();
-    void cerrarBD();
 };
 
 #endif // SQLMANAGER_H
