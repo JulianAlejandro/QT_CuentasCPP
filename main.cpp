@@ -15,7 +15,7 @@ int main(int argc, char *argv[])
     // en un futuro hacer el gestor de estadisticas aquí y pasarselo al Mainwindow
 
     // 2. Se lo pasamos al MainWindow al construirlo
-    MainWindow w(transactionManager);
+    MainWindow w(transactionManager, sqlManager);
     w.show();
 
     return a.exec();

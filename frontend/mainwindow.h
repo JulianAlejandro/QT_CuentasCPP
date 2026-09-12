@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <memory>
 #include "backend/itransactionsmanager.h"
+#include "backend/sqlmanager.h"
 #include "commonDataTypes.h"
 
 QT_BEGIN_NAMESPACE
@@ -17,7 +18,9 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    MainWindow(std::shared_ptr<ITransactionsManager> backend, QWidget *parent = nullptr);
+    MainWindow(std::shared_ptr<ITransactionsManager> backend,
+               std::shared_ptr<SQLManager> sqlManager,
+               QWidget *parent = nullptr);
     ~MainWindow();
 
 private slots:
@@ -33,9 +36,12 @@ private slots:
 
     void on_dateEdit_userDateChanged(const QDate &date);
 
+    void on_actionSQLDebug_triggered();
+
 private:
     Ui::MainWindow *_ui;
     std::shared_ptr<ITransactionsManager> _transactionManager;
+    std::shared_ptr<SQLManager> _sqlManager;
 
     std::vector<T_Structure> _last_transactionsloaded; // TODO
     std::vector<DT_Structure> _last_DerivativeTransactionsLoaded; //TODO

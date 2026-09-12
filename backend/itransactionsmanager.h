@@ -28,8 +28,6 @@ public:
     virtual std::vector<std::string> getCurrencies() = 0;
 
     virtual void deleteTransactionById(const int id) = 0;
-
-    virtual void deleteDerivativeTransactionsBYId_T(const int id_t) = 0;
 private:
 
     virtual void deleteDerivativeTransactionsById(const int id) = 0;

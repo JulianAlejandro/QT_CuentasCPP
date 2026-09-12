@@ -3,6 +3,7 @@
 
 #include "frontend/transaccionbasicadialog.h"
 #include "frontend/addderivatetransactiondialog/addderivativetransactionsdialog.h"
+#include "frontend/sqldebugdialog.h"
 #include <QMessageBox>
 #include <QTableWidget>
 #include <QHeaderView>
@@ -13,10 +14,13 @@
 #include "commonDataTypes.h"
 //#include "categorytreewidgetdialog.h"//prueba
 
-MainWindow::MainWindow(std::shared_ptr<ITransactionsManager> backend, QWidget *parent)
+MainWindow::MainWindow(std::shared_ptr<ITransactionsManager> backend,
+                       std::shared_ptr<SQLManager> sqlManager,
+                       QWidget *parent)
     : QMainWindow(parent)
     , _ui(new Ui::MainWindow)
     , _transactionManager(backend)
+    , _sqlManager(sqlManager)
     //, _contadorId(0)  // Inicializar contador de IDs
 {
     _ui->setupUi(this);
@@ -219,7 +223,6 @@ void MainWindow::onDeleteRow()
         // transactionManager->eliminarTransaccion(id);
 
         _transactionManager->deleteTransactionById(id);
-        _transactionManager->deleteDerivativeTransactionsBYId_T(id);
 
         _last_transactionsloaded = _transactionManager->getTransactions();
         TableUtils::loadTransactionsTableWidget(_ui->tableWidget, _last_transactionsloaded, IdRole);
@@ -267,6 +270,13 @@ void MainWindow::onRowSelected()
 void MainWindow::on_actionQuitar_2_triggered()
 {
     close();
+}
+
+void MainWindow::on_actionSQLDebug_triggered()
+{
+    SQLDebugDialog* dlg = new SQLDebugDialog(_sqlManager.get(), this);
+    dlg->setAttribute(Qt::WA_DeleteOnClose);
+    dlg->show();
 }
 
 

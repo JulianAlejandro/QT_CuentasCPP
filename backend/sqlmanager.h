@@ -4,10 +4,17 @@
 #include <QSqlDatabase>
 #include <vector>
 #include <QString>
+#include <QStringList>
 #include <string>
 #include "DataTypes.h"
 
 #define BBDD_NAME "/datos_cuentas_cpp.db" // TODO: no se si es buena idea poner asi el path
+
+struct TablaSQL {
+    QString nombre;
+    QStringList columnas;
+    std::vector<QStringList> filas;
+};
 
 class SQLManager
 {
@@ -26,7 +33,6 @@ public:
     bool insertarTransaccionesNetas(const estructuraTN& transaccion);
     bool actualizarTransaccionNeta(const estructuraTN& transaccion);
     bool eliminarTransaccionNeta(int id);
-    bool eliminarTransaccionesNetasPorId_TB(int id_TB);
 
     // Métodos para Categorías
     std::vector<estructuraCategoria> obtenerTodasCategorias();
@@ -35,6 +41,9 @@ public:
 
     // Métodos para Divisas
     std::vector<estructuraDivisa> obtenerTodasDivisas();
+
+    // Debug
+    std::vector<TablaSQL> obtenerTodasLasTablas();
 
 private:
     QSqlDatabase _bd;

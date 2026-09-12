@@ -2,6 +2,7 @@
 #include <qDebug>
 #include <QSqlError>
 #include <QSqlQuery>
+#include <QSqlRecord>
 #include <QCoreApplication>
 #include <vector>
 #include <QString>
@@ -15,6 +16,9 @@ public:
             if(!_bd.open()) {
                 qDebug() << "Error abriendo BD:" << _bd.lastError().text();
             }
+        }
+        if(_bd.isOpen()) {
+            QSqlQuery(_bd).exec("PRAGMA foreign_keys = ON");
         }
     }
     ~BDConeccion() {
@@ -157,6 +161,13 @@ SQLManager::SQLManager()
     if(success){
         if(!q.exec("INSERT OR IGNORE INTO categoria (id, nombre, id_padre) VALUES (0, 'raiz', NULL)")){
             qDebug() << "Error insertando categoria raiz:" << q.lastError().text();
+        }
+    }
+
+    if(success){
+        q.exec("DELETE FROM transaccion_neta WHERE id_TB NOT IN (SELECT id FROM transaccion_bruta)");
+        if(q.numRowsAffected() > 0){
+            qDebug() << "Huérfanos de transaccion_neta eliminados:" << q.numRowsAffected();
         }
     }
 }
@@ -426,26 +437,6 @@ bool SQLManager::eliminarTransaccionNeta(int id)
     return success;
 }
 
-bool SQLManager::eliminarTransaccionesNetasPorId_TB(int id_TB)
-{
-    BDConeccion conn(_bd);
-    if(!conn.isOpen()) return false;
-
-    QSqlQuery q;
-    q.prepare("DELETE FROM transaccion_neta WHERE id_TB = :id_TB");
-    q.bindValue(":id_TB", id_TB);
-
-    bool success = q.exec();
-    if(!success){
-        qDebug() << "Error eliminando transacciones netas por id_TB:" << q.lastError().text();
-    } else {
-        qDebug() << "Transacciones netas eliminadas para id_TB" << id_TB
-                 << "- filas afectadas:" << q.numRowsAffected();
-    }
-
-    return success;
-}
-
 int SQLManager::obtenerIdCategoriaPorNombre(const std::string& nombre)
 {
     BDConeccion conn(_bd);
@@ -469,4 +460,41 @@ int SQLManager::obtenerIdCategoriaPorNombre(const std::string& nombre)
              << QString::fromStdString(nombre);
 
     return -1;
+}
+
+std::vector<TablaSQL> SQLManager::obtenerTodasLasTablas()
+{
+    static const QStringList tablas = {
+        "transaccion_bruta", "transaccion_neta", "categoria", "divisa"
+    };
+
+    std::vector<TablaSQL> resultado;
+    BDConeccion conn(_bd);
+    if(!conn.isOpen()) return resultado;
+
+    for (const QString& nombre : tablas) {
+        TablaSQL tabla;
+        tabla.nombre = nombre;
+
+        QSqlQuery q;
+        if(!q.exec("SELECT * FROM " + nombre)){
+            qDebug() << "Error leyendo tabla" << nombre << ":" << q.lastError().text();
+            continue;
+        }
+
+        const QSqlRecord rec = q.record();
+        for (int i = 0; i < rec.count(); ++i)
+            tabla.columnas << rec.fieldName(i);
+
+        while(q.next()){
+            QStringList fila;
+            for (int i = 0; i < rec.count(); ++i)
+                fila << q.value(i).toString();
+            tabla.filas.push_back(fila);
+        }
+
+        resultado.push_back(tabla);
+    }
+
+    return resultado;
 }

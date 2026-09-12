@@ -16,6 +16,7 @@ SOURCES += \
     frontend/categorytreewidgetdialog.cpp \
     frontend/transaccionbasicadialog.cpp \
     frontend/mainwindow.cpp \
+    frontend/sqldebugdialog.cpp \
     frontend/tableutils.cpp \
     frontend/addderivatetransactiondialog/addderivativetransactionsdialog.cpp \
     frontend/addderivatetransactiondialog/dateeditdelegate.cpp \
@@ -32,6 +33,7 @@ HEADERS += \
     frontend/categorytreewidgetdialog.h \
     frontend/transaccionbasicadialog.h \
     frontend/mainwindow.h \
+    frontend/sqldebugdialog.h \
     frontend/tableutils.h \
     frontend/addderivatetransactiondialog/addderivativetransactionsdialog.h \
     frontend/addderivatetransactiondialog/dateeditdelegate.h \
@@ -45,6 +47,7 @@ FORMS += \
     frontend/categorytreewidgetdialog.ui \
     frontend/transaccionbasicadialog.ui \
     frontend/mainwindow.ui \
+    frontend/sqldebugdialog.ui \
     frontend/addderivatetransactiondialog/addderivativetransactionsdialog.ui
 
 # Default rules for deployment.

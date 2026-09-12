@@ -47,7 +47,6 @@ public:
 
 
     void deleteTransactionById(const int id) override;
-    void deleteDerivativeTransactionsBYId_T(const int id_t) override;
 private:
     std::shared_ptr<SQLManager> _sqlManager;
 

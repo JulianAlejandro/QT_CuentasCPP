@@ -97,6 +97,7 @@
      <string>Opciones</string>
     </property>
     <addaction name="actionA_adir_transaccion_Basica"/>
+    <addaction name="actionSQLDebug"/>
    </widget>
    <addaction name="menuopciones"/>
    <addaction name="menuOpciones"/>
@@ -126,6 +127,11 @@
   <action name="actionA_adir_transaccion_Basica">
    <property name="text">
     <string>Añadir transaccion Basica</string>
+   </property>
+  </action>
+  <action name="actionSQLDebug">
+   <property name="text">
+    <string>SQLDebug</string>
    </property>
   </action>
  </widget>

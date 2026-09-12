@@ -363,7 +363,3 @@ std::vector<std::string> TransactionsManager::getCurrencies(){
 void TransactionsManager::deleteTransactionById(const int id){
     _sqlManager->eliminarTransaccionBruta(id);
 }
-
-void TransactionsManager::deleteDerivativeTransactionsBYId_T(const int id_t){
-    _sqlManager->eliminarTransaccionesNetasPorId_TB(id_t);
-}
