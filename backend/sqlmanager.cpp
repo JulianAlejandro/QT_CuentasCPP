@@ -814,6 +814,28 @@ bool SQLManager::eliminarTransaccionNeta(int id)
     return success;
 }
 
+bool SQLManager::eliminarTransaccionesNetasPorId_TB(int id_TB)
+{
+    if(!abrirBD()) return false;
+
+    QSqlQuery q;
+    QString queryStr = "DELETE FROM transaccion_neta WHERE id_TB = :id_TB";
+
+    q.prepare(queryStr);
+    q.bindValue(":id_TB", id_TB);
+
+    bool success = q.exec();
+    if(!success){
+        qDebug() << "Error eliminando transacciones netas por id_TB:" << q.lastError().text();
+    } else {
+        qDebug() << "Transacciones netas eliminadas para id_TB" << id_TB
+                 << "- filas afectadas:" << q.numRowsAffected();
+    }
+
+    cerrarBD();
+    return success;
+}
+
 // Métodos para INSERTAR Categorías
 bool SQLManager::insertarCategoria(const estructuraCategoria& categoria)
 {

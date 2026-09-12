@@ -34,6 +34,7 @@ public:
     bool insertarTransaccionesNetas(const std::vector<estructuraTN>& transacciones);
     bool actualizarTransaccionNeta(const estructuraTN& transaccion);
     bool eliminarTransaccionNeta(int id);
+    bool eliminarTransaccionesNetasPorId_TB(int id_TB);
 
     // Métodos para Categorías
     std::vector<estructuraCategoria> obtenerTodasCategorias();

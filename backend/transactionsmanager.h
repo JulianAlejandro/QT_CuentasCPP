@@ -51,9 +51,6 @@ public:
 private:
     std::shared_ptr<SQLManager> _sqlManager;
 
-    std::vector<T_Structure> _current_Ts;
-    std::vector<DT_Structure> _current_DTs;
-
     std::vector<Category_Structure> _current_category_table;
 
     static constexpr std::array<const char*, N_FIELDS_T> TRANSACTION_FIELD_TITLES = {

@@ -50,8 +50,7 @@ std::vector<T_Structure> TransactionsManager::getTransactions() {
         resultado.push_back(obtain_TStruct(transaccion));
     }
 
-    _current_Ts = resultado;
-    return _current_Ts;
+    return resultado;
 }
 
 std::vector<T_Structure> TransactionsManager::getTransactionsByMonth(const std::string& fecha) {
@@ -81,8 +80,7 @@ std::vector<T_Structure> TransactionsManager::getTransactionsByMonth(const std::
         resultado.push_back(obtain_TStruct(transaccion));
     }
 
-    _current_Ts = resultado;
-    return _current_Ts;
+    return resultado;
 }
 
 std::vector<DT_Structure> TransactionsManager::getDerivativeTransactionsById(int id_TB) {
@@ -92,9 +90,8 @@ std::vector<DT_Structure> TransactionsManager::getDerivativeTransactionsById(int
     for (const auto& transaccion : netas){
         resultado.push_back(obtain_DT_Struct(transaccion));
     }
-    _current_DTs = resultado;
 
-    return _current_DTs;
+    return resultado;
 }
 
 void TransactionsManager::deleteDerivativeTransactionsById(const int id){
@@ -156,45 +153,29 @@ std::vector<estructuraCategoria> TransactionsManager::getCategories(){
 
 UpdateResult TransactionsManager::actualizeDerivativeTransactionsWithId_T(const std::vector<DT_Structure>& new_DTs, const int id_t){
 
-    // 1. Validar que la suma de los montos coincide con la transacción padre
     if(!validateDerivativeTransactionsSum(new_DTs, id_t)){
         return UpdateResult::SumMismatch;
     }
 
-    // 2. Si no hay cambios, no hacer nada
-    if (transactionsAreEqual(_current_DTs, new_DTs)) {
+    std::vector<DT_Structure> old_DTs = getDerivativeTransactionsById(id_t);
+
+    if (transactionsAreEqual(old_DTs, new_DTs)) {
         return UpdateResult::NoChanges;
     }
 
-    // 3. Procesar los cambios
-    processDerivativeTransactionsChanges(_current_DTs, new_DTs, id_t);
+    processDerivativeTransactionsChanges(old_DTs, new_DTs, id_t);
     return UpdateResult::Success;
 }
 
 bool TransactionsManager::validateDerivativeTransactionsSum(const std::vector<DT_Structure>& DTs, int parentId) {
-    // Buscar la transacción padre en m_current_Ts
-    double parentAmount = 0.0;
-    bool parentFound = false;
+    estructuraTB parentTB = _sqlManager->obtenerTransaccionBrutaPorId(parentId);
 
-    for (const auto& t : _current_Ts) {
-        if (t.id == parentId) {
-            try {
-                // Extraer el monto de la transacción padre
-                parentAmount = std::stod(t.values[t_AMOUNT]);
-                parentFound = true;
-                break;
-            } catch (const std::exception& e) {
-                throw std::runtime_error("Error al convertir el monto de la transacción padre: " +
-                                         std::string(e.what()));
-            }
-        }
-    }
-
-    if (!parentFound) {
+    if (parentTB.id == 0) {
         throw std::runtime_error("Transacción padre con ID " + std::to_string(parentId) + " no encontrada");
     }
 
-    // Calcular la suma de los montos de las transacciones derivadas
+    double parentAmount = parentTB.amount;
+
     double sumDerivativeAmounts = 0.0;
 
     for (const auto& dt : DTs) {
@@ -206,7 +187,6 @@ bool TransactionsManager::validateDerivativeTransactionsSum(const std::vector<DT
         }
     }
 
-    // Comparar con un margen de tolerancia para manejar errores de punto flotante
     const double EPSILON = 0.001;
 
     if (std::abs(sumDerivativeAmounts - parentAmount) > EPSILON) {
@@ -473,11 +453,6 @@ void TransactionsManager::deleteTransactionById(const int id){
     _sqlManager->eliminarTransaccionBruta(id);
 }
 
-void TransactionsManager::deleteDerivativeTransactionsBYId_T(const int id_t){//TODO ERROR AQUI? ESTO TIENE QUE ESTAR MAL
-    // esto esta mal, funciona de momento porque hay una casualidad....arreglar correctametne
-    for(const auto& i : _current_DTs){
-        _sqlManager->eliminarTransaccionNeta(i.id);
-    }
-    _current_DTs.clear();
-
+void TransactionsManager::deleteDerivativeTransactionsBYId_T(const int id_t){
+    _sqlManager->eliminarTransaccionesNetasPorId_TB(id_t);
 }
