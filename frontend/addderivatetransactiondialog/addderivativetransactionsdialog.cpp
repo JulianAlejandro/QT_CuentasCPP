@@ -16,6 +16,7 @@ addDerivativeTransactionsDialog::addDerivativeTransactionsDialog(QWidget *parent
     : QDialog(parent)
     , ui(new Ui::addDerivativeTransactionsDialog)
     , p_amount(0.0)
+    , _parent_tipo("gasto")
 {
     ui->setupUi(this);
     ui->tableView->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -270,7 +271,7 @@ void addDerivativeTransactionsDialog::ejecutarProcedimientoEspecial(int fila)
         return;
     }
 
-    categoryTreeWidgetDialog cd(this, cat_struct);
+    categoryTreeWidgetDialog cd(this, cat_struct, _parent_tipo);
     cd.setWindowTitle("Seleccionar Categoría");
 
     int res = cd.exec();
@@ -352,4 +353,10 @@ void addDerivativeTransactionsDialog::setParentAmount(const double parent_amount
     p_amount = parent_amount;
     qDebug() << "Monto padre establecido:" << p_amount;
     updateSumValidation();
+}
+
+void addDerivativeTransactionsDialog::setParentTipo(const std::string& tipo)
+{
+    _parent_tipo = tipo;
+    qDebug() << "Tipo padre establecido:" << QString::fromStdString(_parent_tipo);
 }

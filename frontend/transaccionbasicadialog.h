@@ -35,6 +35,7 @@ private:
     std::vector<Category_Structure> _categories;
     int _selectedCategoryId;
     QString _selectedCategoryName;
+    std::string _selectedTipo;
 };
 
 #endif // TRANSACCIONBASICADIALOG_H

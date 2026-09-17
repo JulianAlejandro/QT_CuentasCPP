@@ -26,18 +26,21 @@ struct T_Structure {
     std::array<std::string, N_FIELDS_T> values;
     bool processed;
     int category_id;
+    std::string tipo;
 };
 
 struct DT_Structure {
     int id;
     std::array<std::string, N_FIELDS_DT> values;
     int id_T;
+    std::string tipo;
 };
 
 struct Category_Structure {
     int id;
     std::string name;
     int id_parent;
+    std::string tipo;
 };
 
 struct Currency_Structure {

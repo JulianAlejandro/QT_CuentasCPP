@@ -27,6 +27,7 @@ public:
     std::vector<DT_Structure> getDerivativeTransactionsModifications(const int IdRole);
     void setCategoryStructures(std::vector<Category_Structure> c);
     void setParentAmount(const double parent_amount);
+    void setParentTipo(const std::string& tipo);
 
 private slots:
     void onCustomContextMenuRequested(const QPoint &pos);
@@ -45,6 +46,7 @@ private:
 
     Ui::addDerivativeTransactionsDialog *ui;
     double p_amount;
+    std::string _parent_tipo;
 
     QStandardItemModel *m_modelo;
     DoubleSpinBoxDelegate *m_DoubleSpinnerDelegate;

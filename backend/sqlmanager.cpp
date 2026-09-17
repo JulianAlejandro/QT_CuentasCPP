@@ -37,6 +37,7 @@ estructuraTB extraerTransaccionBruta(QSqlQuery& q) {
     tb.date = q.value("date").toString().toStdString();
     tb.currency = q.value("currency").toString().toStdString();
     tb.processed = q.value("processed").toBool();
+    tb.tipo = q.value("tipo").toString().toStdString();
     return tb;
 }
 
@@ -49,6 +50,7 @@ estructuraTN extraerTransaccionNeta(QSqlQuery& q) {
     tn.id_TB = q.value("id_TB").toInt();
     tn.category_id = q.value("category_id").toInt();
     tn.category_name = q.value("category_name").toString().toStdString();
+    tn.tipo = q.value("tipo").toString().toStdString();
     return tn;
 }
 
@@ -57,6 +59,7 @@ estructuraCategoria extraerCategoria(QSqlQuery& q) {
     cat.id = q.value("id").toInt();
     cat.nombre = q.value("nombre").toString().toStdString();
     cat.id_padre = q.value("id_padre").toInt();
+    cat.tipo = q.value("tipo").toString().toStdString();
     return cat;
 }
 
@@ -74,6 +77,7 @@ void bindearTransaccionBruta(QSqlQuery& q, const estructuraTB& t) {
     q.bindValue(":date", QString::fromStdString(t.date));
     q.bindValue(":currency", QString::fromStdString(t.currency));
     q.bindValue(":processed", t.processed);
+    q.bindValue(":tipo", QString::fromStdString(t.tipo));
 }
 
 void bindearTransaccionNeta(QSqlQuery& q, const estructuraTN& t) {
@@ -82,6 +86,7 @@ void bindearTransaccionNeta(QSqlQuery& q, const estructuraTN& t) {
     q.bindValue(":date", QString::fromStdString(t.date));
     q.bindValue(":id_TB", t.id_TB);
     q.bindValue(":category_id", t.category_id);
+    q.bindValue(":tipo", QString::fromStdString(t.tipo));
 }
 
 }
@@ -117,7 +122,8 @@ SQLManager::SQLManager()
                            "comment TEXT NOT NULL,"
                            "date DATE NOT NULL,"
                            "currency TEXT NOT NULL REFERENCES divisa(codigo),"
-                           "processed BOOLEAN DEFAULT FALSE"
+                           "processed BOOLEAN DEFAULT FALSE,"
+                           "tipo TEXT NOT NULL CHECK(tipo IN('ingreso','gasto'))"
                            ");")){
         qDebug() << "Error creando tabla transaccion_bruta:" << q.lastError().text();
         success = false;
@@ -127,6 +133,7 @@ SQLManager::SQLManager()
                            "id INTEGER PRIMARY KEY AUTOINCREMENT,"
                            "nombre TEXT NOT NULL UNIQUE,"
                            "id_padre INTEGER REFERENCES categoria(id) ON DELETE CASCADE,"
+                           "tipo TEXT NOT NULL CHECK(tipo IN('ingreso','gasto')),"
                            "CHECK (id != id_padre)"
                            ");")){
         qDebug() << "Error creando tabla categoria:" << q.lastError().text();
@@ -140,6 +147,7 @@ SQLManager::SQLManager()
                            "date DATE NOT NULL,"
                            "id_TB INTEGER NOT NULL,"
                            "category_id INTEGER NOT NULL REFERENCES categoria(id),"
+                           "tipo TEXT NOT NULL CHECK(tipo IN('ingreso','gasto')),"
                            "FOREIGN KEY (id_TB) REFERENCES transaccion_bruta(id) "
                            "ON DELETE CASCADE "
                            "ON UPDATE CASCADE"
@@ -159,8 +167,14 @@ SQLManager::SQLManager()
     }
 
     if(success){
-        if(!q.exec("INSERT OR IGNORE INTO categoria (id, nombre, id_padre) VALUES (0, 'raiz', NULL)")){
-            qDebug() << "Error insertando categoria raiz:" << q.lastError().text();
+        if(!q.exec("INSERT OR IGNORE INTO categoria (id, nombre, id_padre, tipo) VALUES (0, 'Ingresos', NULL, 'ingreso')")){
+            qDebug() << "Error insertando categoria Ingresos:" << q.lastError().text();
+        }
+    }
+
+    if(success){
+        if(!q.exec("INSERT OR IGNORE INTO categoria (id, nombre, id_padre, tipo) VALUES (1, 'Gastos', NULL, 'gasto')")){
+            qDebug() << "Error insertando categoria Gastos:" << q.lastError().text();
         }
     }
 
@@ -174,12 +188,12 @@ SQLManager::SQLManager()
 
 estructuraTB SQLManager::obtenerTransaccionBrutaPorId(int id)
 {
-    estructuraTB tb = {0, 0.0, "", "", "", false};
+    estructuraTB tb = {0, 0.0, "", "", "", false, ""};
     BDConeccion conn(_bd);
     if(!conn.isOpen()) return tb;
 
     QSqlQuery q;
-    q.prepare("SELECT id, amount, comment, date, currency, processed "
+    q.prepare("SELECT id, amount, comment, date, currency, processed, tipo "
                "FROM transaccion_bruta WHERE id = :id");
     q.bindValue(":id", id);
 
@@ -204,7 +218,7 @@ std::vector<estructuraTB> SQLManager::obtenerTodasTransaccionesBrutas()
     if(!conn.isOpen()) return listaTransacciones;
 
     QSqlQuery q;
-    if(!q.exec("SELECT id, amount, comment, date, currency, processed "
+    if(!q.exec("SELECT id, amount, comment, date, currency, processed, tipo "
                "FROM transaccion_bruta ORDER BY date DESC, id DESC")){
         qDebug() << "Error ejecutando consulta:" << q.lastError().text();
         return listaTransacciones;
@@ -225,7 +239,7 @@ std::vector<estructuraTB> SQLManager::obtenerTransaccionesBrutasPorFecha(const s
     if(!conn.isOpen()) return listaTransacciones;
 
     QSqlQuery q;
-    q.prepare("SELECT id, amount, comment, date, currency, processed "
+    q.prepare("SELECT id, amount, comment, date, currency, processed, tipo "
                "FROM transaccion_bruta "
                "WHERE date BETWEEN :fechaInicio AND :fechaFin "
                "ORDER BY date DESC, id DESC");
@@ -256,7 +270,7 @@ std::vector<estructuraTN> SQLManager::obtenerTransaccionesNetasConId_TB(int id_T
 
     QSqlQuery q;
     q.prepare("SELECT tn.id, tn.amount, tn.comment, tn.date, tn.id_TB, "
-               "tn.category_id, c.nombre as category_name "
+               "tn.category_id, c.nombre as category_name, tn.tipo "
                "FROM transaccion_neta tn "
                "LEFT JOIN categoria c ON tn.category_id = c.id "
                "WHERE tn.id_TB = :id_TB ORDER BY tn.id");
@@ -282,7 +296,7 @@ std::vector<estructuraCategoria> SQLManager::obtenerTodasCategorias()
     if(!conn.isOpen()) return listaCategorias;
 
     QSqlQuery q;
-    if(!q.exec("SELECT id, nombre, id_padre FROM categoria ORDER BY nombre")){
+    if(!q.exec("SELECT id, nombre, id_padre, tipo FROM categoria ORDER BY tipo, nombre")){
         qDebug() << "Error ejecutando consulta:" << q.lastError().text();
         return listaCategorias;
     }
@@ -318,6 +332,102 @@ std::string SQLManager::obtenerNombreCategoriaPorId(int id){
     return name;
 }
 
+std::vector<estructuraCategoria> SQLManager::obtenerCategoriasPorTipo(const std::string& tipo)
+{
+    std::vector<estructuraCategoria> listaCategorias;
+    BDConeccion conn(_bd);
+    if(!conn.isOpen()) return listaCategorias;
+
+    QSqlQuery q;
+    q.prepare("SELECT id, nombre, id_padre, tipo FROM categoria WHERE tipo = :tipo ORDER BY nombre");
+    q.bindValue(":tipo", QString::fromStdString(tipo));
+
+    if(!q.exec()){
+        qDebug() << "Error ejecutando consulta por tipo:" << q.lastError().text();
+        return listaCategorias;
+    }
+
+    while(q.next()){
+        listaCategorias.push_back(extraerCategoria(q));
+    }
+
+    qDebug() << "Categorías recuperadas para tipo" << QString::fromStdString(tipo) << ":" << listaCategorias.size();
+    return listaCategorias;
+}
+
+estructuraCategoria SQLManager::obtenerCategoriaPorIdYTipo(int id, const std::string& tipo)
+{
+    estructuraCategoria cat = {0, "", -1, ""};
+    BDConeccion conn(_bd);
+    if(!conn.isOpen()) return cat;
+
+    QSqlQuery q;
+    q.prepare("SELECT id, nombre, id_padre, tipo FROM categoria WHERE id = :id AND tipo = :tipo");
+    q.bindValue(":id", id);
+    q.bindValue(":tipo", QString::fromStdString(tipo));
+
+    if(!q.exec()){
+        qDebug() << "Error ejecutando consulta:" << q.lastError().text();
+        return cat;
+    }
+
+    if(q.next()){
+        cat = extraerCategoria(q);
+    } else {
+        qDebug() << "No se encontró categoría con ID:" << id << "y tipo:" << QString::fromStdString(tipo);
+    }
+
+    return cat;
+}
+
+int SQLManager::obtenerIdCategoriaPorNombreYTipo(const std::string& nombre, const std::string& tipo)
+{
+    BDConeccion conn(_bd);
+    if(!conn.isOpen()) return -1;
+
+    QSqlQuery q;
+    q.prepare("SELECT id FROM categoria WHERE nombre = :nombre AND tipo = :tipo");
+    q.bindValue(":nombre", QString::fromStdString(nombre));
+    q.bindValue(":tipo", QString::fromStdString(tipo));
+
+    if(!q.exec()){
+        qDebug() << "Error obteniendo id de categoria por nombre y tipo:"
+                 << q.lastError().text();
+        return -1;
+    }
+
+    if(q.next()){
+        return q.value("id").toInt();
+    }
+
+    qDebug() << "No existe categoria con nombre:"
+             << QString::fromStdString(nombre)
+             << "y tipo:" << QString::fromStdString(tipo);
+
+    return -1;
+}
+
+int SQLManager::insertarCategoria(const std::string& nombre, int id_padre, const std::string& tipo)
+{
+    BDConeccion conn(_bd);
+    if(!conn.isOpen()) return -1;
+
+    QSqlQuery q;
+    q.prepare("INSERT INTO categoria (nombre, id_padre, tipo) VALUES (:nombre, :id_padre, :tipo)");
+    q.bindValue(":nombre", QString::fromStdString(nombre));
+    q.bindValue(":id_padre", id_padre);
+    q.bindValue(":tipo", QString::fromStdString(tipo));
+
+    if(!q.exec()){
+        qDebug() << "Error insertando categoria:" << q.lastError().text();
+        return -1;
+    }
+
+    int insertedId = q.lastInsertId().toInt();
+    qDebug() << "Categoria insertada correctamente, ID:" << insertedId;
+    return insertedId;
+}
+
 std::vector<estructuraDivisa> SQLManager::obtenerTodasDivisas()
 {
     std::vector<estructuraDivisa> listaDivisas;
@@ -344,8 +454,8 @@ int SQLManager::insertarTransaccionesBruta(const estructuraTB& transaccion)
     if(!conn.isOpen()) return -1;
 
     QSqlQuery q;
-    q.prepare("INSERT INTO transaccion_bruta (amount, comment, date, currency, processed) "
-               "VALUES (:amount, :comment, :date, :currency, :processed)");
+    q.prepare("INSERT INTO transaccion_bruta (amount, comment, date, currency, processed, tipo) "
+               "VALUES (:amount, :comment, :date, :currency, :processed, :tipo)");
     bindearTransaccionBruta(q, transaccion);
 
     if(!q.exec()){
@@ -383,8 +493,8 @@ bool SQLManager::insertarTransaccionesNetas(const estructuraTN& transaccion)
     if(!conn.isOpen()) return false;
 
     QSqlQuery q;
-    q.prepare("INSERT INTO transaccion_neta (amount, comment, date, id_TB, category_id) "
-               "VALUES (:amount, :comment, :date, :id_TB, :category_id)");
+    q.prepare("INSERT INTO transaccion_neta (amount, comment, date, id_TB, category_id, tipo) "
+               "VALUES (:amount, :comment, :date, :id_TB, :category_id, :tipo)");
     bindearTransaccionNeta(q, transaccion);
 
     if(!q.exec()){
@@ -403,7 +513,7 @@ bool SQLManager::actualizarTransaccionNeta(const estructuraTN& transaccion)
 
     QSqlQuery q;
     q.prepare("UPDATE transaccion_neta SET amount = :amount, comment = :comment, "
-               "date = :date, id_TB = :id_TB, category_id = :category_id "
+               "date = :date, id_TB = :id_TB, category_id = :category_id, tipo = :tipo "
                "WHERE id = :id");
     bindearTransaccionNeta(q, transaccion);
     q.bindValue(":id", transaccion.id);

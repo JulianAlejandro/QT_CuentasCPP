@@ -7,16 +7,20 @@ TransaccionBasicaDialog::TransaccionBasicaDialog(QWidget *parent)
     : QDialog(parent)
     , ui(new Ui::TransaccionBasicaDialog)
     , _selectedCategoryId(0)
+    , _selectedTipo("gasto")
 {
     ui->setupUi(this);
 
-    // Configurar valores por defecto
     ui->dateEdit->setDate(QDate::currentDate());
     ui->amountDubleSpinBox->setValue(0.0);
 
-    // Inicializar categoría por defecto
-    _selectedCategoryName = "raiz";
+    _selectedCategoryName = "";
     ui->categoryLineEdit->setText(_selectedCategoryName);
+
+    ui->tipoCombo->addItem("Gasto", "gasto");
+    ui->tipoCombo->addItem("Ingreso", "ingreso");
+
+    ui->tipoCombo->setCurrentIndex(0);
 }
 
 TransaccionBasicaDialog::~TransaccionBasicaDialog()
@@ -29,20 +33,21 @@ T_Structure TransaccionBasicaDialog::getNewTransaction()
     T_Structure result;
     result.id = -1;
 
-    // Para el amount
-    result.values[t_AMOUNT] = ui->amountDubleSpinBox->text().toStdString();
+    _selectedTipo = ui->tipoCombo->currentData().toString().toStdString();
 
-    // Fecha en formato ISO: "yyyy-MM-dd"
+    double amount = ui->amountDubleSpinBox->value();
+    if (_selectedTipo == "gasto") {
+        amount = -std::abs(amount);
+    } else {
+        amount = +std::abs(amount);
+    }
+
+    result.values[t_AMOUNT] = std::to_string(amount);
+
     result.values[t_DATE] = ui->dateEdit->date().toString("yyyy-MM-dd").toStdString();
-
-    // Concepto
     result.values[t_CONCEPT] = ui->conceptLineEdit->text().toStdString();
 
-    // Divisa seleccionada del combobox
-    // Obtener el código de divisa (podría ser solo el código o código + nombre)
     QString selectedCurrency = ui->currencyComboBox->currentText();
-
-    // Si el texto tiene formato "EUR - Euro", extraer solo "EUR"
     if (selectedCurrency.contains(" - ")) {
         selectedCurrency = selectedCurrency.split(" - ").first();
     }
@@ -51,12 +56,12 @@ T_Structure TransaccionBasicaDialog::getNewTransaction()
 
     result.processed = false;
     result.category_id = _selectedCategoryId;
+    result.tipo = _selectedTipo;
 
-    // Debug opcional
     qDebug() << "Nueva transacción creada:";
+    qDebug() << "  Tipo:" << QString::fromStdString(_selectedTipo);
+    qDebug() << "  Monto:" << amount;
     qDebug() << "  Divisa:" << selectedCurrency;
-    qDebug() << "  Monto:" << QString::fromStdString(result.values[t_AMOUNT]);
-    qDebug() << "  Fecha:" << QString::fromStdString(result.values[t_DATE]);
 
     return result;
 }
@@ -154,7 +159,8 @@ void TransaccionBasicaDialog::on_buttonBox_rejected()
 
 void TransaccionBasicaDialog::on_categorySelectButton_clicked()
 {
-    categoryTreeWidgetDialog dialog(this, _categories);
+    std::string tipo = ui->tipoCombo->currentData().toString().toStdString();
+    categoryTreeWidgetDialog dialog(this, _categories, tipo);
     if (dialog.exec() == QDialog::Accepted) {
         _selectedCategoryId = dialog.getSelectedCategoryId();
         _selectedCategoryName = dialog.getSelectedCategoryName();

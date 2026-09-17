@@ -36,7 +36,11 @@ public:
 
     // Métodos para Categorías
     std::vector<estructuraCategoria> obtenerTodasCategorias();
+    std::vector<estructuraCategoria> obtenerCategoriasPorTipo(const std::string& tipo);
+    estructuraCategoria obtenerCategoriaPorIdYTipo(int id, const std::string& tipo);
     int obtenerIdCategoriaPorNombre(const std::string& nombre);
+    int obtenerIdCategoriaPorNombreYTipo(const std::string& nombre, const std::string& tipo);
+    int insertarCategoria(const std::string& nombre, int id_padre, const std::string& tipo);
     std::string obtenerNombreCategoriaPorId(int id);
 
     // Métodos para Divisas

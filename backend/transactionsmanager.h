@@ -36,6 +36,7 @@ public:
     std::vector<DT_Structure> getDerivativeTransactionsById(int id) override;
 
     std::vector<Category_Structure> getCategoryTable() override;
+    std::vector<Category_Structure> getCategoryTable(const std::string& tipo);
 
     UpdateResult actualizeDerivativeTransactionsWithId_T(const std::vector<DT_Structure>& new_DTs, const int id_t) override;
 

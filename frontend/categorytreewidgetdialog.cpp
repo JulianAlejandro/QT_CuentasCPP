@@ -8,18 +8,27 @@ void inicializarTreeWidget(QTreeWidget *tree,
 
 categoryTreeWidgetDialog::categoryTreeWidgetDialog(
     QWidget *parent,
-    const std::vector<Category_Structure> &categorias)
+    const std::vector<Category_Structure> &categorias,
+    const std::string &tipo)
     : QDialog(parent)
     , ui(new Ui::categoryTreeWidgetDialog)
-    , m_categorias(categorias)
     , m_selectedName("")
-    , m_selectedId(-1)  // Valor por defecto indicando que no hay selección
+    , m_selectedId(-1)
 {
     ui->setupUi(this);
 
+    if (tipo.empty()) {
+        m_categorias = categorias;
+    } else {
+        for (const auto& cat : categorias) {
+            if (cat.tipo == tipo) {
+                m_categorias.push_back(cat);
+            }
+        }
+    }
+
     inicializarTreeWidget(ui->treeWidget, m_categorias);
 
-    // Conectar la señal de doble clic
     connect(ui->treeWidget, &QTreeWidget::itemDoubleClicked,
             this, &categoryTreeWidgetDialog::onItemDoubleClicked);
 }

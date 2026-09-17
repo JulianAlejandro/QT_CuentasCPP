@@ -17,7 +17,8 @@ class categoryTreeWidgetDialog : public QDialog
 public:
     explicit categoryTreeWidgetDialog(
         QWidget *parent,
-        const std::vector<Category_Structure> &categorias
+        const std::vector<Category_Structure> &categorias,
+        const std::string &tipo = ""
         );
 
     // Método para obtener la categoría seleccionada

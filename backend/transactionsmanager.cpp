@@ -11,13 +11,9 @@ T_Structure obtain_TStruct(const estructuraTB& estructuraTB) {
     T_Structure e;
     e.id = estructuraTB.id;
     e.processed = estructuraTB.processed;
-   // std::array<std::string, e.values.size()> data = {estructuraTB.date, estructuraTB.comment,
-   //                                             std::to_string(estructuraTB.amount), estructuraTB.currency};
-
-   // for(int i = 0; i < e.values.size(); i++){
     e.values={estructuraTB.date, estructuraTB.comment,
             std::to_string(estructuraTB.amount), estructuraTB.currency};
-
+    e.tipo = estructuraTB.tipo;
     return e;
 }
 
@@ -27,6 +23,7 @@ DT_Structure obtain_DT_Struct(const estructuraTN& estructuraTN){
     e.id_T = estructuraTN.id_TB;
     e.values = {estructuraTN.date, estructuraTN.comment, std::to_string(estructuraTN.amount),
                 estructuraTN.category_name};
+    e.tipo = estructuraTN.tipo;
     return e;
 }
 
@@ -98,13 +95,14 @@ void TransactionsManager::deleteDerivativeTransactionsById(const int id){
 
 void TransactionsManager::insertDerivativeTransaction(const DT_Structure s){
     estructuraTN e;
-    e.id = s.id; // no hay
+    e.id = s.id;
     e.amount = std::stod(s.values[dt_AMOUNT]);
     e.comment = s.values[dt_CONCEPT];
     e.date = s.values[dt_DATE];
     e.id_TB = s.id_T;
     e.category_name = s.values[dt_CATEGORY];
-    e.category_id = _sqlManager->obtenerIdCategoriaPorNombre(s.values[dt_CATEGORY]);
+    e.category_id = _sqlManager->obtenerIdCategoriaPorNombreYTipo(s.values[dt_CATEGORY], s.tipo);
+    e.tipo = s.tipo;
 
     _sqlManager->insertarTransaccionesNetas(e);
 
@@ -119,7 +117,8 @@ void TransactionsManager::actualizeDerivativeTransaction(const DT_Structure s){
     e.date = s.values[dt_DATE];
     e.id_TB = s.id_T;
     e.category_name = s.values[dt_CATEGORY];
-    e.category_id = _sqlManager->obtenerIdCategoriaPorNombre(s.values[dt_CATEGORY]);
+    e.category_id = _sqlManager->obtenerIdCategoriaPorNombreYTipo(s.values[dt_CATEGORY], s.tipo);
+    e.tipo = s.tipo;
 
     _sqlManager->actualizarTransaccionNeta(e);
 }
@@ -135,11 +134,27 @@ std::vector<Category_Structure> TransactionsManager::getCategoryTable(){
         aux.id = i.id;
         aux.id_parent = i.id_padre;
         aux.name = i.nombre;
+        aux.tipo = i.tipo;
         c_struct.push_back(aux);
     }
     _current_category_table = c_struct;
     return _current_category_table;
 
+}
+
+std::vector<Category_Structure> TransactionsManager::getCategoryTable(const std::string& tipo){
+    std::vector<Category_Structure> c_struct;
+    std::vector<estructuraCategoria> estr_c = _sqlManager->obtenerCategoriasPorTipo(tipo);
+
+    for (const auto& i : estr_c){
+        Category_Structure aux;
+        aux.id = i.id;
+        aux.id_parent = i.id_padre;
+        aux.name = i.nombre;
+        aux.tipo = i.tipo;
+        c_struct.push_back(aux);
+    }
+    return c_struct;
 }
 
 UpdateResult TransactionsManager::actualizeDerivativeTransactionsWithId_T(const std::vector<DT_Structure>& new_DTs, const int id_t){
@@ -310,6 +325,7 @@ void TransactionsManager::insertNewTransaction(T_Structure Ts){
     e.currency = Ts.values[t_CURRENCY];
     e.date = Ts.values[t_DATE];
     e.processed = Ts.processed;
+    e.tipo = Ts.tipo;
 
     _sqlManager->insertarTransaccionesBruta(e);
 }
@@ -324,6 +340,7 @@ int TransactionsManager::insertNewTransactionWithDefaultDerivative(const T_Struc
     e.currency = Ts.values[t_CURRENCY];
     e.date = Ts.values[t_DATE];
     e.processed = Ts.processed;
+    e.tipo = Ts.tipo;
 
     int id_bruta = _sqlManager->insertarTransaccionesBruta(e);
     if (id_bruta == -1) return -1;
@@ -338,6 +355,7 @@ int TransactionsManager::insertNewTransactionWithDefaultDerivative(const T_Struc
     tn.id_TB = id_bruta;
     tn.category_id = Ts.category_id;
     tn.category_name = categoryName;
+    tn.tipo = e.tipo;
 
     bool ok = _sqlManager->insertarTransaccionesNetas(tn);
     if (!ok) return -1;
