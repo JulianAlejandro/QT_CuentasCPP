@@ -3,6 +3,7 @@
 #define CATEGORYTREEWIDGETDIALOG_H
 
 #include <QDialog>
+#include <QString>
 #include "commonDataTypes.h"
 #include <QTreeWidgetItem>
 
@@ -17,7 +18,8 @@ class categoryTreeWidgetDialog : public QDialog
 public:
     explicit categoryTreeWidgetDialog(
         QWidget *parent,
-        const std::vector<Category_Structure> &categorias
+        const std::vector<Category_Structure> &categorias,
+        const QString &filterTipo = ""
         );
 
     // Método para obtener la categoría seleccionada
@@ -32,6 +34,7 @@ private slots:
 private:
     Ui::categoryTreeWidgetDialog *ui;
     std::vector<Category_Structure> m_categorias;
+    QString m_filterTipo;
 
     // Variables para almacenar la selección
     QString m_selectedName;

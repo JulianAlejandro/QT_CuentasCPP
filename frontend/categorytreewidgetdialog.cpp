@@ -4,20 +4,23 @@
 #include <QMessageBox>
 
 void inicializarTreeWidget(QTreeWidget *tree,
-                           const std::vector<Category_Structure> &categorias);
+                           const std::vector<Category_Structure> &categorias,
+                           const QString &filterTipo);
 
 categoryTreeWidgetDialog::categoryTreeWidgetDialog(
     QWidget *parent,
-    const std::vector<Category_Structure> &categorias)
+    const std::vector<Category_Structure> &categorias,
+    const QString &filterTipo)
     : QDialog(parent)
     , ui(new Ui::categoryTreeWidgetDialog)
     , m_categorias(categorias)
+    , m_filterTipo(filterTipo)
     , m_selectedName("")
-    , m_selectedId(-1)  // Valor por defecto indicando que no hay selección
+    , m_selectedId(-1)
 {
     ui->setupUi(this);
 
-    inicializarTreeWidget(ui->treeWidget, m_categorias);
+    inicializarTreeWidget(ui->treeWidget, m_categorias, m_filterTipo);
 
     // Conectar la señal de doble clic
     connect(ui->treeWidget, &QTreeWidget::itemDoubleClicked,
@@ -31,14 +34,11 @@ categoryTreeWidgetDialog::~categoryTreeWidgetDialog()
 
 void categoryTreeWidgetDialog::onItemDoubleClicked(QTreeWidgetItem *item, int column)
 {
-    Q_UNUSED(column); // No usamos el parámetro de columna
+    Q_UNUSED(column);
 
     if (item) {
-        // Obtener el nombre y el ID del item
         m_selectedName = item->text(0);
         m_selectedId = item->data(0, Qt::UserRole).toInt();
-
-        // Cerrar el diálogo con resultado aceptado
         accept();
     }
 }
@@ -54,15 +54,49 @@ int categoryTreeWidgetDialog::getSelectedCategoryId() const
 }
 
 void inicializarTreeWidget(QTreeWidget *tree,
-                           const std::vector<Category_Structure> &categorias)
+                           const std::vector<Category_Structure> &categorias,
+                           const QString &filterTipo)
 {
     tree->clear();
     tree->setColumnCount(1);
     tree->setHeaderLabel("Categorías");
 
     std::map<int, QTreeWidgetItem*> mapa;
+    std::set<int> categoriasAMostrar;
+
+    if (filterTipo.isEmpty()) {
+        for (const auto &cat : categorias) {
+            categoriasAMostrar.insert(cat.id);
+        }
+    } else {
+        for (const auto &cat : categorias) {
+            if (QString::fromStdString(cat.tipo).toLower() == filterTipo.toLower()) {
+                categoriasAMostrar.insert(cat.id);
+            }
+        }
+
+        for (const auto &cat : categorias) {
+            if (categoriasAMostrar.count(cat.id) > 0) {
+                int parentId = cat.id_parent;
+                while (parentId != 0) {
+                    categoriasAMostrar.insert(parentId);
+                    int currentParentId = parentId;
+                    auto it = std::find_if(categorias.begin(), categorias.end(),
+                        [currentParentId](const Category_Structure& c){ return c.id == currentParentId; });
+                    if (it != categorias.end()) {
+                        parentId = it->id_parent;
+                    } else {
+                        break;
+                    }
+                }
+            }
+        }
+    }
 
     for (const auto &cat : categorias) {
+        if (categoriasAMostrar.count(cat.id) == 0) {
+            continue;
+        }
         QTreeWidgetItem *item = new QTreeWidgetItem();
         item->setText(0, QString::fromStdString(cat.name));
         item->setData(0, Qt::UserRole, cat.id);
@@ -70,12 +104,16 @@ void inicializarTreeWidget(QTreeWidget *tree,
     }
 
     for (const auto &cat : categorias) {
+        if (categoriasAMostrar.count(cat.id) == 0) {
+            continue;
+        }
         QTreeWidgetItem *item = mapa[cat.id];
 
-        if (cat.id_parent == 0 || mapa.find(cat.id_parent) == mapa.end())
+        if (cat.id_parent == 0 || mapa.find(cat.id_parent) == mapa.end()) {
             tree->addTopLevelItem(item);
-        else
+        } else {
             mapa[cat.id_parent]->addChild(item);
+        }
     }
 
     tree->expandAll();

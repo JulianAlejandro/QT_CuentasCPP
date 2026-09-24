@@ -276,7 +276,10 @@ void addDerivativeTransactionsDialog::ejecutarProcedimientoEspecial(int fila)
         return;
     }
 
-    categoryTreeWidgetDialog cd(this, cat_struct);
+    QModelIndex tipoIndex = m_modelo->index(fila, 4);
+    QString currentTipo = m_modelo->data(tipoIndex, Qt::EditRole).toString();
+
+    categoryTreeWidgetDialog cd(this, cat_struct, currentTipo);
     cd.setWindowTitle("Seleccionar Categoría");
 
     int res = cd.exec();

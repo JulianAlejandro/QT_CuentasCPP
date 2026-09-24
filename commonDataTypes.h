@@ -39,6 +39,7 @@ struct Category_Structure {
     int id;
     std::string name;
     int id_parent;
+    std::string tipo;
 };
 
 struct Currency_Structure {

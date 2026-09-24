@@ -111,6 +111,7 @@ std::vector<Category_Structure> TransactionsManager::getCategoryTable(){
         aux.id = i.id;
         aux.id_parent = i.id_padre;
         aux.name = i.nombre;
+        aux.tipo = i.tipo;
         c_struct.push_back(aux);
     }
     _current_category_table = c_struct;
