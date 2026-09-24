@@ -26,6 +26,7 @@ addDerivativeTransactionsDialog::addDerivativeTransactionsDialog(QWidget *parent
     m_modelo = new QStandardItemModel(this);
     m_DoubleSpinnerDelegate = new DoubleSpinBoxDelegate(this);
     m_DateEditDelegate = new DateEditDelegate(this);
+    m_TipoDelegate = new TipoDelegate(this);
 
     // Inicializar con 0 filas en lugar de 7
     m_modelo->setRowCount(0);
@@ -53,6 +54,7 @@ void addDerivativeTransactionsDialog::setFieldsTableWidget(const QStringList& co
     if (edit) {
         ui->tableView->setItemDelegateForColumn(0, m_DateEditDelegate);
         ui->tableView->setItemDelegateForColumn(2, m_DoubleSpinnerDelegate);
+        ui->tableView->setItemDelegateForColumn(4, m_TipoDelegate);
 
         ui->tableView->setEditTriggers(QAbstractItemView::DoubleClicked |
                                        QAbstractItemView::EditKeyPressed);
@@ -105,6 +107,10 @@ void addDerivativeTransactionsDialog::on_addPushButton_clicked()
     // Para la columna de fecha, establecer fecha actual por defecto
     QModelIndex dateIndex = m_modelo->index(newRow, 0);
     m_modelo->setData(dateIndex, QDate::currentDate().toString("yyyy-MM-dd"));
+
+    // Para la columna de tipo, establecer "ingreso" por defecto
+    QModelIndex tipoIndex = m_modelo->index(newRow, 4);
+    m_modelo->setData(tipoIndex, "ingreso");
 
     ui->tableView->selectRow(newRow);
 
@@ -311,6 +317,8 @@ std::vector<DT_Structure> addDerivativeTransactionsDialog::getDerivativeTransact
             QString valor = dato.isValid() ? dato.toString() : "";
             filaDatos.values[columna] = valor.toStdString();
         }
+
+        filaDatos.tipo = filaDatos.values[dt_TIPO];
 
         result.push_back(filaDatos);
     }

@@ -21,7 +21,8 @@ SOURCES += \
     frontend/addderivatetransactiondialog/addderivativetransactionsdialog.cpp \
     frontend/addderivatetransactiondialog/dateeditdelegate.cpp \
     frontend/addderivatetransactiondialog/doublespinboxdelegate.cpp \
-    frontend/addderivatetransactiondialog/spinboxdelegate.cpp
+    frontend/addderivatetransactiondialog/spinboxdelegate.cpp \
+    frontend/addderivatetransactiondialog/tipodelegate.cpp
 
 
 HEADERS += \
@@ -38,7 +39,8 @@ HEADERS += \
     frontend/addderivatetransactiondialog/addderivativetransactionsdialog.h \
     frontend/addderivatetransactiondialog/dateeditdelegate.h \
     frontend/addderivatetransactiondialog/doublespinboxdelegate.h \
-    frontend/addderivatetransactiondialog/spinboxdelegate.h
+    frontend/addderivatetransactiondialog/spinboxdelegate.h \
+    frontend/addderivatetransactiondialog/tipodelegate.h
 
 
 #QMAKE_CXXFLAGS += -std=gnu++11

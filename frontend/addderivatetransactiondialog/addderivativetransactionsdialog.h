@@ -4,6 +4,7 @@
 #include <QDialog>
 #include <QTableWidget>
 #include "commonDataTypes.h"
+#include "tipodelegate.h"
 
 namespace Ui {
 class addDerivativeTransactionsDialog;
@@ -13,6 +14,7 @@ class QStandardItemModel;
 class SpinBoxDelegate;
 class DoubleSpinBoxDelegate;
 class DateEditDelegate;
+class TipoDelegate;
 
 class addDerivativeTransactionsDialog : public QDialog
 {
@@ -49,6 +51,7 @@ private:
     QStandardItemModel *m_modelo;
     DoubleSpinBoxDelegate *m_DoubleSpinnerDelegate;
     DateEditDelegate *m_DateEditDelegate;
+    TipoDelegate *m_TipoDelegate;
     std::vector<Category_Structure> cat_struct;
 };
 
