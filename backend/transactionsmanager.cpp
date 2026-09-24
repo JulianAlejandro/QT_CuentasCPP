@@ -385,7 +385,11 @@ void TransactionsManager::insertNewTransaction(T_Structure Ts){
 
     estructuraTB e;
     e.id = Ts.id;
-    e.amount = stod(Ts.values[t_AMOUNT]);
+    double amount = stod(Ts.values[t_AMOUNT]);
+    if (Ts.tipo == "gasto") {
+        amount = -amount;
+    }
+    e.amount = amount;
     e.comment = Ts.values[t_CONCEPT];
     e.currency = Ts.values[t_CURRENCY];
     e.date = Ts.values[t_DATE];
