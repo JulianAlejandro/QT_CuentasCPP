@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>347</width>
-    <height>191</height>
+    <height>221</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -46,6 +46,13 @@
          </property>
         </widget>
        </item>
+       <item>
+        <widget class="QLabel" name="label_5">
+         <property name="text">
+          <string>Tipo</string>
+         </property>
+        </widget>
+       </item>
       </layout>
      </item>
      <item>
@@ -56,7 +63,7 @@
        <item>
         <widget class="QDoubleSpinBox" name="amountDubleSpinBox">
          <property name="minimum">
-          <double>-999999900000.000000000000000</double>
+          <double>0.000000000000000</double>
          </property>
          <property name="maximum">
           <double>999999.000000000000000</double>
@@ -69,6 +76,9 @@
        <item>
         <widget class="QComboBox" name="currencyComboBox"/>
        </item>
+       <item>
+        <widget class="QComboBox" name="tipoComboBox"/>
+       </item>
       </layout>
      </item>
     </layout>
@@ -76,7 +86,7 @@
    <item row="1" column="0">
     <spacer name="horizontalSpacer">
      <property name="orientation">
-      <enum>Qt::Orientation::Horizontal</enum>
+      <enum>Qt::Horizontal</enum>
      </property>
      <property name="sizeHint" stdset="0">
       <size>

@@ -52,11 +52,11 @@ private:
     std::vector<Category_Structure> _current_category_table;
 
     static constexpr std::array<const char*, N_FIELDS_T> TRANSACTION_FIELD_TITLES = {
-        "Date", "Concept", "Amount", "Currency"
+        "Date", "Concept", "Amount", "Currency", "Tipo"
     };
 
     static constexpr std::array<const char*, N_FIELDS_DT> DERIVATIVE_TRANSACTION_FIELD_TITLES = {
-        "Date", "Concept", "Amount", "Category"
+        "Date", "Concept", "Amount", "Category", "Tipo"
     };
 
 

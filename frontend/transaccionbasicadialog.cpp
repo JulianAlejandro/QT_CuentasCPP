@@ -12,6 +12,10 @@ TransaccionBasicaDialog::TransaccionBasicaDialog(QWidget *parent)
     ui->dateEdit->setDate(QDate::currentDate());
     ui->amountDubleSpinBox->setValue(0.0);
 
+    // Configurar combo de tipo
+    ui->tipoComboBox->addItem("ingreso");
+    ui->tipoComboBox->addItem("gasto");
+
     // Configurar formato de fecha si lo deseas
     // ui->dateEdit->setDisplayFormat("yyyy-MM-dd");
 }
@@ -46,6 +50,10 @@ T_Structure TransaccionBasicaDialog::getNewTransaction()
 
     result.values[t_CURRENCY] = selectedCurrency.toStdString();
 
+    // Tipo seleccionado
+    result.tipo = ui->tipoComboBox->currentText().toStdString();
+    result.values[t_TIPO] = result.tipo;
+
     result.processed = false;
 
     // Debug opcional
@@ -53,6 +61,7 @@ T_Structure TransaccionBasicaDialog::getNewTransaction()
     qDebug() << "  Divisa:" << selectedCurrency;
     qDebug() << "  Monto:" << QString::fromStdString(result.values[t_AMOUNT]);
     qDebug() << "  Fecha:" << QString::fromStdString(result.values[t_DATE]);
+    qDebug() << "  Tipo:" << QString::fromStdString(result.tipo);
 
     return result;
 }

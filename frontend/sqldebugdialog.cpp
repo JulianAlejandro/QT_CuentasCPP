@@ -209,7 +209,54 @@ bool SQLDebugDialog::insertCategoriesData()
         return false;
     }
 
-    q.prepare("INSERT INTO categoria (id, nombre, id_padre) VALUES (?, ?, ?)");
+    q.prepare("INSERT INTO categoria (id, nombre, id_padre, tipo) VALUES (?, ?, ?, ?)");
+
+    std::map<int, QString> tiposCategorias = {
+        {0, "ingreso"},
+        {1, "ingreso"},
+        {2, "ingreso"},
+        {3, "ingreso"},
+        {10, "ingreso"},
+        {11, "ingreso"},
+        {12, "ingreso"},
+        {13, "ingreso"},
+        {14, "ingreso"},
+        {4, "gasto"},
+        {5, "gasto"},
+        {15, "gasto"},
+        {16, "gasto"},
+        {17, "gasto"},
+        {18, "gasto"},
+        {19, "gasto"},
+        {20, "gasto"},
+        {21, "gasto"},
+        {6, "gasto"},
+        {7, "gasto"},
+        {22, "gasto"},
+        {23, "gasto"},
+        {24, "gasto"},
+        {25, "gasto"},
+        {26, "gasto"},
+        {27, "gasto"},
+        {28, "gasto"},
+        {29, "gasto"},
+        {30, "gasto"},
+        {31, "gasto"},
+        {32, "gasto"},
+        {33, "gasto"},
+        {34, "gasto"},
+        {35, "gasto"},
+        {36, "gasto"},
+        {37, "gasto"},
+        {38, "gasto"},
+        {39, "gasto"},
+        {40, "gasto"},
+        {41, "gasto"},
+        {42, "gasto"},
+        {43, "gasto"},
+        {44, "gasto"},
+        {45, "gasto"}
+    };
 
     for(const auto& cat : categorias){
         int id = cat.first;
@@ -232,6 +279,7 @@ bool SQLDebugDialog::insertCategoriesData()
         } else {
             q.bindValue(2, QVariant());
         }
+        q.bindValue(3, tiposCategorias[id]);
 
         if(!q.exec()){
             db.rollback();
@@ -277,11 +325,12 @@ bool SQLDebugDialog::insertTransactionsData()
         return false;
     }
 
-    q.prepare("INSERT INTO transaccion_bruta (amount, comment, date, currency, processed) VALUES (?, ?, ?, ?, ?)");
+    q.prepare("INSERT INTO transaccion_bruta (amount, comment, date, currency, processed, tipo) VALUES (?, ?, ?, ?, ?, ?)");
 
     QVariantList amounts = {2500.00, 300.00, 120.50, 45.00, 85.00, 1500.00};
     QStringList comments = {"Salario Enero", "Bonus proyecto", "Compra supermercado", "Cine y cena", "Gasolina", "Salario Febrero"};
     QStringList dates = {"2026-01-31", "2026-01-28", "2026-01-25", "2026-01-20", "2026-01-15", "2026-02-28"};
+    QStringList tiposTB = {"ingreso", "ingreso", "ingreso", "ingreso", "ingreso", "ingreso"};
 
     for(int i = 0; i < amounts.size(); ++i){
         q.bindValue(0, amounts[i]);
@@ -289,19 +338,21 @@ bool SQLDebugDialog::insertTransactionsData()
         q.bindValue(2, dates[i]);
         q.bindValue(3, "EUR");
         q.bindValue(4, false);
+        q.bindValue(5, tiposTB[i]);
         if(!q.exec()){
             db.rollback();
             return false;
         }
     }
 
-    q.prepare("INSERT INTO transaccion_neta (amount, comment, date, id_TB, category_id) VALUES (?, ?, ?, ?, ?)");
+    q.prepare("INSERT INTO transaccion_neta (amount, comment, date, id_TB, category_id, tipo) VALUES (?, ?, ?, ?, ?, ?)");
 
     QVariantList tn_amounts = {2000.00, 500.00, 300.00, 80.00, 40.50, 25.00, 20.00, 85.00, 1500.00, 200.00, 150.00, 60.00};
     QStringList tn_comments = {"Salario", "Freelance", "Bonus", "Supermercado", "Restaurantes", "Cine", "Comida llevar", "Gasolina", "Salario", "Dividendos", "Servicios", "Ropa"};
     QStringList tn_dates = {"2026-01-31", "2026-01-31", "2026-01-28", "2026-01-25", "2026-01-25", "2026-01-20", "2026-01-20", "2026-01-15", "2026-02-28", "2026-01-30", "2026-01-26", "2026-01-18"};
     QVariantList tn_idTB = {1, 1, 2, 3, 3, 4, 4, 5, 6, 2, 3, 4};
     QVariantList tn_catId = {2, 10, 3, 7, 22, 33, 23, 26, 2, 12, 17, 43};
+    QStringList tiposTN = {"ingreso", "ingreso", "ingreso", "gasto", "gasto", "gasto", "gasto", "gasto", "ingreso", "ingreso", "gasto", "gasto"};
 
     for(int i = 0; i < tn_amounts.size(); ++i){
         q.bindValue(0, tn_amounts[i]);
@@ -309,6 +360,7 @@ bool SQLDebugDialog::insertTransactionsData()
         q.bindValue(2, tn_dates[i]);
         q.bindValue(3, tn_idTB[i]);
         q.bindValue(4, tn_catId[i]);
+        q.bindValue(5, tiposTN[i]);
         if(!q.exec()){
             db.rollback();
             return false;

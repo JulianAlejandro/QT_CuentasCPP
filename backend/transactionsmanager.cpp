@@ -12,12 +12,14 @@ T_Structure obtain_TStruct(const estructuraTB& estructuraTB) {
     T_Structure e;
     e.id = estructuraTB.id;
     e.processed = estructuraTB.processed;
+    e.tipo = estructuraTB.tipo;
    // std::array<std::string, e.values.size()> data = {estructuraTB.date, estructuraTB.comment,
    //                                             std::to_string(estructuraTB.amount), estructuraTB.currency};
 
    // for(int i = 0; i < e.values.size(); i++){
     e.values={estructuraTB.date, estructuraTB.comment,
-            std::to_string(estructuraTB.amount), estructuraTB.currency};
+            std::to_string(estructuraTB.amount), estructuraTB.currency,
+            estructuraTB.tipo};
 
     return e;
 }
@@ -26,8 +28,9 @@ DT_Structure obtain_DT_Struct(const estructuraTN& estructuraTN){
     DT_Structure e;
     e.id = estructuraTN.id;
     e.id_T = estructuraTN.id_TB;
+    e.tipo = estructuraTN.tipo;
     e.values = {estructuraTN.date, estructuraTN.comment, std::to_string(estructuraTN.amount),
-                estructuraTN.category_name};
+                estructuraTN.category_name, estructuraTN.tipo};
     return e;
 }
 
@@ -386,6 +389,7 @@ void TransactionsManager::insertNewTransaction(T_Structure Ts){
     e.currency = Ts.values[t_CURRENCY];
     e.date = Ts.values[t_DATE];
     e.processed = Ts.processed;
+    e.tipo = Ts.tipo;
 
     _sqlManager->insertarTransaccionesBruta(e);
 }

@@ -11,6 +11,7 @@ struct estructuraTB {
     std::string date;
     std::string currency;
     bool processed;
+    std::string tipo;
 };
 
 struct estructuraTN {
@@ -21,12 +22,14 @@ struct estructuraTN {
     int id_TB;
     std::string category_name;
     int category_id;
+    std::string tipo;
 };
 
 struct estructuraCategoria {
     int id;
     std::string nombre;
     int id_padre;
+    std::string tipo;
 };
 
 struct estructuraDivisa {
