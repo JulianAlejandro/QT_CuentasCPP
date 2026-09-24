@@ -55,10 +55,23 @@
      <x>0</x>
      <y>0</y>
      <width>859</width>
-     <height>17</height>
+     <height>18</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menuopciones">
+   <widget class="QMenu" name="menuEstadisticas">
+    <property name="title">
+     <string>Estadisticas</string>
+    </property>
+    <addaction name="actionMenu_Estadisticas"/>
+   </widget>
+    <widget class="QMenu" name="menuOpciones">
+     <property name="title">
+      <string>Opciones</string>
+     </property>
+     <addaction name="actionA_adir_transaccion_Basica"/>
+     <addaction name="actionSQL_Debug"/>
+    </widget>
+   <widget class="QMenu" name="archivo">
     <property name="title">
      <string>Archivo</string>
     </property>
@@ -66,19 +79,7 @@
     <addaction name="actionQuitar"/>
     <addaction name="actionQuitar_2"/>
    </widget>
-   <widget class="QMenu" name="menuEstadisticas">
-    <property name="title">
-     <string>Estadisticas</string>
-    </property>
-    <addaction name="actionMenu_Estadisticas"/>
-   </widget>
-   <widget class="QMenu" name="menuOpciones">
-    <property name="title">
-     <string>Opciones</string>
-    </property>
-    <addaction name="actionA_adir_transaccion_Basica"/>
-   </widget>
-   <addaction name="menuopciones"/>
+   <addaction name="archivo"/>
    <addaction name="menuOpciones"/>
    <addaction name="menuEstadisticas"/>
   </widget>
@@ -106,6 +107,11 @@
   <action name="actionA_adir_transaccion_Basica">
    <property name="text">
     <string>Añadir transaccion Basica</string>
+   </property>
+  </action>
+  <action name="actionSQL_Debug">
+   <property name="text">
+    <string>SQL_Debug</string>
    </property>
   </action>
  </widget>

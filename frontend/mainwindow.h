@@ -22,6 +22,7 @@ public:
 
 private slots:
     void on_actionA_adir_transaccion_Basica_triggered();
+    void on_actionSQL_Debug_triggered();
     void onCustomContextMenuRequested(const QPoint &pos);
     void onAddDerivativeTransaction();
 

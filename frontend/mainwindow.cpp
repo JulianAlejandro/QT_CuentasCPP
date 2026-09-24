@@ -3,6 +3,7 @@
 
 #include "frontend/transaccionbasicadialog.h"
 #include "frontend/addderivatetransactiondialog/addderivativetransactionsdialog.h"
+#include "frontend/sqldebugdialog.h"
 #include <QMessageBox>
 #include <QTableWidget>
 #include <QHeaderView>
@@ -85,6 +86,12 @@ void MainWindow::on_actionA_adir_transaccion_Basica_triggered()
     // Si fue Rejected, no hacer nada (implícitamente)
     _last_transactionsloaded = _transactionManager->getTransactions();
     TableUtils::loadTransactionsTableWidget(_ui->tableWidget, _last_transactionsloaded, IdRole);
+}
+
+void MainWindow::on_actionSQL_Debug_triggered()
+{
+    SQLDebugDialog dialog(this);
+    dialog.exec();
 }
 
 void MainWindow::onCustomContextMenuRequested(const QPoint &pos)
