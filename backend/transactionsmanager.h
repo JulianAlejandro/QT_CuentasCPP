@@ -36,7 +36,12 @@ public:
 
     UpdateResult actualizeDerivativeTransactionsWithId_T(const std::vector<DT_Structure>& new_DTs, const int id_t) override;
 
-    void insertNewTransaction(T_Structure Ts) override;
+    int insertNewTransaction(T_Structure Ts) override;
+
+    void insertDefaultDerivativeTransaction(int id_TB,
+                                            const T_Structure& parent,
+                                            int categoryId,
+                                            const std::string& categoryName) override;
 
     std::vector<std::string> getCurrencies() override;
 

@@ -20,7 +20,12 @@ public:
 
     virtual UpdateResult actualizeDerivativeTransactionsWithId_T(const std::vector<DT_Structure>& new_DTs, const int id_t) = 0;
 
-    virtual void insertNewTransaction(T_Structure Ts) = 0;
+    virtual int insertNewTransaction(T_Structure Ts) = 0;
+
+    virtual void insertDefaultDerivativeTransaction(int id_TB,
+                                                    const T_Structure& parent,
+                                                    int categoryId,
+                                                    const std::string& categoryName) = 0;
 
     virtual std::vector<std::string> getCurrencies() = 0;
 

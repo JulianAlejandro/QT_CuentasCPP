@@ -1,6 +1,8 @@
 #include "transaccionbasicadialog.h"
 #include "ui_transaccionbasicadialog.h"
+#include "categorytreewidgetdialog.h"
 #include <QDebug>
+#include <QMessageBox>
 
 TransaccionBasicaDialog::TransaccionBasicaDialog(QWidget *parent)
     : QDialog(parent)
@@ -117,6 +119,50 @@ void TransaccionBasicaDialog::setListCurrencies(const std::vector<std::string> &
     qDebug() << "Cargadas" << list.size() << "divisas en el combobox";
 }
 
+void TransaccionBasicaDialog::setCategoryStructures(const std::vector<Category_Structure> &cats)
+{
+    m_categorias = cats;
+}
+
+int TransaccionBasicaDialog::getSelectedCategoryId() const
+{
+    return m_selectedCategoryId;
+}
+
+std::string TransaccionBasicaDialog::getSelectedCategoryName() const
+{
+    return m_selectedCategoryName;
+}
+
+void TransaccionBasicaDialog::on_categoryPushButton_clicked()
+{
+    if (m_categorias.empty()) {
+        QMessageBox::warning(this, "Aviso", "No hay categorías disponibles.");
+        return;
+    }
+
+    QString tipoFiltro = ui->tipoComboBox->currentText(); // "gasto" | "ingreso"
+
+    categoryTreeWidgetDialog cd(this, m_categorias, tipoFiltro);
+    cd.setWindowTitle("Seleccionar Categoría");
+
+    if (cd.exec() == QDialog::Accepted) {
+        m_selectedCategoryName = cd.getSelectedCategoryName().toStdString();
+        m_selectedCategoryId = cd.getSelectedCategoryId();
+        ui->categoryLineEdit->setText(cd.getSelectedCategoryName());
+    }
+}
+
+void TransaccionBasicaDialog::on_tipoComboBox_currentIndexChanged(int index)
+{
+    Q_UNUSED(index)
+
+    // El tipo cambia de árbol (gasto/ingreso): invalidar la categoría seleccionada
+    m_selectedCategoryId = -1;
+    m_selectedCategoryName.clear();
+    ui->categoryLineEdit->clear();
+}
+
 void TransaccionBasicaDialog::on_buttonBox_accepted()
 {
     // Validación básica antes de aceptar
@@ -129,6 +175,11 @@ void TransaccionBasicaDialog::on_buttonBox_accepted()
     if (ui->amountDubleSpinBox->value() == 0.0) {
         qWarning() << "Monto cero, no se puede aceptar";
         // Podrías mostrar un mensaje al usuario aquí
+        return;
+    }
+
+    if (m_selectedCategoryId == -1) {
+        QMessageBox::warning(this, "Aviso", "Debe seleccionar una categoría.");
         return;
     }
 

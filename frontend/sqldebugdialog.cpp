@@ -327,7 +327,7 @@ bool SQLDebugDialog::insertTransactionsData()
 
     q.prepare("INSERT INTO transaccion_bruta (amount, comment, date, currency, processed, tipo) VALUES (?, ?, ?, ?, ?, ?)");
 
-    QVariantList amounts = {2500.00, 300.00, 120.50, 45.00, 85.00, 1500.00};
+    QVariantList amounts = {2500.00, 300.00, -120.50, -45.00, -85.00, 1500.00};
     QStringList comments = {"Salario Enero", "Bonus proyecto", "Compra supermercado", "Cine y cena", "Gasolina", "Salario Febrero"};
     QStringList dates = {"2026-01-31", "2026-01-28", "2026-01-25", "2026-01-20", "2026-01-15", "2026-02-28"};
     QStringList tiposTB = {"ingreso", "ingreso", "gasto", "gasto", "gasto", "ingreso"};
@@ -347,7 +347,7 @@ bool SQLDebugDialog::insertTransactionsData()
 
     q.prepare("INSERT INTO transaccion_neta (amount, comment, date, id_TB, category_id, tipo) VALUES (?, ?, ?, ?, ?, ?)");
 
-    QVariantList tn_amounts = {2000.00, 500.00, 300.00, 80.00, 40.50, 25.00, 20.00, 85.00, 1500.00, 200.00, 150.00, 60.00};
+    QVariantList tn_amounts = {2000.00, 500.00, 300.00, -80.00, -40.50, -25.00, -20.00, -85.00, 1500.00, 200.00, -150.00, -60.00};
     QStringList tn_comments = {"Salario", "Freelance", "Bonus", "Supermercado", "Restaurantes", "Cine", "Comida llevar", "Gasolina", "Salario", "Dividendos", "Servicios", "Ropa"};
     QStringList tn_dates = {"2026-01-31", "2026-01-31", "2026-01-28", "2026-01-25", "2026-01-25", "2026-01-20", "2026-01-20", "2026-01-15", "2026-02-28", "2026-01-30", "2026-01-26", "2026-01-18"};
     QVariantList tn_idTB = {1, 1, 2, 3, 3, 4, 4, 5, 6, 9, 9, 9};

@@ -18,7 +18,7 @@ public:
     estructuraTB obtenerTransaccionBrutaPorId(int id);
     std::vector<estructuraTB> obtenerTodasTransaccionesBrutas();
     std::vector<estructuraTB> obtenerTransaccionesBrutasPorEstado(bool processed);
-    bool insertarTransaccionesBruta(const estructuraTB& transaccion);
+    int insertarTransaccionesBruta(const estructuraTB& transaccion);
     bool insertarTransaccionesBrutas(const std::vector<estructuraTB>& transacciones);
 
     bool actualizarTransaccionBruta(const estructuraTB& transaccion);

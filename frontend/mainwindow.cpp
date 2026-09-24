@@ -77,11 +77,33 @@ void MainWindow::on_actionA_adir_transaccion_Basica_triggered()
     TransaccionBasicaDialog pd(this);
     pd.setWindowTitle("Transacciones brutas");
     pd.setListCurrencies(_transactionManager->getCurrencies());
+    pd.setCategoryStructures(_transactionManager->getCategoryTable());
 
     // Usar QDialog::Accepted para mayor claridad
     if (pd.exec() == QDialog::Accepted) {
-        // Solo aquí se ejecuta si el usuario hizo clic en OK/Aceptar
-        _transactionManager->insertNewTransaction(pd.getNewTransaction());
+        T_Structure nueva = pd.getNewTransaction();
+        int nuevoIdTB = _transactionManager->insertNewTransaction(nueva);
+
+        if (nuevoIdTB > 0) {
+            // Crear la transacción derivada por defecto vinculada a la bruta recién creada
+            _transactionManager->insertDefaultDerivativeTransaction(
+                nuevoIdTB, nueva, pd.getSelectedCategoryId(), pd.getSelectedCategoryName());
+        } else {
+            QMessageBox::warning(this, "Error", "No se pudo crear la transacción.");
+        }
+
+        // Actualizar tabla de transacciones básicas
+        _last_transactionsloaded = _transactionManager->getTransactions();
+        TableUtils::loadTransactionsTableWidget(_ui->tableWidget, _last_transactionsloaded, IdRole);
+
+        // Actualizar tabla de transacciones derivadas de la transacción recién creada
+        if (nuevoIdTB > 0) {
+            _last_DerivativeTransactionsLoaded =
+                _transactionManager->getDerivativeTransactionsById(nuevoIdTB);
+            TableUtils::loadTransactionsTableWidget(_ui->tableWidget_2,
+                _last_DerivativeTransactionsLoaded, IdRole);
+        }
+        return;
     }
     // Si fue Rejected, no hacer nada (implícitamente)
     _last_transactionsloaded = _transactionManager->getTransactions();

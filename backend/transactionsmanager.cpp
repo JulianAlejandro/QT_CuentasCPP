@@ -381,7 +381,7 @@ std::vector<DT_Structure> TransactionsManager::findNewTransactions(
 }
 
 
-void TransactionsManager::insertNewTransaction(T_Structure Ts){
+int TransactionsManager::insertNewTransaction(T_Structure Ts){
 
     estructuraTB e;
     e.id = Ts.id;
@@ -396,7 +396,30 @@ void TransactionsManager::insertNewTransaction(T_Structure Ts){
     e.processed = Ts.processed;
     e.tipo = Ts.tipo;
 
-    _sqlManager->insertarTransaccionesBruta(e);
+    return _sqlManager->insertarTransaccionesBruta(e);
+}
+
+
+void TransactionsManager::insertDefaultDerivativeTransaction(
+        int id_TB, const T_Structure& parent,
+        int categoryId, const std::string& categoryName)
+{
+    estructuraTN e;
+    e.id = -1;
+
+    double amount = std::stod(parent.values[t_AMOUNT]);
+    if (parent.tipo == "gasto") {
+        amount = -amount;
+    }
+    e.amount = amount;
+    e.comment = parent.values[t_CONCEPT];
+    e.date = parent.values[t_DATE];
+    e.id_TB = id_TB;
+    e.category_name = categoryName;
+    e.category_id = categoryId;
+    e.tipo = parent.tipo;
+
+    _sqlManager->insertarTransaccionesNetas(e);
 }
 
 

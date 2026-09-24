@@ -532,9 +532,9 @@ estructuraDivisa SQLManager::obtenerDivisaPorCodigo(const std::string& codigo)
 }
 
 // Métodos para INSERTAR Transacciones Brutas
-bool SQLManager::insertarTransaccionesBruta(const estructuraTB& transaccion)
+int SQLManager::insertarTransaccionesBruta(const estructuraTB& transaccion)
 {
-    if(!abrirBD()) return false;
+    if(!abrirBD()) return -1;
 
     QSqlQuery q;
     QString queryStr = "INSERT INTO transaccion_bruta (amount, comment, date, currency, processed, tipo) "
@@ -548,15 +548,17 @@ bool SQLManager::insertarTransaccionesBruta(const estructuraTB& transaccion)
     q.bindValue(":processed", transaccion.processed);
     q.bindValue(":tipo", QString::fromStdString(transaccion.tipo));
 
+    int newId = -1;
     bool success = q.exec();
     if(!success){
         qDebug() << "Error insertando transacción bruta:" << q.lastError().text();
     } else {
-        qDebug() << "Transacción bruta insertada correctamente, ID:" << q.lastInsertId().toInt();
+        newId = q.lastInsertId().toInt();
+        qDebug() << "Transacción bruta insertada correctamente, ID:" << newId;
     }
 
     cerrarBD();
-    return success;
+    return newId;
 }
 
 
