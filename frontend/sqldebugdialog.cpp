@@ -330,7 +330,7 @@ bool SQLDebugDialog::insertTransactionsData()
     QVariantList amounts = {2500.00, 300.00, 120.50, 45.00, 85.00, 1500.00};
     QStringList comments = {"Salario Enero", "Bonus proyecto", "Compra supermercado", "Cine y cena", "Gasolina", "Salario Febrero"};
     QStringList dates = {"2026-01-31", "2026-01-28", "2026-01-25", "2026-01-20", "2026-01-15", "2026-02-28"};
-    QStringList tiposTB = {"ingreso", "ingreso", "ingreso", "ingreso", "ingreso", "ingreso"};
+    QStringList tiposTB = {"ingreso", "ingreso", "gasto", "gasto", "gasto", "ingreso"};
 
     for(int i = 0; i < amounts.size(); ++i){
         q.bindValue(0, amounts[i]);
@@ -350,7 +350,7 @@ bool SQLDebugDialog::insertTransactionsData()
     QVariantList tn_amounts = {2000.00, 500.00, 300.00, 80.00, 40.50, 25.00, 20.00, 85.00, 1500.00, 200.00, 150.00, 60.00};
     QStringList tn_comments = {"Salario", "Freelance", "Bonus", "Supermercado", "Restaurantes", "Cine", "Comida llevar", "Gasolina", "Salario", "Dividendos", "Servicios", "Ropa"};
     QStringList tn_dates = {"2026-01-31", "2026-01-31", "2026-01-28", "2026-01-25", "2026-01-25", "2026-01-20", "2026-01-20", "2026-01-15", "2026-02-28", "2026-01-30", "2026-01-26", "2026-01-18"};
-    QVariantList tn_idTB = {1, 1, 2, 3, 3, 4, 4, 5, 6, 2, 3, 4};
+    QVariantList tn_idTB = {1, 1, 2, 3, 3, 4, 4, 5, 6, 9, 9, 9};
     QVariantList tn_catId = {2, 10, 3, 7, 22, 33, 23, 26, 2, 12, 17, 43};
     QStringList tiposTN = {"ingreso", "ingreso", "ingreso", "gasto", "gasto", "gasto", "gasto", "gasto", "ingreso", "ingreso", "gasto", "gasto"};
 

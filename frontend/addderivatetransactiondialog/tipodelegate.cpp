@@ -12,8 +12,8 @@ QWidget* TipoDelegate::createEditor(QWidget* parent, const QStyleOptionViewItem&
     Q_UNUSED(index);
 
     QComboBox* editor = new QComboBox(parent);
-    editor->addItem("Gasto", "gasto");
-    editor->addItem("Ingreso", "ingreso");
+    editor->addItem("gasto"); //, "gasto");
+    editor->addItem("ingreso");//, "ingreso");
     editor->setFocusPolicy(Qt::StrongFocus);
     return editor;
 }
@@ -24,7 +24,13 @@ void TipoDelegate::setEditorData(QWidget* editor, const QModelIndex& index) cons
     if (!combo) return;
 
     QString value = index.model()->data(index, Qt::EditRole).toString();
-    int idx = combo->findData(value);
+    if (value.isEmpty()) {
+        value = index.model()->data(index, Qt::DisplayRole).toString();
+    }
+    int idx = combo->findData(value.toLower());
+    if (idx < 0) {
+        idx = combo->findData(value);
+    }
     if (idx >= 0) {
         combo->setCurrentIndex(idx);
     }
@@ -36,7 +42,7 @@ void TipoDelegate::setModelData(QWidget* editor, QAbstractItemModel* model, cons
     if (!combo) return;
 
     QString value = combo->currentData().toString();
-    QString displayText = combo->currentText();
+    QString displayText = combo->itemText(combo->currentIndex());
 
     QString oldValue = index.data(Qt::EditRole).toString();
 

@@ -80,7 +80,10 @@ void addDerivativeTransactionsDialog::loadTransactionsTableWidget(
         for (size_t col = 0; col < fila.size() && col < static_cast<size_t>(m_modelo->columnCount()); ++col) {
             QString valor = QString::fromStdString(fila[col]);
             QModelIndex idx = m_modelo->index(static_cast<int>(row), static_cast<int>(col));
-            m_modelo->setData(idx, valor);
+            m_modelo->setData(idx, valor, Qt::EditRole);
+            if (col == dt_TIPO) {
+                qDebug() << "Cargando tipo:" << valor << "(length:" << valor.length() << ")";
+            }
         }
 
         m_modelo->setData(
@@ -127,7 +130,7 @@ void addDerivativeTransactionsDialog::onDataChanged(const QModelIndex &topLeft, 
 
 bool addDerivativeTransactionsDialog::validateAmountSum() const
 {
-    if (p_amount <= 0.0) {
+    if (p_amount == 0.0) {
         qDebug() << "Monto padre no establecido o inválido:" << p_amount;
         return false;
     }
@@ -140,7 +143,6 @@ bool addDerivativeTransactionsDialog::validateAmountSum() const
         QVariant data = m_modelo->data(index, Qt::EditRole);
 
         if (!data.isValid() || data.toString().trimmed().isEmpty()) {
-            // Celda vacía, consideramos como 0.0
             continue;
         }
 
@@ -152,7 +154,20 @@ bool addDerivativeTransactionsDialog::validateAmountSum() const
             return false;
         }
 
-        sum += amount;
+        QModelIndex tipoIndex = m_modelo->index(row, dt_TIPO); // Columna 4
+        QVariant tipoData = m_modelo->data(tipoIndex, Qt::EditRole);
+        QString tipo = tipoData.isValid() ? tipoData.toString() : "";
+        qDebug() << "Row:" << row << "Tipo data:" << tipoData << "IsValid:" << tipoData.isValid();
+
+        qDebug() << tipo;
+
+        //if (tipo.toLower() == "gasto") {// cosa extraña rara
+
+        if (tipo == "gasto") {// cosa extraña rara
+            sum -= amount;
+        } else {
+            sum += amount;
+        }
     }
 
     bool isValid = std::abs(sum - p_amount) <= EPSILON;
@@ -322,6 +337,12 @@ std::vector<DT_Structure> addDerivativeTransactionsDialog::getDerivativeTransact
         }
 
         filaDatos.tipo = filaDatos.values[dt_TIPO];
+
+        double amount = std::stod(filaDatos.values[dt_AMOUNT]);
+        if (filaDatos.tipo == "gasto") {
+            amount = -amount;
+        }
+        filaDatos.values[dt_AMOUNT] = std::to_string(amount);
 
         result.push_back(filaDatos);
     }
